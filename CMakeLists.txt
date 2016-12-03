@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 project(linalg_tests)
+set(CMAKE_CXX_STANDARD 14)
 
 #Armadillo
 find_package(Armadillo CONFIG REQUIRED)
@@ -10,6 +11,10 @@ set(LINK_LIBRARIES ${ARMADILLO_LIBRARIES})
 #Eigen
 find_package(Eigen3 CONFIG REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIRS})
+
+#MTL4
+find_package(MTL CONFIG REQUIRED)
+include_directories(${MTL_INCLUDE_DIRS})
 
 #Blaze
 #Currently no CMake support
