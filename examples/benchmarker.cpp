@@ -66,6 +66,7 @@ struct eigen_kernel
 int main()
 {
     benchmarker benchmark;
+    benchmark.set_cache_size(8 * 1024 * 1024);
     int rows = 200, cols = 100;
     int iters = 100;
 

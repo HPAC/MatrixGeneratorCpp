@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <ostream>
 #include <tuple>
+#include <memory>
+#include <random>
 
 namespace linalg_tests {
 
@@ -90,6 +92,10 @@ namespace linalg_tests {
         uint32_t clocks_count;
         int clocks_reserved;
 
+        // cache trash
+        std::unique_ptr<double> cache_trash;
+        uint32_t trash_size;
+
         const std::string output_separator = "\t";
 
         const int TOTAL_TIME = -1;
@@ -100,9 +106,26 @@ namespace linalg_tests {
                 clock_measurements(1),
                 clocks(1),
                 clocks_count(1),
-                clocks_reserved(0)
+                clocks_reserved(0),
+                cache_trash(nullptr)
         {
 
+        }
+
+        /// Pass L3 cache size in bytes
+        /// \param l3_size
+        void set_cache_size(int l3_size)
+        {
+            trash_size = l3_size / sizeof(double);
+            cache_trash.reset(new double[trash_size]);
+
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<> dis(0, 1);
+            std::for_each(cache_trash.get(), cache_trash.get() + trash_size,
+                [&](double & val) {
+                   val = dis(gen);
+                });
         }
 
         void reserve_clocks(int count)
@@ -153,13 +176,16 @@ namespace linalg_tests {
 
             for (uint32_t i = 0; i < iters; ++i) {
                 clocks_count = clocks_reserved + 1;
+                trash_cache();
+
                 start_clock(TOTAL_TIME);
                 //auto begin = std::clock();
                 detail::call_helper::call(*this, std::forward<F>(f), std::forward<Args>(args)...);
                 //double time_spent = (double)(std::clock() - begin) / CLOCKS_PER_SEC;
                 //stop_clock();
                 stop_clock(TOTAL_TIME);
-                //std::cout << /*C.norm() <<*/ " " << time_spent << std::endl;
+
+                //std::cout << time_spent << std::endl;
 
                 for (size_t j = 0; j < clocks_count; ++j)//{
                     data[j * iters + i] = clock_measurements[j];
@@ -211,6 +237,16 @@ namespace linalg_tests {
         }
 
     private:
+
+        void trash_cache()
+        {
+            if(cache_trash) {
+                std::for_each(cache_trash.get(), cache_trash.get() + trash_size,
+                    [](double & val) {
+                      val += 0.01;
+                    });
+            }
+        }
 
         void print(std::ostream & os, const std::string & label, const measurement_data & data)
         {
