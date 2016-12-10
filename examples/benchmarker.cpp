@@ -47,7 +47,7 @@ struct eigen_kernel
     eigen_kernel(benchmarker & b_) :
             b(b_) {}
 
-    Eigen::MatrixXd operator()(int rows, int cols)
+    void operator()(int rows, int cols)
     {
         // Note that we can rely on increasing indices, remembering is not necessary
         b.start_clock( b.add_clock() );
@@ -57,12 +57,8 @@ struct eigen_kernel
         b.stop_clock();
 
         b.start_clock(b.add_clock());
-        auto C = A * B.transpose();
-        // TODO: remove when non-lazy evaluation is implemented
-        C(0,0);
+        auto C = (A * B.transpose()).eval();
         b.stop_clock();
-
-        return C;
     }
 
 };
