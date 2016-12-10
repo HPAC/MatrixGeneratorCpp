@@ -26,7 +26,7 @@ namespace linalg_tests {
             }
 
             template<typename Duration, typename F, typename... Args>
-            static auto call(basic_benchmarker<Duration> & b, F && f, Args &&... args)
+            static auto call(basic_benchmarker<Duration> &, F && f, Args &&... args)
             -> std::result_of_t<F(Args...)>
             {
                 return f(std::forward<Args>(args)...);
@@ -87,7 +87,7 @@ namespace linalg_tests {
         typedef std::chrono::high_resolution_clock clock_t2;
         std::vector<double> clock_measurements;
         std::vector<typename clock_t2::time_point> clocks;
-        int clocks_count;
+        uint32_t clocks_count;
         int clocks_reserved;
 
         const std::string output_separator = "\t";
@@ -97,8 +97,8 @@ namespace linalg_tests {
     public:
 
         basic_benchmarker() :
-                clocks(1),
                 clock_measurements(1),
+                clocks(1),
                 clocks_count(1),
                 clocks_reserved(0)
         {
@@ -107,17 +107,17 @@ namespace linalg_tests {
 
         void reserve_clocks(int count)
         {
-            //clocks.resize(count + 1);
+            clocks.resize(count + 1);
             clocks_reserved = count;
         }
 
         int add_clock()
         {
             ++clocks_count;
-            //if(clocks_count > clocks.size()) {
-                //clocks.emplace_back();
-            //    clock_measurements.emplace_back();
-            //}
+            if(clocks_count > clocks.size()) {
+                clocks.emplace_back();
+                clock_measurements.emplace_back();
+            }
             // At least one clock is present (system) + one user-defined
             // First id should be zero
             return clocks_count - 2;
@@ -125,15 +125,15 @@ namespace linalg_tests {
 
         void start_clock(int id)
         {
-            //clocks[id + 1] = clock_t2::now();
+            clocks[id + 1] = clock_t2::now();
         }
 
         void stop_clock(int id)
         {
             auto x = clock_t2::now();
-            /*clock_measurements[id + 1] = std::chrono::duration_cast<Duration>(
+            clock_measurements[id + 1] = std::chrono::duration_cast<Duration>(
                     x - clocks[id + 1]
-                ).count();*/
+                ).count();
         }
 
         void stop_clock()
@@ -153,11 +153,12 @@ namespace linalg_tests {
 
             for (uint32_t i = 0; i < iters; ++i) {
                 clocks_count = clocks_reserved + 1;
-                //start_clock(TOTAL_TIME);
+                start_clock(TOTAL_TIME);
                 //auto begin = std::clock();
                 detail::call_helper::call(*this, std::forward<F>(f), std::forward<Args>(args)...);
                 //double time_spent = (double)(std::clock() - begin) / CLOCKS_PER_SEC;
-                //stop_clock(TOTAL_TIME);
+                //stop_clock();
+                stop_clock(TOTAL_TIME);
                 //std::cout << /*C.norm() <<*/ " " << time_spent << std::endl;
 
                 for (size_t j = 0; j < clocks_count; ++j)//{
@@ -216,11 +217,11 @@ namespace linalg_tests {
             os << "Clock: " << output_separator << label << '\n';
             os << "Average: " << output_separator << data.avg() << '\n';
             os << "Standard deviation: " << data.std_dev() << output_separator
-               << (data.avg() - data.std_dev()) / data.avg() << "% \n";
+               << 100 * data.std_dev() / data.avg() << "% \n";
             os << "Best: " << output_separator << data.min() << output_separator
-               << (data.min() - data.avg()) / data.avg() << "% \n";
+               << 100*(data.min() - data.avg()) / data.avg() << "% \n";
             os << "Worst: " << output_separator << data.max() << output_separator
-               << "+" << (data.max() - data.avg()) / data.avg() << "% \n";
+               << "+" << 100*(data.max() - data.avg()) / data.avg() << "% \n";
         }
 
     };
