@@ -88,8 +88,8 @@ int main()
 
     // Allocate clocks before run
     // Run a lambda expression without args - capture everything
-    //benchmark.reserve_clocks(2);
-    /*benchmark.run(10,
+    benchmark.reserve_clocks(2);
+    benchmark.run(100,
                   [=, &benchmark]() {
                       benchmark.start_clock(0);
                       arma::mat A = arma::randu<arma::mat>(rows, cols);
@@ -97,9 +97,9 @@ int main()
                       benchmark.stop_clock(0);
 
                       benchmark.start_clock(1);
-                      A * B.t();
+                      (A * B.t() ).eval();
                       benchmark.stop_clock(1);
-                  });*/
+                  });
 
     std::array<std::string, 3> labels{"Blaze", "Eigen", "Armadillo"};
     std::array<std::string, 2> clock_labels{"Initialization", "Computation"};
