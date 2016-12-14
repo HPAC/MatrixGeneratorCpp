@@ -168,6 +168,7 @@ namespace linalg_tests {
         void run(uint32_t iters, F && f, Args &&... args)
         {
             clocks_count = clocks_reserved + 1;
+            std::fill(clock_measurements.begin(), clock_measurements.end(), 0.0);
 
             // First run
             detail::call_helper::call(*this, std::forward<F>(f), std::forward<Args>(args)...);
