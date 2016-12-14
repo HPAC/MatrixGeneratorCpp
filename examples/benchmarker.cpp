@@ -12,27 +12,36 @@
 
 using linalg_tests::benchmarker;
 
+
+
 /// Blaze kernel as a function
+/// Random initialization takes more time due to:
+/// a) lack of randomly initialized matrices
+/// b) unnecessary copy caused by forEach being an expression
+///   evaluated on assignment
+/// \param b
+/// \param rows
+/// \param cols
+/// \return
 blaze::DynamicMatrix<double> blaze_kernel(benchmarker & b, int rows, int cols)
 {
     int idx = b.add_clock();
-    auto begin = std::clock();
+    //auto begin = std::clock();
     b.start_clock( idx );
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
     blaze::DynamicMatrix<double> A(rows, cols);
-    blaze::forEach(A, [&](double) { return dis(gen); });
+    A = blaze::forEach(A, [&](double) { return dis(gen); });
     blaze::DynamicMatrix<double> B(rows, cols);
-    blaze::forEach(B, [&](double) { return dis(gen); });
+    B = blaze::forEach(B, [&](double) { return dis(gen); });
     b.stop_clock(idx);
-    double time_spent = (double)(std::clock() - begin) / CLOCKS_PER_SEC;
-    std::cout << time_spent << std::endl;
+    //double time_spent = (double)(std::clock() - begin) / CLOCKS_PER_SEC;
+    //std::cout << time_spent << std::endl;
 
     b.start_clock(b.add_clock());
-    auto C = A * blaze::trans(B);
-    // TODO: remove when non-lazy evaluation is implemented
-    C(0,0);
+    // TODO: remove when better non-lazy evaluation is implemented
+    blaze::DynamicMatrix<double> C = blaze::eval(A * blaze::trans(B));
     // Use the feature of stopping last clock
     b.stop_clock();
 
@@ -71,7 +80,7 @@ int main()
     int iters = 100;
 
     // Run a function with additional args
-    //benchmark.run(iters, blaze_kernel, rows, cols);
+    benchmark.run(iters, blaze_kernel, rows, cols);
 
     // Run a functor without benchmark arg
     eigen_kernel k(benchmark);
