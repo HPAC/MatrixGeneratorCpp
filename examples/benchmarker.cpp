@@ -23,10 +23,9 @@ using linalg_tests::benchmarker;
 /// \param rows
 /// \param cols
 /// \return
-blaze::DynamicMatrix<double> blaze_kernel(benchmarker & b, int rows, int cols)
+void blaze_kernel(benchmarker & b, int rows, int cols)
 {
     int idx = b.add_clock();
-    //auto begin = std::clock();
     b.start_clock( idx );
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -36,16 +35,12 @@ blaze::DynamicMatrix<double> blaze_kernel(benchmarker & b, int rows, int cols)
     blaze::DynamicMatrix<double> B(rows, cols);
     B = blaze::forEach(B, [&](double) { return dis(gen); });
     b.stop_clock(idx);
-    //double time_spent = (double)(std::clock() - begin) / CLOCKS_PER_SEC;
-    //std::cout << time_spent << std::endl;
 
     b.start_clock(b.add_clock());
     // TODO: remove when better non-lazy evaluation is implemented
     blaze::DynamicMatrix<double> C = blaze::eval(A * blaze::trans(B));
     // Use the feature of stopping last clock
     b.stop_clock();
-
-    return C;
 }
 
 /// Eigen kernel as a function object
@@ -72,6 +67,18 @@ struct eigen_kernel
 
 };
 
+void arma_kernel(benchmarker & b, int rows, int cols)
+{
+    b.start_clock(0);
+    arma::mat A = arma::randu<arma::mat>(rows, cols);
+    arma::mat B = arma::randu<arma::mat>(rows, cols);
+    b.stop_clock(0);
+
+    b.start_clock(1);
+    auto C = (A * B.t() ).eval();
+    b.stop_clock(1);
+}
+
 int main()
 {
     benchmarker benchmark;
@@ -89,7 +96,7 @@ int main()
     // Allocate clocks before run
     // Run a lambda expression without args - capture everything
     benchmark.reserve_clocks(2);
-    benchmark.run(100,
+    benchmark.run(iters,
                   [=, &benchmark]() {
                       benchmark.start_clock(0);
                       arma::mat A = arma::randu<arma::mat>(rows, cols);
@@ -97,11 +104,34 @@ int main()
                       benchmark.stop_clock(0);
 
                       benchmark.start_clock(1);
-                      (A * B.t() ).eval();
+                      auto C = (A * B.t() ).eval();
                       benchmark.stop_clock(1);
                   });
 
-    std::array<std::string, 3> labels{"Blaze", "Eigen", "Armadillo"};
+    benchmark.run(iters,
+                  [=, &benchmark]() {
+                      benchmark.start_clock(0);
+                      std::random_device rd;
+                      std::mt19937 gen(rd());
+                      std::uniform_real_distribution<> dis(0, 1);
+                      mtl::mat::dense2D<double> A(rows, cols);
+                      std::for_each(A.address_data(), A.address_data() + rows*cols,
+                                    [&](double & val) {
+                                        val = dis(gen);
+                                    });
+                      mtl::mat::dense2D<double> B(rows, cols);
+                      std::for_each(B.address_data(), B.address_data() + rows*cols,
+                                    [&](double & val) {
+                                        val = dis(gen);
+                                    });
+                      benchmark.stop_clock(0);
+
+                      benchmark.start_clock(1);
+                      auto C = mtl::traits::evaluate(A * mtl::mat::trans(B) );
+                      benchmark.stop_clock(1);
+                  });
+
+    std::array<std::string, 4> labels{"Blaze", "Eigen", "Armadillo", "MTL4"};
     std::array<std::string, 2> clock_labels{"Initialization", "Computation"};
 
     benchmark.print_results(std::cout, labels, clock_labels);
