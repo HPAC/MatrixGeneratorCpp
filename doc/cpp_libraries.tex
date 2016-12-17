@@ -192,9 +192,17 @@
 \subsubsection{Forced evaluation}
 \begin{itemize}
 \item \textbf{MTL4} mtl::traits::evaluate \\
-\item \textbf{Eigen} mtl::traits::evaluate \\
-\item \textbf{MTL4} mtl::traits::evaluate \\
-\item \textbf{Blaze} there is a function which does not work \\
+\item \textbf{Eigen} \textit{expression}.eval() \\
+\item \textbf{Armadillo} \textit{expression}.eval() \\
+\item \textbf{Blaze} there is a function which does not work, created issue \\
+\end{itemize}
+
+\subsubsection{Aliasing}
+\begin{itemize}
+\item \textbf{MTL4} no information in docs \\
+\item \textbf{Eigen} no checking, only default in GEMM, introduces a temporary. result matrix should be called with .noalias() to disable this feature\\ 
+\item \textbf{Armadillo} implements aliasing check, no information about  \\
+\item \textbf{Blaze} no clear information, it may not be a problem \\
 \end{itemize}
 
 
