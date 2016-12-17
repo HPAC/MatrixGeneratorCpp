@@ -1,0 +1,201 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{pbox}
+\usepackage{float}
+\usepackage{placeins}
+
+\title{Linear algebra libraries in C++}
+
+\begin{document}
+
+\maketitle
+
+\newcommand{\template}[2]{#1 $\langle$ #2 $\rangle$} 
+\section{Basic information}
+
+\subsection{MTL4}
+
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|c|c|}
+  \hline
+  Library type & Only template headers \\
+  \hline
+  Build type & No build, CMake config files \\
+  \hline
+  Namespace & mtl \\
+  \hline
+  Vector type & \template{dense\_vector}{T} \\
+  \hline
+  Matrix type & \template{dense2D}{T} or \template{matrix}{T} \\
+  \hline
+  Default ordering & row-major \\
+  \hline
+  Special types & \pbox{20cm}{banded and triangular views, but not suitable for HPC \\ compressed matrix (sparse) advised for triangular\footnote{ \url{http://www.simunova.com/docs/mtl4/html/banded__matrices.html} } } \\
+  \hline
+  Predefined generators & Only diagonal, Hessian and Laplacian\\
+  \hline
+\end{tabular}}
+\end{table}
+
+\subsection{Armadillo}
+
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|c|c|}
+  \hline
+  Library type & Template headers and shared library \\
+  \hline
+  Build type & CMake build + CMake config file \\
+  \hline
+  Namespace & arma \\
+  \hline
+  Vector type & \template{Row}{T} or \template{Col}{T} \\
+  \hline
+  Matrix type & \pbox{20cm}{\template{Mat}{T} or mat, fmat, cx\_mat, cx\_fmat \\ other templated types may not be allowed \\ for functions depending on LAPACK or ATLAS } \\
+  \hline
+  Default ordering & column-major \textbf{ONLY} \\
+  \hline
+  Special types & None mentioned in documentation \\
+  \hline
+  Predefined generators & \pbox{20cm}{Fill constructors (one, zero, eye, rand) \\ Generators: eye, linspace, one, rand, Toeplitz}\\
+  \hline
+\end{tabular}}
+\end{table}
+
+\subsection{Eigen}
+
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|c|c|}
+  \hline
+  Library type & Template\footnote{Lib removed} \\
+  \hline
+  Build type & CMake build + CMake config file \\
+  \hline
+  Namespace & Eigen \\
+  \hline
+  Vector type & VectorXf/d or RowVectorXf/d \\
+  \hline
+  Matrix type & MatriXf/d \\
+  \hline
+  Default ordering & column-major \\
+  \hline
+  Special types & \pbox{20cm}{DiagonalMatrix, triangular view through \\ triangularView(), selfadjointView()} \\
+  \hline
+  Predefined generators & Zero, Ones, Constant, Random \\
+  \hline
+\end{tabular}}
+\end{table}
+
+\FloatBarrier
+
+\subsection{Blaze}
+
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|c|c|}
+  \hline
+  Library type & Template \\
+  \hline
+  Build type & None, configured Makefile for unused library \\
+  \hline
+  Namespace & blaze \\
+  \hline
+  Vector type & \template{DynamicVector}{T, (rowVector, columnVector)} \\
+  \hline
+  Matrix type & \template{DynamicMatrix}{T, (rowMajor, columnMajor)} \\
+  \hline
+  Default ordering & row-major\\
+  \hline
+  Special types & Adaptors for triangle and symmetric matrices \\
+  \hline
+  Predefined generators & None\\
+  \hline
+\end{tabular}}
+\end{table}
+
+
+\section{Matrix operations}
+
+\begin{itemize}
+\item \textbf{G}lobal - function in library namespace
+\item \textbf{O}bject - method defined in object
+\item \textbf{N}one 
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{I}nplace - modify current object
+\item \textbf{R}eturn - new value or object
+\end{itemize}
+
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|c|c|c|c|c|}
+  \hline
+  - & MTL4 & Armadillo & Eigen & Blaze \\
+  \hline
+  Norm & \textbf{GR} & \textbf{GR} & \textbf{OR} & \textbf{N} \\ 
+  \hline
+  Norms & 1, 2, Inf, Frobenius & 1, 2, Inf, Fro & Euclidian & \textbf{N} \\
+  \hline
+  Normalize & \textbf{N} & \textbf{GR} & \textbf{OI}, \textbf{OR} & \textbf{N} \\ 
+  \hline
+  Trace & \textbf{GR} & \textbf{GR} & \textbf{OR} & \textbf{N} \\
+  \hline
+  Transpose, conjugate & \textbf{GR} & \textbf{GR} & \textbf{OI}, \textbf{OR} & \textbf{OI}, \textbf{OR} \\
+  \hline
+  Determinant & \textbf{N} & \textbf{GR} & \textbf{OR} & \textbf{GR} \\
+  \hline
+  Inversion & \textbf{GR} & \textbf{GR}, \textbf{GI}, \textbf{OI} & \textbf{OR} & \textbf{GR},\textbf{OR} \\
+  \hline
+  Inversion algorithms & ? & Pseudoinverse on SVD & LU only & LU, Cholesky, Bunch-Kaufman \\
+  \hline
+\end{tabular}}
+\end{table}
+
+\subsection{Decompositions}
+
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|c|c|c|c|c|}
+  \hline
+  - & MTL4 & Armadillo & Eigen & Blaze \\
+  \hline
+  LU & lu & lu & \template{FullPivLU}{T} and PartialPivLU & lu \\
+  \hline
+  Cholesky & No & chol & \textbf{llt and ldlt} & llh \\
+  \hline
+  QR & No & qr & \textbf{householderQr} & qr \\
+  \hline
+  SVD & svd & svd & \textbf{jacobiSVD and BDCSVD} & No \\
+  \hline
+  Schur & No & schur & No & No \\
+  \hline
+  LE solver & lu\_solve & solve & Multiple solvers & LAPACK bindings\\
+  \hline
+\end{tabular}}
+\end{table}
+
+\FloatBarrier
+
+\subsection{Expression Templates}
+
+\subsubsection{Forced evaluation}
+\begin{itemize}
+\item \textbf{MTL4} mtl::traits::evaluate \\
+\item \textbf{Eigen} mtl::traits::evaluate \\
+\item \textbf{MTL4} mtl::traits::evaluate \\
+\item \textbf{Blaze} there is a function which does not work \\
+\end{itemize}
+
+
+\end{document}
