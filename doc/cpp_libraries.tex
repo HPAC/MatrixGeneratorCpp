@@ -6,6 +6,57 @@
 \usepackage{float}
 \usepackage{placeins}
 
+% Begin Listings for C++
+\usepackage{color}
+\usepackage{float}
+\usepackage{listings}
+\lstloadlanguages{C++}
+
+\lstset{
+language=C++,                       % choose the language of the code
+basicstyle=\footnotesize\ttfamily,  % the size of the fonts that are used for the
+                                    % code
+%numbers=left,                       % where to put the line-numbers
+numberstyle=\tiny,                  % the size of the fonts that are used for the
+                                    % line-numbers
+stepnumber=1,                       % the step between two line-numbers. If it's
+                                    % 1 each line will be numbered
+numbersep=5pt,                      % how far the line-numbers are from the code
+%backgroundcolor=\color{gray},      % choose the background color. You must add
+                                    % \usepackage{color}
+showspaces=false,                   % show spaces adding particular underscores
+showstringspaces=false,             % underline spaces within strings
+showtabs=false,                     % show tabs within strings adding particular
+                                    % underscores
+keywordstyle=\bfseries\color{darkblue},  % color of the keywords
+commentstyle=\color{darkgreen},     % color of the comments
+stringstyle=\color{darkred},        % color of strings
+captionpos=b,                       % sets the caption-position to top
+tabsize=2,                          % sets default tabsize to 2 spaces
+frame=tb,                       % adds a frame around the code
+breaklines=true,                    % sets automatic line breaking
+breakatwhitespace=false,            % sets if automatic breaks should only happen
+                                    % at whitespace
+escapechar=\%,                      % toggles between regular LaTeX and listing
+belowskip=0.3cm,                    % vspace after listing
+morecomment=[s][\bfseries\color{darkblue}]{struct}{\ },
+morecomment=[s][\bfseries\color{darkblue}]{class}{\ },
+morecomment=[s][\bfseries\color{darkblue}]{public:}{\ },
+morecomment=[s][\bfseries\color{darkblue}]{public}{\ },
+morecomment=[s][\bfseries\color{darkblue}]{protected:}{\ },
+morecomment=[s][\bfseries\color{darkblue}]{private:}{\ },
+morecomment=[s][\bfseries\color{black}]{operator+}{\ },
+xleftmargin=0.1cm,
+%xrightmargin=0.1cm,
+}
+\newfloat{code}{H}{myc}
+\definecolor{darkblue}{rgb}{0,0,.6}
+\definecolor{darkred}{rgb}{.6,0,0}
+\definecolor{darkgreen}{rgb}{0,.6,0}
+\definecolor{red}{rgb}{.98,0,0}
+\definecolor{gray}{rgb}{.6,.6,.6}
+% End Listings for C++
+
 \title{Linear algebra libraries in C++}
 
 \begin{document}
@@ -187,6 +238,84 @@
 
 \FloatBarrier
 
+\section{Datatypes}
+
+\subsection{Special matrix types}
+
+We consider the problem of defining storage for temporal results in a sequence of operations. This problem is unknown in dynamically typed languages such as MATLAB or Python but it becomes an issue strongly static environment of C++. 
+
+\begin{code}[h]
+\begin{lstlisting}[
+    caption={Sequence of linear algebra operations.},
+    label={lst:sequence}]
+typedef /** **/ matrix_t;
+matrix_t A = init(), B = init(), D = init();
+matrix_t C = f(A, B);
+matrix_t E = g(C, D);
+\end{lstlisting}
+\end{code}
+
+The programmer is required to explicitly define matrix type at each stage of operation. \textit{matrix\_t} refers to a general dynamic matrix type defined by the library. If the user input in \textit{init} function includes matrix properties, such as symmetry, triangularity or tridiagonality, those properties may be preserved in operations defined in functions \textit{f} and \textit{g}. We find three questions here: how to create and define matrices with special types, does the library preserve and reuse the information about matrix to optimize computations and how can we define matrices \textit{C} and \textit{E} without preventing library from applying optimized algorithms?
+
+Expression Templates and its compile-time type deduction implies separate types to store additional information on matrices. If an additional type is introduced, e.g. \textit{matrix\_symm\_t}, definition of matrix C becomes problematic. Type must be known at compilation time and it becomes the user responsibility to analyze function \textit{f} and decide whether \textit{matrix\_t}, \textit{matrix\_symm\_t} or any other type is suitable at that moment. If the user declares a special matrix type conflicting with results from \textit{f}, e.g. generic matrix is assigned to a symmetric one, program may fail to compile due to lack of assignment operator, it may introduce unnecessary overhead caused by a runtime test to verify if assignment operation is valid or in libraries without such facility the results may be incorrect. A safer and less involving for the user options is to use generic matrix everywhere. However when a different type is returned from \textit{f} will have two consequences: potential optimizations for symmetric matrices in \textit{g} are not applied and assignment to generic matrix from a special type may result in an unnecessary call to copy constructor.
+
+C++11 introduced keyword \textit{auto} for automatic type deduction. Direct application of \textit{auto} in Expression Templates is going to deduce node type representing computation. It may defer computations due to lazy evaluation policy and it is generally not advised to use auto with ET libraries\cite{eigenAuto}. It seems that this issue may be resolved with enforced evaluation.
+
+\begin{code}[h]
+\begin{lstlisting}[
+    caption={Auto keyword.},
+    label={lst:sequence}]
+typedef /** **/ matrix_t;
+matrix_t A = init(), B = init(), D = init();
+// May be unsafe, impossible to benchmark
+auto C = f(A, B);
+// Should be safe
+auto D = evaluate(f(A,B));
+\end{lstlisting}
+\end{code}
+
+\begin{itemize}
+\item how to create matrices with special properties?
+\item is the library capable of using this information at different stages of computation? 
+\item how to \textit{dynamically} define matrices?
+\end{itemize}
+
+\subsubsection{Blaze}
+Information valid at December 2016.
+\begin{itemize}
+\item adaptors to create symmetric, Hermitian and triangular matrices\cite{blazeAdaptors}
+\item yes\cite{blazeEval}
+\item we have requested this feature and it is quite straightforward due to result type defined in each ET node\cite{blazeEval}
+\end{itemize}
+
+Special matrix types:
+\begin{itemize}
+\item \textbf{SymmetricMatrix} \\
+Symmetry is enforced when entries are modified. It doesn't matter which part of matrix is filled.
+\item \textbf{HermitianMatrix} \\
+Hermitian symmetry is enforced when entries are modified. It doesn't matter which part of matrix is filled.
+\item \textbf{TriangularMatrix} \\
+For \textbf{Lower} and \textbf{Upper}: XMatrix, UniXMatrix with diagonal elements equal to one, StrictlyXMatrix with zeros on diagonal and a DiagonalMatrix 
+\end{itemize}
+
+\subsubsection{Eigen}
+Information valid at December 2016. \\
+\begin{itemize}
+\item views for symmetric, Hermitian and triangular matrices\cite{eigenViewSymm}\cite{eigenViewTriang}; no support for band matrices\cite{eigenBand}
+\item rather unlikely\cite{eigenEval}
+\item we have not been given a clear answer\cite{eigenEval}, documentation on auto keyword suggests that evaluation \textit{expression}.eval() should be safe
+\end{itemize}
+
+The main drawback of their model is that views are not standalone objects. Not only it makes impossible to save information about triangularity or symmetry in a new matrix but it makes much harder to implement a generator of matrices. A view should be used in computations but the underlying matrix has to be kept alive. Possible solutions: a generator object storing references to all special matrices and returning only views, a wrapper storing both matrix and view and implementing the necessary matrix interface, inheriting from Eigen matrix type.
+
+The interface of matrix views is rather limited and may not be sufficient for some applications.
+\begin{itemize}
+\item \textbf{SelfAdjointView} \\
+May refer to either Lower or Upper part of matrix; 'opposite triangular part is never referenced and can be used to store other information'
+\item \textbf{TriangularView} \\
+For \textbf{Lower} and \textbf{Upper} additionally: UnitX and StrictlyX. 
+\end{itemize}
+
 \subsection{Expression Templates}
 
 \subsubsection{Forced evaluation}
@@ -204,6 +333,41 @@
 \item \textbf{Armadillo} implements aliasing check, no information about  \\
 \item \textbf{Blaze} no clear information, it may not be a problem \\
 \end{itemize}
+
+\subsubsection{Imported datatype}
+\begin{itemize}
+\item \textbf{MTL4} no information in docs \\
+\item \textbf{Eigen} \\ 
+\item \textbf{Armadillo} implements aliasing check, no information about  \\
+\item \textbf{Blaze} no clear information, it may not be a problem \\
+\end{itemize}
+
+
+\begin{thebibliography}{9}
+
+\bibitem{blazeAdaptors}
+\url{https://bitbucket.org/blaze-lib/blaze/wiki/Adaptors}
+
+\bibitem{blazeEval}
+\url{https://bitbucket.org/blaze-lib/blaze/issues/72/functionality-to-enforce-non-lazy}
+
+\bibitem{eigenViewSymm}
+\url{https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointView.html}
+
+\bibitem{eigenViewTriang}
+\url{https://eigen.tuxfamily.org/dox/classEigen_1_1TriangularView.html}
+
+\bibitem{eigenAuto}
+\url{https://eigen.tuxfamily.org/dox/TopicPitfalls.html}
+
+\bibitem{eigenBand}
+\url{https://forum.kde.org/viewtopic.php?f=74&t=130666}
+
+\bibitem{eigenEval}
+\url{https://forum.kde.org/viewtopic.php?f=74&t=137795}
+
+\end{thebibliography}
+
 
 
 \end{document}
