@@ -316,6 +316,16 @@ May refer to either Lower or Upper part of matrix; 'opposite triangular part is 
 For \textbf{Lower} and \textbf{Upper} additionally: UnitX and StrictlyX. 
 \end{itemize}
 
+\subsubsection{MTL4}
+Information valid at December 2016. \\
+\begin{itemize}
+\item no support for symmetry, views for banded and triangular matrices\cite{mtlView} but they are not advised: 'this is not recommended in high-performance applications because the lower triangle is still traversed while returning zero values'; 
+\item very unlikely
+\item auto is possible to use\cite{mtlAuto} with mtl::traits::evaluate; latter feature is not properly documented hence we may not rely on it completely
+\end{itemize}
+
+There seems to be no native support for defining matrices with specific properties.
+
 \subsection{Expression Templates}
 
 \subsubsection{Forced evaluation}
@@ -365,6 +375,12 @@ For \textbf{Lower} and \textbf{Upper} additionally: UnitX and StrictlyX.
 
 \bibitem{eigenEval}
 \url{https://forum.kde.org/viewtopic.php?f=74&t=137795}
+
+\bibitem{mtlAuto}
+\url{http://www.simunova.com/docs/mtl4/html/cppeleven__intro.html}
+
+\bibitem{mtlView}
+\url{http://www.simunova.com/docs/mtl4/html/banded__matrices.html}
 
 \end{thebibliography}
 
