@@ -326,6 +326,24 @@ Information valid at December 2016. \\
 
 There seems to be no native support for defining matrices with specific properties.
 
+\subsection{Imported datatypes}
+
+\subsubsection{Blaze}
+
+Imported matrix is blaze::CustomMatrix\cite{blazeCustom} \\
+There are two important template parameters for custom matrices: \textbf{alignment} and \textbf{padding} for vectorized instructions. Either memory is allocated with dedicated Blaze allocator (or any other allocator aligning memory) or memory allocation process is shifted to matrix. Alignment may have an impact on performance, padding definitely has a significant positive impact according to Blaze.\\
+However, padding makes initialization much harder. It may be easier to just perform copy from an unpadded memory storage. Thus one can reuse initialization procedure with other libraries.
+
+\subsubsection{Eigen}
+Imported matrix is eigen::Map\cite{eigenImport} \\
+Array may be aligned or unaligned.
+
+\subsubsection{Armadillo}
+One can initialize a matrix from an array\cite{armaImport}, with or without an additional allocation. No information about alignment or padding.
+
+\subsubsection{MTL4}
+No clear information in documentation, only that a matrix may be initialized from a regular array\cite{mtlImport}. No information about alignment or padding.
+
 \subsection{Expression Templates}
 
 \subsubsection{Forced evaluation}
@@ -344,14 +362,6 @@ There seems to be no native support for defining matrices with specific properti
 \item \textbf{Blaze} no clear information, it may not be a problem \\
 \end{itemize}
 
-\subsubsection{Imported datatype}
-\begin{itemize}
-\item \textbf{MTL4} no information in docs \\
-\item \textbf{Eigen} \\ 
-\item \textbf{Armadillo} implements aliasing check, no information about  \\
-\item \textbf{Blaze} no clear information, it may not be a problem \\
-\end{itemize}
-
 
 \begin{thebibliography}{9}
 
@@ -360,6 +370,9 @@ There seems to be no native support for defining matrices with specific properti
 
 \bibitem{blazeEval}
 \url{https://bitbucket.org/blaze-lib/blaze/issues/72/functionality-to-enforce-non-lazy}
+
+\bibitem{blazeCustom}
+\url{https://bitbucket.org/blaze-lib/blaze/wiki/Matrix%20Types#!custommatrix}
 
 \bibitem{eigenViewSymm}
 \url{https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointView.html}
@@ -376,11 +389,20 @@ There seems to be no native support for defining matrices with specific properti
 \bibitem{eigenEval}
 \url{https://forum.kde.org/viewtopic.php?f=74&t=137795}
 
+\bibitem{eigenImport}
+\url{https://eigen.tuxfamily.org/dox/group__TutorialMapClass.html}
+
 \bibitem{mtlAuto}
 \url{http://www.simunova.com/docs/mtl4/html/cppeleven__intro.html}
 
 \bibitem{mtlView}
 \url{http://www.simunova.com/docs/mtl4/html/banded__matrices.html}
+
+\bibitem{mtlImport}
+\url{http://www.simunova.com/docs/mtl4/html/matrix__insertion.html}
+
+\bibitem{armaImport}
+\url{http://arma.sourceforge.net/docs.html#Mat}
 
 \end{thebibliography}
 
