@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
+include(ExternalProject)
 
 project(linalg_tests)
 
 option(WITH_EXAMPLES "Build examples" Off)
+option(WITH_TESTS "Build tests" Off)
 
 set(CMAKE_CXX_STANDARD 14)
 set(LINK_LIBRARIES "")
@@ -46,3 +48,19 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 if(${WITH_EXAMPLES})
     add_subdirectory(examples)
 endif(${WITH_EXAMPLES})
+
+################################
+# GTest
+################################
+if(${WITH_TESTS})
+    ExternalProject_Add(googletest
+	    GIT_REPOSITORY git@github.com:google/googletest.git
+        CMAKE_ARGS -DBUILD_GTEST=On
+	    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
+	    INSTALL_COMMAND "")
+    ExternalProject_Get_Property(googletest source_dir binary_dir)
+    enable_testing()
+    set(GTEST_LINK_FLAGS ${binary_dir}/googlemock/gtest/libgtest.a ${binary_dir}/googlemock/gtest/libgtest_main.a -lpthread CACHE STRING "GTest link flags" FORCE)
+
+    add_subdirectory(tests)
+endif(${WITH_TESTS})
