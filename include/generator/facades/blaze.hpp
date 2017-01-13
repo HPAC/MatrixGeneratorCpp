@@ -9,7 +9,6 @@
 #include <libraries.hpp>
 #include <generator/generator.hpp>
 #include <generator/facades/facade.hpp>
-#include <generator/shape.hpp>
 
 namespace generator {
 
@@ -34,14 +33,23 @@ namespace generator {
     struct generator<library::blaze, T> : public
         detail::generator_facade<generator<library::blaze, T>, T, detail::blaze_matrix_type>
     {
+        typedef detail::generator_facade<
+                generator<library::blaze, T>,
+                T,
+                detail::blaze_matrix_type > base_t;
         typedef T value_t;
 
-        //explicit specialization inside class is not allowed
         template<typename Shape>
-        using matrix_t = typename detail::blaze_matrix_type<T, Shape>::type;
+        using intermediate_t = typename base_t::template intermediate_t<Shape>;
 
-        template<typename... Properties>
-        void fill(float *) {}
+        template<typename Shape>
+        using matrix_t = typename base_t::template matrix_t<Shape>;
+
+        template<typename Shape, typename... Properties>
+        matrix_t<Shape> create(Shape && shape, intermediate_t<Shape> data)
+        {
+            return matrix_t<Shape>(shape.rows, shape.cols, data.get());
+        };
     };
 }
 

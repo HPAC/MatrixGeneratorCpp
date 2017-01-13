@@ -10,7 +10,9 @@
 
 TEST(random, test_eq) {
     generator::generator<library::blaze, float> gen;
-    gen.generate(generator::shape::general(100, 100), generator::property::random());
+    auto mat = gen.generate(generator::shape::general(100, 100), generator::property::random());
+    EXPECT_EQ(mat.rows(), 100u);
+    EXPECT_EQ(mat.columns(), 100u);
 }
 
 

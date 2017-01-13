@@ -14,13 +14,12 @@ namespace generator { namespace shape {
         struct general
         {
             //typedef _SelfAdjoint SelfAdjoint;
-        protected:
-            const int rows_;
-            const int cols_;
+            const int rows;
+            const int cols;
             
             constexpr general(int rows, int cols):
-                rows_(rows),
-                cols_(cols)
+                rows(rows),
+                cols(cols)
             {}
         };
 
