@@ -283,7 +283,7 @@ auto D = evaluate(f(A,B));
 \subsubsection{Blaze}
 Information valid at December 2016.
 \begin{itemize}
-\item adaptors to create symmetric, Hermitian and triangular matrices\cite{blazeAdaptors}
+\item adaptors to create symmetric, Hermitian and triangular matrices\cite{blazeAdaptors}; no support for band matrices, use sparse matrix instead\cite{blazeBand}
 \item yes\cite{blazeEval}
 \item we have requested this feature and it is quite straightforward due to result type defined in each ET node\cite{blazeEval}
 \end{itemize}
@@ -367,6 +367,9 @@ No clear information in documentation, only that a matrix may be initialized fro
 
 \bibitem{blazeAdaptors}
 \url{https://bitbucket.org/blaze-lib/blaze/wiki/Adaptors}
+
+\bibitem{blazeBand}
+\url{https://bitbucket.org/blaze-lib/blaze/issues/73/support-for-a-band-matrix}
 
 \bibitem{blazeEval}
 \url{https://bitbucket.org/blaze-lib/blaze/issues/72/functionality-to-enforce-non-lazy}
