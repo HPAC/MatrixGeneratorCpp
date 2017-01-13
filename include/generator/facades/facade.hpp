@@ -8,22 +8,44 @@
 
 namespace generator { namespace detail {
 
+    namespace detail {
+
+        template<typename T, typename Shape>
+        struct blaze_matrix_type;
+
+        template<typename T>
+        struct blaze_matrix_type<T, generator::shape::general>
+        {
+            typedef blaze::DynamicMatrix<T> type;
+        };
+
+        template<typename T>
+        struct blaze_generator
+        {
+        };
+
+    }
+
     // Curiously Recurring Template Pattern
     //
     // Implementation should define two methods:
     // - allocate - create matrix depending on shape type
-    // - generate - 
-    template<typename GeneratorImpl>
+    // - fill -
+    template<typename GeneratorImpl, typename T, template<typename, typename> class MatrixType>
     struct generator_facade
     {
-        typedef typename GeneratorImpl::value_t value_t;
-        typedef typename GeneratorImpl::matrix_t<Shape>::type matrix_t;
-        
+        typedef T value_t;
+
+        // typedefs do not support template parameters
+        template<typename Shape>
+        using matrix_t = MatrixType<T, Shape>;
+    public:
         template<typename Shape, typename... Properties>
-        matrix_t generate(Shape && shape)
+        void generate(Shape &&, Properties &&...)
         {
-            auto data = dynamic_cast<GeneratorImpl*>(this)->template allocate( std::forward<Shape>(shape) );
-            return dynamic_cast<GeneratorImpl*>(this)->template generate<Properties...>(data);
+            //auto data = dynamic_cast<GeneratorImpl*>(this)->template allocate( std::forward<Shape>(shape) );
+            float * data = nullptr;
+            return static_cast<GeneratorImpl*>(this)->template fill<Properties...>(data);
         }
     };
 

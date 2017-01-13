@@ -3,11 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef LINALG_TESTS_GENERATOR_GENERATOR_HPP
+#define LINALG_TESTS_GENERATOR_GENERATOR_HPP
+
 #include <generator/facades/blaze.hpp>
+#include <generator/shape.hpp>
+#include <generator/types.hpp>
 
-namespace generator {
-
-    template<typename Library, typename T>
-    struct generator;
-
-}
+#endif

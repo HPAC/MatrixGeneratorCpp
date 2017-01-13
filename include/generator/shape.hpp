@@ -6,17 +6,17 @@
 #ifndef LINALG_TESTS_GENERATOR_SHAPE_HPP
 #define LINALG_TESTS_GENERATOR_SHAPE_HPP
 
-namespace matrix { namespace shape {
+namespace generator { namespace shape {
 
     namespace detail {
 
-        template<bool SelfAdjoint>
+        template<bool _SelfAdjoint>
         struct general
         {
-            typedef SelfAdjoint SelfAdjoint;
+            //typedef _SelfAdjoint SelfAdjoint;
         protected:
-            constexpr int rows_;
-            constexpr int cols_;
+            const int rows_;
+            const int cols_;
             
             constexpr general(int rows, int cols):
                 rows_(rows),
