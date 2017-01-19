@@ -20,7 +20,7 @@ namespace generator { namespace shape {
 
         static type create(const generator::shape::general & gen)
         {
-            return std::unique_ptr<T>(new T(gen.rows * gen.cols));
+            return std::unique_ptr<T>(new T[gen.rows * gen.cols]);
         }
     };
 
