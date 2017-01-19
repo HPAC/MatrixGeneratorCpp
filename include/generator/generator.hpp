@@ -8,6 +8,6 @@
 
 #include <generator/facades/blaze.hpp>
 #include <generator/shape.hpp>
-#include <generator/types.hpp>
+#include <generator/property.hpp>
 
 #endif

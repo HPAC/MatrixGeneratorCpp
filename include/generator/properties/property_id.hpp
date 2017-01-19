@@ -1,0 +1,8 @@
+//
+// Created by mcopik on 30.01.17.
+//
+
+#ifndef LINALG_TESTS_PROPERTY_ID_HPP
+#define LINALG_TESTS_PROPERTY_ID_HPP
+
+#endif //LINALG_TESTS_PROPERTY_ID_HPP
