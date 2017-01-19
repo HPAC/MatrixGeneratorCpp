@@ -8,6 +8,7 @@
 
 #include <generator/shape.hpp>
 #include <generator/intermediate.hpp>
+#include <generator/properties/properties.hpp>
 
 namespace generator { namespace detail {
 
@@ -32,7 +33,7 @@ namespace generator { namespace detail {
         {
             //auto data = dynamic_cast<GeneratorImpl*>(this)->template allocate( std::forward<Shape>(shape) );
             intermediate_t<Shape> data = shape::intermediate<T, Shape>::create(std::forward<Shape>(shape));
-
+            property::property<T, property::hash<Properties...>()>::fill(std::forward<Shape>(shape), data, [](){return 1;});
             return static_cast<GeneratorImpl*>(this)->template create<Shape, Properties...>(std::forward<Shape>(shape), std::move(data));
         }
     };
