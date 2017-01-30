@@ -54,6 +54,49 @@ TYPED_TEST(random_test, test_medium) {
     EXPECT_EQ(mat.columns(), 173u);
 }
 
+#define GENERATE_TESTS(name, prop, gtest_operand)           \
+template<typename Matrix>                                       \
+void verify_##name(Matrix && mat, uint32_t rows, uint32_t cols)\
+{                                                                                       \
+    EXPECT_EQ(mat.rows(), rows);            \
+    EXPECT_EQ(mat.columns(), cols);         \
+    for(uint32_t i = 0; i < rows; ++i) {    \
+        for(uint32_t j = 0; j < cols; ++j) {    \
+            gtest_operand(mat(i, j), 0.0f); \
+        }   \
+    }   \
+}   \
+    \
+TYPED_TEST(random_test, test_small_##name) {   \
+    auto mat = this->gen.generate(generator::shape::general(1, 1), generator::property::random(),   \
+                                  prop);    \
+    verify_##name(mat, 1u, 1u);   \
+    \
+    mat = this->gen.generate(generator::shape::general(2, 1), generator::property::random(),    \
+                             prop);  \
+    verify_##name(mat, 2u, 1u);   \
+    \
+    mat = this->gen.generate(generator::shape::general(25, 50), generator::property::random(),  \
+                             prop);  \
+    verify_##name(mat, 25u, 50u); \
+    \
+    mat = this->gen.generate(generator::shape::general(50, 25), generator::property::random(),  \
+                             prop);  \
+    verify_##name(mat, 50u, 25u); \
+}  \
+    \
+TYPED_TEST(random_test, test_medium_##name) {  \
+    auto mat = this->gen.generate(generator::shape::general(100, 100), generator::property::random(),   \
+                                  prop); \
+    verify_##name(mat, 100u, 100u);   \
+    \
+    mat = this->gen.generate(generator::shape::general(199, 173), generator::property::random(),    \
+                             prop);  \
+    verify_##name(mat, 199u, 173u);   \
+}
+
+GENERATE_TESTS(positive, generator::property::positive(), EXPECT_GT)
+GENERATE_TESTS(negative, generator::property::negative(), EXPECT_LT)
 
 
 int main(int argc, char **argv) {
