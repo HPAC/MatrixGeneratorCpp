@@ -10,9 +10,11 @@
 
 namespace generator { namespace property {
 
-    struct random : property_t<0> {};
+    struct random   : property_t<0> {};
     struct positive : property_t<1> {};
     struct negative : property_t<2> {};
+    struct zeros    : property_t<3> {};
+    struct eye      : property_t<4> {};
 
     template<typename T, uint64_t type>
     struct property;

@@ -8,5 +8,6 @@
 
 #include <generator/properties/property_id.hpp>
 #include <generator/properties/random.hpp>
+#include <generator/properties/zeros.hpp>
 
 #endif

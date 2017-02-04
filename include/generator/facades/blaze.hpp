@@ -6,6 +6,8 @@
 #ifndef LINALG_TESTS_GENERATOR_FACADES_BLAZE_HPP
 #define LINALG_TESTS_GENERATOR_FACADES_BLAZE_HPP
 
+#include <ctime>
+
 #include <libraries.hpp>
 #include <generator/generator.hpp>
 #include <generator/facades/facade.hpp>
@@ -21,6 +23,16 @@ namespace generator {
         struct blaze_matrix_type<T, generator::shape::general>
         {
             typedef blaze::DynamicMatrix<T> type;
+        };
+
+        /// As long as we don't use block matrices,
+        /// Hermitian and Symmetric in Blaze behaves identically for non-complex types
+        /// Hence we can always use Hermitian
+        /// \tparam T
+        template<typename T>
+        struct blaze_matrix_type<T, generator::shape::self_adjoint>
+        {
+            typedef blaze::HermitianMatrix< blaze::DynamicMatrix<T> > type;
         };
 
     }
@@ -44,6 +56,10 @@ namespace generator {
 
         template<typename Shape>
         using matrix_t = typename base_t::template matrix_t<Shape>;
+
+        generator(uint32_t seed = time(0)) :
+                base_t(seed)
+        {}
 
         template<typename Shape, typename... Properties>
         matrix_t<Shape> create(Shape && shape, intermediate_t<Shape> data)
