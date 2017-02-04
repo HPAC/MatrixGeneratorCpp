@@ -10,6 +10,7 @@
 #include <libraries.hpp>
 #include <generator/generator.hpp>
 
+using std::make_tuple;
 
 template<typename Types>
 struct random_test : public testing::Test
@@ -26,32 +27,31 @@ typedef testing::Types<
 
 TYPED_TEST_CASE(random_test, types_to_test);
 
-TYPED_TEST(random_test, test_small) {
-    auto mat = this->gen.generate(generator::shape::general(1, 1), generator::property::random());
-    EXPECT_EQ(mat.rows(), 1u);
-    EXPECT_EQ(mat.columns(), 1u);
+std::array< std::tuple<uint32_t, uint32_t>, 4> small_sizes{ make_tuple(1,1), make_tuple(2, 1), make_tuple(25, 50), make_tuple(50, 25)};
+std::array< std::tuple<uint32_t, uint32_t>, 3> small_sq_sizes{make_tuple(1,1), make_tuple(2, 2), make_tuple(25, 25)};
+std::array< std::tuple<uint32_t, uint32_t>, 2> medium_sizes{make_tuple(100, 100), make_tuple(199, 173)};
+std::array< std::tuple<uint32_t, uint32_t>, 2> medium_sq_sizes{make_tuple(100,100), make_tuple(125, 125)};
 
-    mat = this->gen.generate(generator::shape::general(2, 1), generator::property::random());
-    EXPECT_EQ(mat.rows(), 2u);
-    EXPECT_EQ(mat.columns(), 1u);
-
-    mat = this->gen.generate(generator::shape::general(25, 50), generator::property::random());
-    EXPECT_EQ(mat.rows(), 25u);
-    EXPECT_EQ(mat.columns(), 50u);
-
-    mat = this->gen.generate(generator::shape::general(50, 25), generator::property::random());
-    EXPECT_EQ(mat.rows(), 50u);
-    EXPECT_EQ(mat.columns(), 25u);
+TYPED_TEST(random_test, general_test_small)
+{
+    for(auto & sizes : small_sizes)
+    {
+        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);
+        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random());
+        EXPECT_EQ(mat.rows(), rows);
+        EXPECT_EQ(mat.columns(), cols);
+    }
 }
 
-TYPED_TEST(random_test, test_medium) {
-    auto mat = this->gen.generate(generator::shape::general(100, 100), generator::property::random());
-    EXPECT_EQ(mat.rows(), 100u);
-    EXPECT_EQ(mat.columns(), 100u);
-
-    mat = this->gen.generate(generator::shape::general(199, 173), generator::property::random());
-    EXPECT_EQ(mat.rows(), 199u);
-    EXPECT_EQ(mat.columns(), 173u);
+TYPED_TEST(random_test, general_test_medium)
+{
+    for(auto & sizes : medium_sizes)
+    {
+        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);
+        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random());
+        EXPECT_EQ(mat.rows(), rows);
+        EXPECT_EQ(mat.columns(), cols);
+    }
 }
 
 #define GENERATE_TESTS(name, prop, gtest_operand)           \
