@@ -6,21 +6,20 @@
 #ifndef LINALG_TESTS_GENERATOR_SHAPE_HPP
 #define LINALG_TESTS_GENERATOR_SHAPE_HPP
 
-namespace matrix { namespace shape {
+namespace generator { namespace shape {
 
     namespace detail {
 
-        template<bool SelfAdjoint>
+        template<bool _SelfAdjoint>
         struct general
         {
-            typedef SelfAdjoint SelfAdjoint;
-        protected:
-            constexpr int rows_;
-            constexpr int cols_;
+            //typedef _SelfAdjoint SelfAdjoint;
+            const int rows;
+            const int cols;
             
             constexpr general(int rows, int cols):
-                rows_(rows),
-                cols_(cols)
+                rows(rows),
+                cols(cols)
             {}
         };
 
@@ -32,7 +31,11 @@ namespace matrix { namespace shape {
             detail::general<false>(rows, cols) {}
     };
 
-    struct self_adjoint : detail::general<true> {};
+    struct self_adjoint : detail::general<true>
+    {
+        constexpr self_adjoint(int rows, int cols):
+                detail::general<true>(rows, cols) {}
+    };
 
     struct triangular;
 

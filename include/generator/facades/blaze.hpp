@@ -6,24 +6,67 @@
 #ifndef LINALG_TESTS_GENERATOR_FACADES_BLAZE_HPP
 #define LINALG_TESTS_GENERATOR_FACADES_BLAZE_HPP
 
+#include <ctime>
+
+#include <libraries.hpp>
+#include <generator/generator.hpp>
 #include <generator/facades/facade.hpp>
 
 namespace generator {
 
     namespace detail {
 
+        template<typename T, typename Shape>
+        struct blaze_matrix_type;
+
         template<typename T>
-        struct blaze_generator
+        struct blaze_matrix_type<T, generator::shape::general>
         {
-            typedef typename T value_t;
+            typedef blaze::DynamicMatrix<T> type;
+        };
+
+        /// As long as we don't use block matrices,
+        /// Hermitian and Symmetric in Blaze behaves identically for non-complex types
+        /// Hence we can always use Hermitian
+        /// \tparam T
+        template<typename T>
+        struct blaze_matrix_type<T, generator::shape::self_adjoint>
+        {
+            typedef blaze::HermitianMatrix< blaze::DynamicMatrix<T> > type;
         };
 
     }
 
+    // Forward declaration
+    template<typename Library, typename T>
+    struct generator;
+
     template<typename T>
     struct generator<library::blaze, T> : public
-        detail::generator_facade<detail::blaze_generator, T>
-    {}
+        detail::generator_facade<generator<library::blaze, T>, T, detail::blaze_matrix_type>
+    {
+        typedef detail::generator_facade<
+                generator<library::blaze, T>,
+                T,
+                detail::blaze_matrix_type > base_t;
+        typedef T value_t;
+
+        template<typename Shape>
+        using intermediate_t = typename base_t::template intermediate_t<Shape>;
+
+        template<typename Shape>
+        using matrix_t = typename base_t::template matrix_t<Shape>;
+
+        generator(uint32_t seed = time(0)) :
+                base_t(seed)
+        {}
+
+        template<typename Shape, typename... Properties>
+        matrix_t<Shape> create(Shape && shape, intermediate_t<Shape> data)
+        {
+            return matrix_t<Shape>(shape.rows, shape.cols, data.get());
+        };
+    };
 }
 
 #endif

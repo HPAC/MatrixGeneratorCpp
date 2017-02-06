@@ -53,14 +53,23 @@ endif(${WITH_EXAMPLES})
 # GTest
 ################################
 if(${WITH_TESTS})
-    ExternalProject_Add(googletest
-	    GIT_REPOSITORY git@github.com:google/googletest.git
-        CMAKE_ARGS -DBUILD_GTEST=On
-	    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
-	    INSTALL_COMMAND "")
-    ExternalProject_Get_Property(googletest source_dir binary_dir)
+
     enable_testing()
-    set(GTEST_LINK_FLAGS ${binary_dir}/googlemock/gtest/libgtest.a ${binary_dir}/googlemock/gtest/libgtest_main.a -lpthread CACHE STRING "GTest link flags" FORCE)
+    find_package(GTest)
+    if(GTEST_FOUND)
+        include_directories(${GTEST_INCLUDE_DIRS})
+    else()
+        # don't update automatically
+        ExternalProject_Add(googletest
+            GIT_REPOSITORY git@github.com:google/googletest.git
+            CMAKE_ARGS -DBUILD_GTEST=On
+            PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
+            UPDATE_DISCONNECTED 1
+            INSTALL_COMMAND "")
+        ExternalProject_Get_Property(googletest source_dir binary_dir)
+        include_directories(${source_dir}/googletest/include/)
+        set(GTEST_LINK_FLAGS ${binary_dir}/googlemock/gtest/libgtest.a ${binary_dir}/googlemock/gtest/libgtest_main.a -lpthread CACHE STRING "GTest link flags" FORCE)
+    endif(GTEST_FOUND)
 
     add_subdirectory(tests)
 endif(${WITH_TESTS})
