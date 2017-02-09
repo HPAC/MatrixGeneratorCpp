@@ -73,7 +73,7 @@ if(${WITH_TESTS})
         set(GTEST_LINK_FLAGS ${binary_dir}/googlemock/gtest/libgtest.a ${binary_dir}/googlemock/gtest/libgtest_main.a -lpthread CACHE STRING "GTest link flags" FORCE)
         # for local build one has to make tests dependent on the external project
         set(GTEST_DEPENDENCY googletest)
-    endif(GTEST_FOUND)
+    endif(GTEST_FOUND AND ${TESTS_FORCE_BUILD})
 
     add_subdirectory(tests)
-endif(${WITH_TESTS} AND ${TESTS_FORCE_BUILD})
+endif(${WITH_TESTS})
