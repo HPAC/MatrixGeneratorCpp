@@ -40,7 +40,7 @@ namespace generator { namespace property {
                     for (uint32_t j = 0; j < i; ++j)
                         ptr[cols * i + j] = ptr[cols * j + i];
                     // from [i, i] until [i+1, 0] is reached
-                    std::generate(ptr + cols * i + i, ptr + cols * (i + 1), std::forward<F>(f));
+                    std::generate(ptr.get() + cols * i + i, ptr.get() + cols * (i + 1), std::forward<F>(f));
                 }
             }
         };

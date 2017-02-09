@@ -20,7 +20,26 @@ namespace generator { namespace shape {
 
         static type create(const generator::shape::general & gen)
         {
-            return std::unique_ptr<T[]>(new T[gen.rows * gen.cols]);
+            return create(gen.rows, gen.cols);
+        }
+    protected:
+        static type create(uint32_t rows, uint32_t cols)
+        {
+            return type(new T[rows * cols]);
+        }
+    };
+
+    /// Self-adjoint matrix is stored as a general matrix
+    template<typename T>
+    struct intermediate<T, generator::shape::self_adjoint> : 
+        intermediate<T,generator::shape::general>
+    {
+        typedef std::unique_ptr<T[]> type;
+        typedef intermediate<T,generator::shape::general> base_t;
+
+        static type create(const generator::shape::self_adjoint & gen)
+        {
+            return base_t::create(gen.rows, gen.cols);
         }
     };
 

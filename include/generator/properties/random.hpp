@@ -29,6 +29,17 @@ namespace generator { namespace property {
                                         return positive ? std::abs(val) : (negative ? -std::abs(val) : val);
                                     });
             }
+
+            template<typename RndGen>
+            static void fill(const shape::self_adjoint & shape, const intermediate_t & data, RndGen && gen)
+            {
+                Filler<true>::fill(shape.rows, shape.cols, data,
+                                    [&]() {
+                                        T val = gen();
+                                        return positive ? std::abs(val) : (negative ? -std::abs(val) : val);
+                                    });
+            }
+
         };
     }
 
