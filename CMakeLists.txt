@@ -5,6 +5,7 @@ project(linalg_tests)
 
 option(WITH_EXAMPLES "Build examples" Off)
 option(WITH_TESTS "Build tests" Off)
+option(TESTS_FORCE_BUILD "Build Gtest" Off)
 
 set(CMAKE_CXX_STANDARD 14)
 set(LINK_LIBRARIES "")
@@ -56,8 +57,9 @@ if(${WITH_TESTS})
 
     enable_testing()
     find_package(GTest)
-    if(GTEST_FOUND)
+    if(GTEST_FOUND AND ${TESTS_FORCE_BUILD})
         include_directories(${GTEST_INCLUDE_DIRS})
+        set(GTEST_LINK_FLAGS ${GTEST_BOTH_LIBRARIES} -lpthread)
     else()
         # don't update automatically
         ExternalProject_Add(googletest
@@ -69,7 +71,9 @@ if(${WITH_TESTS})
         ExternalProject_Get_Property(googletest source_dir binary_dir)
         include_directories(${source_dir}/googletest/include/)
         set(GTEST_LINK_FLAGS ${binary_dir}/googlemock/gtest/libgtest.a ${binary_dir}/googlemock/gtest/libgtest_main.a -lpthread CACHE STRING "GTest link flags" FORCE)
+        # for local build one has to make tests dependent on the external project
+        set(GTEST_DEPENDENCY googletest)
     endif(GTEST_FOUND)
 
     add_subdirectory(tests)
-endif(${WITH_TESTS})
+endif(${WITH_TESTS} AND ${TESTS_FORCE_BUILD})
