@@ -1,0 +1,34 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{pbox}
+\usepackage{float}
+\usepackage{placeins}
+
+
+\title{Matrix generation}
+
+\begin{document}
+
+\section{Shape properties}
+
+\begin{itemize}
+\item \textbf{general} \\
+a general dense matrix described by its size parameters
+\item \textbf{self\_adjoint} \\
+a self-adjoint dense matrix, similar to general but symmetric/Hermitian 
+\end{itemize}
+
+\section{Type properties}
+
+\subsection{Zeros}
+\textbf{Supported subtypes}: None \\
+Returns a matrix filled with zeros
+
+\subsection{Random}
+\textbf{Supported subtypes}: positive, negative \\
+Returns a randomized matrix with distribution of elements specified by generator.
+
+
+\end{document}

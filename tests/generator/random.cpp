@@ -9,6 +9,7 @@
 
 #include <libraries.hpp>
 #include <generator/generator.hpp>
+#include "test_utilities.hpp"
 
 using std::make_tuple;
 
@@ -54,6 +55,26 @@ TYPED_TEST(random_test, general_test_medium)
     }
 }
 
+TYPED_TEST(random_test, symmetric_test_small)
+{
+    for(auto & sizes : small_sq_sizes)
+    {
+        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);
+        auto mat = this->gen.generate(generator::shape::self_adjoint(rows, cols), generator::property::random());
+        verify_hermitian(mat, rows, cols);
+    }
+}
+
+TYPED_TEST(random_test, symmetric_test_medium)
+{
+    for(auto & sizes : medium_sq_sizes)
+    {
+        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);
+        auto mat = this->gen.generate(generator::shape::self_adjoint(rows, cols), generator::property::random());
+        verify_hermitian(mat, rows, cols);
+    }
+}
+
 #define GENERATE_TESTS(name, prop, sizes_obj, gtest_operand)           \
 template<typename Matrix>                                       \
 void verify_##name(Matrix && mat, uint32_t rows, uint32_t cols)\
@@ -80,6 +101,11 @@ GENERATE_TESTS(positive_small, generator::property::positive(), small_sizes, EXP
 GENERATE_TESTS(positive_medium, generator::property::positive(), medium_sizes, EXPECT_GT)
 GENERATE_TESTS(negative_small, generator::property::negative(), small_sizes, EXPECT_LT)
 GENERATE_TESTS(negative_medium, generator::property::negative(), medium_sizes, EXPECT_LT)
+
+GENERATE_HERMITIAN_TESTS(positive_small, generator::property::positive(), small_sq_sizes)
+GENERATE_HERMITIAN_TESTS(positive_medium, generator::property::positive(), medium_sq_sizes)
+GENERATE_HERMITIAN_TESTS(negative_small, generator::property::negative(), small_sq_sizes)
+GENERATE_HERMITIAN_TESTS(negative_medium, generator::property::negative(), medium_sq_sizes)
 
 
 int main(int argc, char **argv) {
