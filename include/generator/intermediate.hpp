@@ -16,11 +16,11 @@ namespace generator { namespace shape {
     template<typename T>
     struct intermediate<T, generator::shape::general>
     {
-        typedef std::unique_ptr<T> type;
+        typedef std::unique_ptr<T[]> type;
 
         static type create(const generator::shape::general & gen)
         {
-            return std::unique_ptr<T>(new T[gen.rows * gen.cols]);
+            return std::unique_ptr<T[]>(new T[gen.rows * gen.cols]);
         }
     };
 

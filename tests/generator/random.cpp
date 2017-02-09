@@ -30,7 +30,7 @@ TYPED_TEST_CASE(random_test, types_to_test);
 std::array< std::tuple<uint32_t, uint32_t>, 4> small_sizes{ make_tuple(1,1), make_tuple(2, 1), make_tuple(25, 50), make_tuple(50, 25)};
 std::array< std::tuple<uint32_t, uint32_t>, 3> small_sq_sizes{make_tuple(1,1), make_tuple(2, 2), make_tuple(25, 25)};
 std::array< std::tuple<uint32_t, uint32_t>, 2> medium_sizes{make_tuple(100, 100), make_tuple(199, 173)};
-std::array< std::tuple<uint32_t, uint32_t>, 2> medium_sq_sizes{make_tuple(100,100), make_tuple(125, 125)};
+std::array< std::tuple<uint32_t, uint32_t>, 3> medium_sq_sizes{make_tuple(100,100), make_tuple(103,103), make_tuple(125, 125)};
 
 TYPED_TEST(random_test, general_test_small)
 {
@@ -54,10 +54,10 @@ TYPED_TEST(random_test, general_test_medium)
     }
 }
 
-#define GENERATE_TESTS(name, prop, gtest_operand)           \
+#define GENERATE_TESTS(name, prop, sizes_obj, gtest_operand)           \
 template<typename Matrix>                                       \
 void verify_##name(Matrix && mat, uint32_t rows, uint32_t cols)\
-{                                                                                       \
+{                                                 \
     EXPECT_EQ(mat.rows(), rows);            \
     EXPECT_EQ(mat.columns(), cols);         \
     for(uint32_t i = 0; i < rows; ++i) {    \
@@ -68,35 +68,18 @@ void verify_##name(Matrix && mat, uint32_t rows, uint32_t cols)\
 }   \
     \
 TYPED_TEST(random_test, test_small_##name) {   \
-    auto mat = this->gen.generate(generator::shape::general(1, 1), generator::property::random(),   \
-                                  prop);    \
-    verify_##name(mat, 1u, 1u);   \
-    \
-    mat = this->gen.generate(generator::shape::general(2, 1), generator::property::random(),    \
-                             prop);  \
-    verify_##name(mat, 2u, 1u);   \
-    \
-    mat = this->gen.generate(generator::shape::general(25, 50), generator::property::random(),  \
-                             prop);  \
-    verify_##name(mat, 25u, 50u); \
-    \
-    mat = this->gen.generate(generator::shape::general(50, 25), generator::property::random(),  \
-                             prop);  \
-    verify_##name(mat, 50u, 25u); \
-}  \
-    \
-TYPED_TEST(random_test, test_medium_##name) {  \
-    auto mat = this->gen.generate(generator::shape::general(100, 100), generator::property::random(),   \
-                                  prop); \
-    verify_##name(mat, 100u, 100u);   \
-    \
-    mat = this->gen.generate(generator::shape::general(199, 173), generator::property::random(),    \
-                             prop);  \
-    verify_##name(mat, 199u, 173u);   \
+    for(auto & sizes : sizes_obj)            \
+    {                                         \
+        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
+        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random(), prop);  \
+        verify_##name(mat, rows, cols); \
+    }   \
 }
 
-GENERATE_TESTS(positive, generator::property::positive(), EXPECT_GT)
-GENERATE_TESTS(negative, generator::property::negative(), EXPECT_LT)
+GENERATE_TESTS(positive_small, generator::property::positive(), small_sizes, EXPECT_GT)
+GENERATE_TESTS(positive_medium, generator::property::positive(), medium_sizes, EXPECT_GT)
+GENERATE_TESTS(negative_small, generator::property::negative(), small_sizes, EXPECT_LT)
+GENERATE_TESTS(negative_medium, generator::property::negative(), medium_sizes, EXPECT_LT)
 
 
 int main(int argc, char **argv) {

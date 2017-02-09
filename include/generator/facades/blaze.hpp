@@ -62,7 +62,7 @@ namespace generator {
         {}
 
         template<typename Shape, typename... Properties>
-        matrix_t<Shape> create(Shape && shape, intermediate_t<Shape> data)
+        matrix_t<Shape> create(Shape && shape, const intermediate_t<Shape> & data)
         {
             return matrix_t<Shape>(shape.rows, shape.cols, data.get());
         };

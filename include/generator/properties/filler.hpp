@@ -20,7 +20,7 @@ namespace generator { namespace property {
         template<>
         struct Filler<false> {
             template<typename F, typename T>
-            static void fill(uint64_t rows, uint64_t cols, std::unique_ptr <T> &ptr, F &&f) {
+            static void fill(uint64_t rows, uint64_t cols, const std::unique_ptr<T[]> &ptr, F &&f) {
                 std::generate(ptr.get(), ptr.get() + rows * cols, std::forward<F>(f));
             }
         };
@@ -35,7 +35,7 @@ namespace generator { namespace property {
             /// \param ptr
             /// \param f
             template<typename F, typename T>
-            static void fill(uint64_t rows, uint64_t cols, std::unique_ptr <T> &ptr, F &&f) {
+            static void fill(uint64_t rows, uint64_t cols, const std::unique_ptr<T[]> & ptr, F &&f) {
                 for (uint32_t i = 0; i < rows; ++i) {
                     for (uint32_t j = 0; j < i; ++j)
                         ptr[cols * i + j] = ptr[cols * j + i];

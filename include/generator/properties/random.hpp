@@ -21,7 +21,7 @@ namespace generator { namespace property {
             typedef typename shape::intermediate<T, shape::general>::type intermediate_t;
         public:
             template<typename RndGen>
-            static void fill(const shape::general & shape, intermediate_t & data, RndGen && gen)
+            static void fill(const shape::general & shape, const intermediate_t & data, RndGen && gen)
             {
                 Filler<false>::fill(shape.rows, shape.cols, data,
                                     [&]() {
