@@ -23,6 +23,11 @@ namespace generator {
         struct blaze_matrix_type<T, generator::shape::general>
         {
             typedef blaze::DynamicMatrix<T> type;
+
+            static type create(uint32_t rows, uint32_t cols, T * ptr)
+            {
+                return type(rows, cols, ptr);
+            }
         };
 
         /// As long as we don't use block matrices,
@@ -33,6 +38,13 @@ namespace generator {
         struct blaze_matrix_type<T, generator::shape::self_adjoint>
         {
             typedef blaze::HermitianMatrix< blaze::DynamicMatrix<T> > type;
+
+            //FIXME: why the syntax of from-array constructor for DynamicMatrix
+            //and HermitianMatrix is different in Blaze?
+            static type create(uint32_t rows, uint32_t cols, T * ptr)
+            {
+                return type(ptr, rows, cols);
+            }
         };
 
     }
@@ -64,7 +76,8 @@ namespace generator {
         template<typename Shape, typename... Properties>
         matrix_t<Shape> create(Shape && shape, const intermediate_t<Shape> & data)
         {
-            return matrix_t<Shape>(shape.rows, shape.cols, data.get());
+            //return matrix_t<Shape>(data.get(), shape.rows, shape.cols);
+            return detail::blaze_matrix_type<T, Shape>::create(shape.rows, shape.cols, data.get());
         };
     };
 }
