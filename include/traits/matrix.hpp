@@ -30,6 +30,11 @@ namespace traits {
     struct matrix_traits< blaze::HermitianMatrix<blaze::DynamicMatrix<T>> > :
         detail::blaze_matrix< blaze::HermitianMatrix<blaze::DynamicMatrix<T>> >
     {};
+
+    template<typename T>
+    struct matrix_traits< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>> > :
+        detail::blaze_matrix< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>> >
+    {};
 }
 
 #endif

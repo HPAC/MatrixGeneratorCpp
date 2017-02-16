@@ -39,11 +39,29 @@ namespace generator {
         {
             typedef blaze::HermitianMatrix< blaze::DynamicMatrix<T> > type;
 
-            //FIXME: why the syntax of from-array constructor for DynamicMatrix
-            //and HermitianMatrix is different in Blaze?
-            static type create(uint32_t rows, uint32_t cols, T * ptr)
+            static type create(uint32_t rows, uint32_t, T * ptr)
             {
-                return type(ptr, rows, cols);
+                return type(rows, ptr);
+            }
+        };
+
+        /// As long as we don't use block matrices,
+        /// Hermitian and Symmetric in Blaze behaves identically for non-complex types
+        /// Hence we can always use Hermitian
+        /// \tparam T
+        template<typename T>
+        struct blaze_matrix_type<T, generator::shape::diagonal>
+        {
+            typedef blaze::DiagonalMatrix< blaze::DynamicMatrix<T> > type;
+
+            /// Blaze constructors expect an n*n matrix even for diagonal matrix
+            /// It's easier to just write values
+            static type create(uint32_t rows, uint32_t, T * ptr)
+            {
+                type mat(rows, 0);
+                for(std::size_t i = 0; i < rows; ++i)
+                    mat(i, i) = ptr[i];
+                return mat;
             }
         };
 
@@ -78,7 +96,7 @@ namespace generator {
         {
             //return matrix_t<Shape>(data.get(), shape.rows, shape.cols);
             return detail::blaze_matrix_type<T, Shape>::create(shape.rows, shape.cols, data.get());
-        };
+        }
     };
 }
 

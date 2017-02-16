@@ -40,6 +40,18 @@ namespace generator { namespace property {
                                     });
             }
 
+            template<typename RndGen>
+            static void fill(const shape::diagonal & shape, const intermediate_t & data, RndGen && gen)
+            {
+                // Fill one row of a matrix according to our needs.
+                // Symmetry does not matter here.
+                Filler<false>::fill(shape.rows, 1, data,
+                                    [&]() {
+                                        T val = gen();
+                                        return positive ? std::abs(val) : (negative ? -std::abs(val) : val);
+                                    });
+            }
+
         };
     }
 
