@@ -13,23 +13,23 @@
 #include <traits/matrix.hpp>
 
 template<typename T>
-void verify(T)
+void verify(T, const generator::property::random &)
 {}
 
 template<typename T>
-void verify(T val, const generator::property::negative &)
+void verify(T val, const generator::property::random &, const generator::property::negative &)
 {
 	EXPECT_LT(val, 0.0f);
 }
 
 template<typename T>
-void verify(T val, const generator::property::positive &)
+void verify(T val, const generator::property::random &, const generator::property::positive &)
 {
 	EXPECT_GT(val, 0.0f);
 }
 
 template<typename MatType, typename ... Properties>
-void verify(MatType && mat, uint32_t rows, uint32_t cols, Properties &&... props)
+void verify_general(MatType && mat, uint32_t rows, uint32_t cols, Properties &&... props)
 {
     EXPECT_EQ(mat.rows(), rows);
     EXPECT_EQ(mat.columns(), cols);
@@ -70,52 +70,33 @@ void verify_diagonal(MatType && mat, uint32_t rows, Properties &&... props)
     }
 }
 
-#define GENERATE_TESTS_SINGLE(name, sizes_obj)           \
-TYPED_TEST(random_test, test_small_##name) {   \
+#define GENERATE_MATRIX_TEST(shape, verify_func, name_type, name, sizes_obj, ...)   \
+TYPED_TEST(random_test, name_type##_test_##name) {   \
     for(auto & sizes : sizes_obj)            \
     {                                         \
         uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
-        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random());  \
-        verify(mat, rows, cols); \
+        auto mat = this->gen.generate(shape(rows, cols), __VA_ARGS__);  \
+        verify_func(mat, rows, cols, __VA_ARGS__); \
     }   \
 }
 
-#define GENERATE_TESTS_PROPERTY(name, prop, sizes_obj)           \
-TYPED_TEST(random_test, test_##name) {   \
-    for(auto & sizes : sizes_obj)            \
-    {                                         \
-        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
-        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random(), prop);  \
-        verify(mat, rows, cols, prop); \
-    }   \
-}
-
-#define GENERATE_HERMITIAN_TESTS_SINGLE(shape, verify_func, name_type, name, sizes_obj)	\
+#define GENERATE_MATRIX_SQUARE_TEST(shape, verify_func, name_type, name, sizes_obj, ...)    \
 TYPED_TEST(random_test, name_type##_test_##name) {   \
     for(auto rows : sizes_obj)            \
     {                                         \
-        auto mat = this->gen.generate(shape(rows), generator::property::random());	\
-        verify_func(mat, rows);	\
+        auto mat = this->gen.generate(shape(rows), __VA_ARGS__);   \
+        verify_func(mat, rows, __VA_ARGS__); \
     }   \
 }
 
-#define GENERATE_HERMITIAN_TESTS_PROPERTY(shape, verify_func, name_type, name, prop, sizes_obj)	\
-TYPED_TEST(random_test, name_type ##_test_##name) {   \
-    for(auto rows : sizes_obj)            \
-    {                                         \
-        auto mat = this->gen.generate(shape(rows), generator::property::random(), prop);	\
-        verify_func(mat, rows, prop);	\
-    }   \
-}
+#define GENERATE_GENERAL_TEST(name, sizes_obj, ...)   \
+    GENERATE_MATRIX_TEST(generator::shape::general, verify_general, general, name, sizes_obj, __VA_ARGS__)
 
-// A simple hack for macro overloading
-// For two args select SINGLE, for three - PROPERTY
-#define GET_MACRO(_1, _2, _3, MACRO_NAME, ...) MACRO_NAME
-#define GENERATE_TESTS(...) GET_MACRO(__VA_ARGS__, GENERATE_TESTS_PROPERTY, GENERATE_TESTS_SINGLE)(__VA_ARGS__)
-#define GENERATE_HERMITIAN_TESTS(...) GET_MACRO(__VA_ARGS__, GENERATE_HERMITIAN_TESTS_PROPERTY, GENERATE_HERMITIAN_TESTS_SINGLE)    \
-    (generator::shape::self_adjoint, verify_hermitian, hermitian, __VA_ARGS__)
-#define GENERATE_DIAGONAL_TESTS(...) GET_MACRO(__VA_ARGS__, GENERATE_HERMITIAN_TESTS_PROPERTY, GENERATE_HERMITIAN_TESTS_SINGLE)    \
-    (generator::shape::diagonal, verify_diagonal, diagonal, __VA_ARGS__)
+#define GENERATE_HERMITIAN_TEST(name, sizes_obj, ...)   \
+    GENERATE_MATRIX_SQUARE_TEST(generator::shape::self_adjoint, verify_hermitian, hermitian, name, sizes_obj, __VA_ARGS__)
+
+#define GENERATE_DIAGONAL_TEST(name, sizes_obj, ...)   \
+    GENERATE_MATRIX_SQUARE_TEST(generator::shape::diagonal, verify_diagonal, diagonal, name, sizes_obj, __VA_ARGS__)
 
 
 #endif

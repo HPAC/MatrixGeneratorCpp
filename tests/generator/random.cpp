@@ -33,26 +33,26 @@ std::array< uint32_t, 4> small_sq_sizes{1, 2, 9, 25};
 std::array< std::tuple<uint32_t, uint32_t>, 2> medium_sizes{make_tuple(100, 100), make_tuple(199, 173)};
 std::array< uint32_t, 3> medium_sq_sizes{100, 103, 125};
 
-GENERATE_TESTS(small, small_sizes)
-GENERATE_TESTS(medium, medium_sizes)
-GENERATE_TESTS(positive_small, generator::property::positive(), small_sizes)
-GENERATE_TESTS(positive_medium, generator::property::positive(), medium_sizes)
-GENERATE_TESTS(negative_small, generator::property::negative(), small_sizes)
-GENERATE_TESTS(negative_medium, generator::property::negative(), medium_sizes)
+GENERATE_GENERAL_TEST(small, small_sizes, generator::property::random())
+GENERATE_GENERAL_TEST(medium, medium_sizes, generator::property::random())
+GENERATE_GENERAL_TEST(positive_small, small_sizes, generator::property::random(), generator::property::positive())
+GENERATE_GENERAL_TEST(positive_medium, medium_sizes, generator::property::random(), generator::property::positive())
+GENERATE_GENERAL_TEST(negative_small, small_sizes, generator::property::random(), generator::property::negative())
+GENERATE_GENERAL_TEST(negative_medium, medium_sizes, generator::property::random(), generator::property::negative())
 
-GENERATE_HERMITIAN_TESTS(small, small_sq_sizes)
-GENERATE_HERMITIAN_TESTS(medium, medium_sq_sizes)
-GENERATE_HERMITIAN_TESTS(positive_small, generator::property::positive(), small_sq_sizes)
-GENERATE_HERMITIAN_TESTS(positive_medium, generator::property::positive(), medium_sq_sizes)
-GENERATE_HERMITIAN_TESTS(negative_small, generator::property::negative(), small_sq_sizes)
-GENERATE_HERMITIAN_TESTS(negative_medium, generator::property::negative(), medium_sq_sizes)
+GENERATE_HERMITIAN_TEST(small, small_sq_sizes, generator::property::random())
+GENERATE_HERMITIAN_TEST(medium, medium_sq_sizes, generator::property::random())
+GENERATE_HERMITIAN_TEST(positive_small, small_sq_sizes, generator::property::random(), generator::property::positive())
+GENERATE_HERMITIAN_TEST(positive_medium, medium_sq_sizes, generator::property::random(), generator::property::positive())
+GENERATE_HERMITIAN_TEST(negative_small, small_sq_sizes, generator::property::random(), generator::property::negative())
+GENERATE_HERMITIAN_TEST(negative_medium, medium_sq_sizes, generator::property::random(), generator::property::negative())
 
-GENERATE_DIAGONAL_TESTS(small, small_sq_sizes)
-GENERATE_DIAGONAL_TESTS(medium, medium_sq_sizes)
-GENERATE_DIAGONAL_TESTS(positive_small, generator::property::positive(), small_sq_sizes)
-GENERATE_DIAGONAL_TESTS(positive_medium, generator::property::positive(), medium_sq_sizes)
-GENERATE_DIAGONAL_TESTS(negative_small, generator::property::negative(), small_sq_sizes)
-GENERATE_DIAGONAL_TESTS(negative_medium, generator::property::negative(), medium_sq_sizes)
+GENERATE_DIAGONAL_TEST(small, small_sq_sizes, generator::property::random())
+GENERATE_DIAGONAL_TEST(medium, medium_sq_sizes, generator::property::random())
+GENERATE_DIAGONAL_TEST(positive_small, small_sq_sizes, generator::property::random(), generator::property::positive())
+GENERATE_DIAGONAL_TEST(positive_medium, medium_sq_sizes, generator::property::random(), generator::property::positive())
+GENERATE_DIAGONAL_TEST(negative_small, small_sq_sizes, generator::property::random(), generator::property::negative())
+GENERATE_DIAGONAL_TEST(negative_medium, medium_sq_sizes, generator::property::random(), generator::property::negative())
 
 
 int main(int argc, char **argv) {
