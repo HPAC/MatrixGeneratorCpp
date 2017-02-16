@@ -47,6 +47,13 @@ GENERATE_HERMITIAN_TESTS(positive_medium, generator::property::positive(), mediu
 GENERATE_HERMITIAN_TESTS(negative_small, generator::property::negative(), small_sq_sizes)
 GENERATE_HERMITIAN_TESTS(negative_medium, generator::property::negative(), medium_sq_sizes)
 
+GENERATE_DIAGONAL_TESTS(small, small_sq_sizes)
+GENERATE_DIAGONAL_TESTS(medium, medium_sq_sizes)
+GENERATE_DIAGONAL_TESTS(positive_small, generator::property::positive(), small_sq_sizes)
+GENERATE_DIAGONAL_TESTS(positive_medium, generator::property::positive(), medium_sq_sizes)
+GENERATE_DIAGONAL_TESTS(negative_small, generator::property::negative(), small_sq_sizes)
+GENERATE_DIAGONAL_TESTS(negative_medium, generator::property::negative(), medium_sq_sizes)
+
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

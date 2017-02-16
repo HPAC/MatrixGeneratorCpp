@@ -58,6 +58,18 @@ void verify_hermitian(MatType && mat, uint32_t rows, Properties &&... props)
     }
 }
 
+template<typename MatType, typename ... Properties>
+void verify_diagonal(MatType && mat, uint32_t rows, Properties &&... props)
+{
+    EXPECT_EQ(mat.rows(), rows);
+    EXPECT_EQ(mat.columns(), rows);
+
+    for(uint32_t i = 0; i < rows; ++i) {
+        //diagonal
+        verify(mat(i, i), std::forward<Properties>(props)...);
+    }
+}
+
 #define GENERATE_TESTS_SINGLE(name, sizes_obj)           \
 TYPED_TEST(random_test, test_small_##name) {   \
     for(auto & sizes : sizes_obj)            \
@@ -78,21 +90,21 @@ TYPED_TEST(random_test, test_##name) {   \
     }   \
 }
 
-#define GENERATE_HERMITIAN_TESTS_SINGLE(name, sizes_obj)	\
-TYPED_TEST(random_test, symmetric_test_##name) {   \
+#define GENERATE_HERMITIAN_TESTS_SINGLE(shape, verify_func, name_type, name, sizes_obj)	\
+TYPED_TEST(random_test, name_type##_test_##name) {   \
     for(auto rows : sizes_obj)            \
     {                                         \
-        auto mat = this->gen.generate(generator::shape::self_adjoint(rows), generator::property::random());	\
-        verify_hermitian(mat, rows);	\
+        auto mat = this->gen.generate(shape(rows), generator::property::random());	\
+        verify_func(mat, rows);	\
     }   \
 }
 
-#define GENERATE_HERMITIAN_TESTS_PROPERTY(name, prop, sizes_obj)	\
-TYPED_TEST(random_test, symmetric_test_##name) {   \
+#define GENERATE_HERMITIAN_TESTS_PROPERTY(shape, verify_func, name_type, name, prop, sizes_obj)	\
+TYPED_TEST(random_test, name_type ##_test_##name) {   \
     for(auto rows : sizes_obj)            \
     {                                         \
-        auto mat = this->gen.generate(generator::shape::self_adjoint(rows), generator::property::random(), prop);	\
-        verify_hermitian(mat, rows, prop);	\
+        auto mat = this->gen.generate(shape(rows), generator::property::random(), prop);	\
+        verify_func(mat, rows, prop);	\
     }   \
 }
 
@@ -100,7 +112,10 @@ TYPED_TEST(random_test, symmetric_test_##name) {   \
 // For two args select SINGLE, for three - PROPERTY
 #define GET_MACRO(_1, _2, _3, MACRO_NAME, ...) MACRO_NAME
 #define GENERATE_TESTS(...) GET_MACRO(__VA_ARGS__, GENERATE_TESTS_PROPERTY, GENERATE_TESTS_SINGLE)(__VA_ARGS__)
-#define GENERATE_HERMITIAN_TESTS(...) GET_MACRO(__VA_ARGS__, GENERATE_HERMITIAN_TESTS_PROPERTY, GENERATE_HERMITIAN_TESTS_SINGLE)(__VA_ARGS__)
+#define GENERATE_HERMITIAN_TESTS(...) GET_MACRO(__VA_ARGS__, GENERATE_HERMITIAN_TESTS_PROPERTY, GENERATE_HERMITIAN_TESTS_SINGLE)    \
+    (generator::shape::self_adjoint, verify_hermitian, hermitian, __VA_ARGS__)
+#define GENERATE_DIAGONAL_TESTS(...) GET_MACRO(__VA_ARGS__, GENERATE_HERMITIAN_TESTS_PROPERTY, GENERATE_HERMITIAN_TESTS_SINGLE)    \
+    (generator::shape::diagonal, verify_diagonal, diagonal, __VA_ARGS__)
 
 
 #endif
