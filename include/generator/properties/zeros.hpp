@@ -18,30 +18,34 @@ namespace generator { namespace property {
     template<typename T>
     struct property<T, hash<generator::property::zeros>()>
     {
-        typedef typename shape::intermediate<T, shape::general>::type intermediate_t;
-
         template<typename FwdIt>
         static void fill(FwdIt begin, FwdIt end)
         {
-            std::fill(begin, end, 0.0f);
+            std::fill(begin, end, 0.0);
         }
 
     public:
 
         template<typename RndGen>
-        static void fill(const shape::general & shape, intermediate_t & data, RndGen &&)
+        static void fill(const shape::general & shape,
+                        typename shape::intermediate<T, shape::general>::type & data,
+                        RndGen &&)
         {
             fill(data.get(), data.get() + shape.rows * shape.cols);
         }
 
         template<typename RndGen>
-        static void fill(const shape::self_adjoint & shape, intermediate_t & data, RndGen &&)
+        static void fill(const shape::self_adjoint & shape,
+                        typename shape::intermediate<T, shape::self_adjoint>::type & data,
+                        RndGen &&)
         {
             fill(data.get(), data.get() + shape.rows * shape.rows);
         }
 
         template<typename RndGen>
-        static void fill(const shape::diagonal & shape, intermediate_t & data, RndGen &&)
+        static void fill(const shape::diagonal & shape,
+                        typename shape::intermediate<T, shape::diagonal>::type & data,
+                        RndGen &&)
         {
             fill(data.get(), data.get() + shape.rows);
         }

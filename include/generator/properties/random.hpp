@@ -18,10 +18,11 @@ namespace generator { namespace property {
                 bool negative = false>
         struct random_generator
         {
-            typedef typename shape::intermediate<T, shape::general>::type intermediate_t;
         public:
             template<typename RndGen>
-            static void fill(const shape::general & shape, const intermediate_t & data, RndGen && gen)
+            static void fill(const shape::general & shape,
+                            typename shape::intermediate<T, shape::general>::type & data,
+                            RndGen && gen)
             {
                 Filler<false>::fill(shape.rows, shape.cols, data,
                                     [&]() {
@@ -31,7 +32,9 @@ namespace generator { namespace property {
             }
 
             template<typename RndGen>
-            static void fill(const shape::self_adjoint & shape, const intermediate_t & data, RndGen && gen)
+            static void fill(const shape::self_adjoint & shape,
+                            typename shape::intermediate<T, shape::self_adjoint>::type & data,
+                            RndGen && gen)
             {
                 Filler<true>::fill(shape.rows, shape.cols, data,
                                     [&]() {
@@ -41,7 +44,9 @@ namespace generator { namespace property {
             }
 
             template<typename RndGen>
-            static void fill(const shape::diagonal & shape, const intermediate_t & data, RndGen && gen)
+            static void fill(const shape::diagonal & shape,
+                            typename shape::intermediate<T, shape::diagonal>::type & data,
+                            RndGen && gen)
             {
                 // Fill one row of a matrix according to our needs.
                 // Symmetry does not matter here.
