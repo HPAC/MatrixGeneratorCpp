@@ -29,30 +29,51 @@ void verify(T val, const generator::property::positive &)
 }
 
 template<typename MatType, typename ... Properties>
-void verify_hermitian(MatType && mat, uint32_t rows, uint32_t cols, Properties &&... props)
+void verify(MatType && mat, uint32_t rows, uint32_t cols, Properties &&... props)
+{
+    EXPECT_EQ(mat.rows(), rows);
+    EXPECT_EQ(mat.columns(), cols);
+    for(uint32_t i = 0; i < rows; ++i) {
+        for(uint32_t j = 0; j < cols; ++j) {
+            verify(mat(i, j), std::forward<Properties>(props)...);
+        } 
+    }
+}
+
+template<typename MatType, typename ... Properties>
+void verify_hermitian(MatType && mat, uint32_t rows, Properties &&... props)
 {
     typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
 
     EXPECT_EQ(mat.rows(), rows);
-    EXPECT_EQ(mat.columns(), cols);
+    EXPECT_EQ(mat.columns(), rows);
 
     for(uint32_t i = 0; i < rows; ++i) {
     	//diagonal
         verify(mat(i, i), std::forward<Properties>(props)...);	
-        for(uint32_t j = i + 1; j < cols; ++j) {
+        for(uint32_t j = i + 1; j < rows; ++j) {
             EXPECT_NEAR(mat(i, j), mat(j, i), std::numeric_limits<value_t>::epsilon());
             verify(mat(i, j), std::forward<Properties>(props)...);
         }
     }
 }
 
-#define GENERATE_HERMITIAN_TESTS(name, prop, sizes_obj)	\
-TYPED_TEST(random_test, symmetric_test_##name) {   \
+#define GENERATE_TESTS(name, prop, sizes_obj)           \
+TYPED_TEST(random_test, test_small_##name) {   \
     for(auto & sizes : sizes_obj)            \
     {                                         \
-        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);	\
-        auto mat = this->gen.generate(generator::shape::self_adjoint(rows, cols), generator::property::random(), prop);	\
-        verify_hermitian(mat, rows, cols, prop);	\
+        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
+        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random(), prop);  \
+        verify(mat, rows, cols, prop); \
+    }   \
+}
+
+#define GENERATE_HERMITIAN_TESTS(name, prop, sizes_obj)	\
+TYPED_TEST(random_test, symmetric_test_##name) {   \
+    for(auto rows : sizes_obj)            \
+    {                                         \
+        auto mat = this->gen.generate(generator::shape::self_adjoint(rows), generator::property::random(), prop);	\
+        verify_hermitian(mat, rows, prop);	\
     }   \
 }
 

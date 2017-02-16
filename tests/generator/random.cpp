@@ -29,9 +29,9 @@ typedef testing::Types<
 TYPED_TEST_CASE(random_test, types_to_test);
 
 std::array< std::tuple<uint32_t, uint32_t>, 4> small_sizes{ make_tuple(1,1), make_tuple(2, 1), make_tuple(25, 50), make_tuple(50, 25)};
-std::array< std::tuple<uint32_t, uint32_t>, 3> small_sq_sizes{make_tuple(1,1), make_tuple(2, 2), make_tuple(25, 25)};
+std::array< uint32_t, 4> small_sq_sizes{1, 2, 9, 25};
 std::array< std::tuple<uint32_t, uint32_t>, 2> medium_sizes{make_tuple(100, 100), make_tuple(199, 173)};
-std::array< std::tuple<uint32_t, uint32_t>, 3> medium_sq_sizes{make_tuple(100,100), make_tuple(103,103), make_tuple(125, 125)};
+std::array< uint32_t, 3> medium_sq_sizes{100, 103, 125};
 
 TYPED_TEST(random_test, general_test_small)
 {
@@ -57,50 +57,26 @@ TYPED_TEST(random_test, general_test_medium)
 
 TYPED_TEST(random_test, symmetric_test_small)
 {
-    for(auto & sizes : small_sq_sizes)
+    for(auto rows : small_sq_sizes)
     {
-        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);
-        auto mat = this->gen.generate(generator::shape::self_adjoint(rows, cols), generator::property::random());
-        verify_hermitian(mat, rows, cols);
+        auto mat = this->gen.generate(generator::shape::self_adjoint(rows), generator::property::random());
+        verify_hermitian(mat, rows);
     }
 }
 
 TYPED_TEST(random_test, symmetric_test_medium)
 {
-    for(auto & sizes : medium_sq_sizes)
+    for(auto rows : medium_sq_sizes)
     {
-        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);
-        auto mat = this->gen.generate(generator::shape::self_adjoint(rows, cols), generator::property::random());
-        verify_hermitian(mat, rows, cols);
+        auto mat = this->gen.generate(generator::shape::self_adjoint(rows), generator::property::random());
+        verify_hermitian(mat, rows);
     }
 }
 
-#define GENERATE_TESTS(name, prop, sizes_obj, gtest_operand)           \
-template<typename Matrix>                                       \
-void verify_##name(Matrix && mat, uint32_t rows, uint32_t cols)\
-{                                                 \
-    EXPECT_EQ(mat.rows(), rows);            \
-    EXPECT_EQ(mat.columns(), cols);         \
-    for(uint32_t i = 0; i < rows; ++i) {    \
-        for(uint32_t j = 0; j < cols; ++j) {    \
-            gtest_operand(mat(i, j), 0.0f); \
-        }   \
-    }   \
-}   \
-    \
-TYPED_TEST(random_test, test_small_##name) {   \
-    for(auto & sizes : sizes_obj)            \
-    {                                         \
-        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
-        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random(), prop);  \
-        verify_##name(mat, rows, cols); \
-    }   \
-}
-
-GENERATE_TESTS(positive_small, generator::property::positive(), small_sizes, EXPECT_GT)
-GENERATE_TESTS(positive_medium, generator::property::positive(), medium_sizes, EXPECT_GT)
-GENERATE_TESTS(negative_small, generator::property::negative(), small_sizes, EXPECT_LT)
-GENERATE_TESTS(negative_medium, generator::property::negative(), medium_sizes, EXPECT_LT)
+GENERATE_TESTS(positive_small, generator::property::positive(), small_sizes)
+GENERATE_TESTS(positive_medium, generator::property::positive(), medium_sizes)
+GENERATE_TESTS(negative_small, generator::property::negative(), small_sizes)
+GENERATE_TESTS(negative_medium, generator::property::negative(), medium_sizes)
 
 GENERATE_HERMITIAN_TESTS(positive_small, generator::property::positive(), small_sq_sizes)
 GENERATE_HERMITIAN_TESTS(positive_medium, generator::property::positive(), medium_sq_sizes)

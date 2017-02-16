@@ -33,8 +33,8 @@ namespace generator { namespace shape {
 
     struct self_adjoint : detail::general<true>
     {
-        constexpr self_adjoint(int rows, int cols):
-                detail::general<true>(rows, cols) {}
+        constexpr self_adjoint(int rows):
+                detail::general<true>(rows, rows) {}
     };
 
     struct triangular;
