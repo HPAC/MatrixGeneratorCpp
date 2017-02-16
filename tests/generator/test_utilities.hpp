@@ -66,6 +66,12 @@ void verify(T val, const generator::property::zeros &)
     EXPECT_NEAR(val, 0.0f, std::numeric_limits<FloatingType>::epsilon());
 }
 
+template<typename FloatingType, typename T>
+void verify(T val, const generator::property::ones &)
+{
+    EXPECT_NEAR(val, 1.0f, std::numeric_limits<FloatingType>::epsilon());
+}
+
 template<typename MatType, typename ... Properties>
 void verify_general(MatType && mat, uint32_t rows, uint32_t cols, Properties &&... props)
 {

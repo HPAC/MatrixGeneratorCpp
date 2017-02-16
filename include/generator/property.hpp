@@ -14,7 +14,8 @@ namespace generator { namespace property {
     struct positive : property_t<1> {};
     struct negative : property_t<2> {};
     struct zeros    : property_t<3> {};
-    struct eye      : property_t<4> {};
+    struct ones    	: property_t<4> {};
+    struct eye      : property_t<5> {};
 
     template<typename T, uint64_t type>
     struct property;
