@@ -33,51 +33,15 @@ std::array< uint32_t, 4> small_sq_sizes{1, 2, 9, 25};
 std::array< std::tuple<uint32_t, uint32_t>, 2> medium_sizes{make_tuple(100, 100), make_tuple(199, 173)};
 std::array< uint32_t, 3> medium_sq_sizes{100, 103, 125};
 
-TYPED_TEST(random_test, general_test_small)
-{
-    for(auto & sizes : small_sizes)
-    {
-        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);
-        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random());
-        EXPECT_EQ(mat.rows(), rows);
-        EXPECT_EQ(mat.columns(), cols);
-    }
-}
-
-TYPED_TEST(random_test, general_test_medium)
-{
-    for(auto & sizes : medium_sizes)
-    {
-        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);
-        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random());
-        EXPECT_EQ(mat.rows(), rows);
-        EXPECT_EQ(mat.columns(), cols);
-    }
-}
-
-TYPED_TEST(random_test, symmetric_test_small)
-{
-    for(auto rows : small_sq_sizes)
-    {
-        auto mat = this->gen.generate(generator::shape::self_adjoint(rows), generator::property::random());
-        verify_hermitian(mat, rows);
-    }
-}
-
-TYPED_TEST(random_test, symmetric_test_medium)
-{
-    for(auto rows : medium_sq_sizes)
-    {
-        auto mat = this->gen.generate(generator::shape::self_adjoint(rows), generator::property::random());
-        verify_hermitian(mat, rows);
-    }
-}
-
+GENERATE_TESTS(small, small_sizes)
+GENERATE_TESTS(medium, medium_sizes)
 GENERATE_TESTS(positive_small, generator::property::positive(), small_sizes)
 GENERATE_TESTS(positive_medium, generator::property::positive(), medium_sizes)
 GENERATE_TESTS(negative_small, generator::property::negative(), small_sizes)
 GENERATE_TESTS(negative_medium, generator::property::negative(), medium_sizes)
 
+GENERATE_HERMITIAN_TESTS(small, small_sq_sizes)
+GENERATE_HERMITIAN_TESTS(medium, medium_sq_sizes)
 GENERATE_HERMITIAN_TESTS(positive_small, generator::property::positive(), small_sq_sizes)
 GENERATE_HERMITIAN_TESTS(positive_medium, generator::property::positive(), medium_sq_sizes)
 GENERATE_HERMITIAN_TESTS(negative_small, generator::property::negative(), small_sq_sizes)

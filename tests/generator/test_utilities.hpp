@@ -58,8 +58,18 @@ void verify_hermitian(MatType && mat, uint32_t rows, Properties &&... props)
     }
 }
 
-#define GENERATE_TESTS(name, prop, sizes_obj)           \
+#define GENERATE_TESTS_SINGLE(name, sizes_obj)           \
 TYPED_TEST(random_test, test_small_##name) {   \
+    for(auto & sizes : sizes_obj)            \
+    {                                         \
+        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
+        auto mat = this->gen.generate(generator::shape::general(rows, cols), generator::property::random());  \
+        verify(mat, rows, cols); \
+    }   \
+}
+
+#define GENERATE_TESTS_PROPERTY(name, prop, sizes_obj)           \
+TYPED_TEST(random_test, test_##name) {   \
     for(auto & sizes : sizes_obj)            \
     {                                         \
         uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
@@ -68,7 +78,16 @@ TYPED_TEST(random_test, test_small_##name) {   \
     }   \
 }
 
-#define GENERATE_HERMITIAN_TESTS(name, prop, sizes_obj)	\
+#define GENERATE_HERMITIAN_TESTS_SINGLE(name, sizes_obj)	\
+TYPED_TEST(random_test, symmetric_test_##name) {   \
+    for(auto rows : sizes_obj)            \
+    {                                         \
+        auto mat = this->gen.generate(generator::shape::self_adjoint(rows), generator::property::random());	\
+        verify_hermitian(mat, rows);	\
+    }   \
+}
+
+#define GENERATE_HERMITIAN_TESTS_PROPERTY(name, prop, sizes_obj)	\
 TYPED_TEST(random_test, symmetric_test_##name) {   \
     for(auto rows : sizes_obj)            \
     {                                         \
@@ -76,5 +95,12 @@ TYPED_TEST(random_test, symmetric_test_##name) {   \
         verify_hermitian(mat, rows, prop);	\
     }   \
 }
+
+// A simple hack for macro overloading
+// For two args select SINGLE, for three - PROPERTY
+#define GET_MACRO(_1, _2, _3, MACRO_NAME, ...) MACRO_NAME
+#define GENERATE_TESTS(...) GET_MACRO(__VA_ARGS__, GENERATE_TESTS_PROPERTY, GENERATE_TESTS_SINGLE)(__VA_ARGS__)
+#define GENERATE_HERMITIAN_TESTS(...) GET_MACRO(__VA_ARGS__, GENERATE_HERMITIAN_TESTS_PROPERTY, GENERATE_HERMITIAN_TESTS_SINGLE)(__VA_ARGS__)
+
 
 #endif
