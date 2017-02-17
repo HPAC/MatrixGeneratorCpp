@@ -18,8 +18,6 @@ namespace generator { namespace property {
     template<typename T>
     struct property<T, hash<generator::property::ones>()>
     {
-        typedef typename shape::intermediate<T, shape::general>::type intermediate_t;
-
         template<typename FwdIt>
         static void fill(FwdIt begin, FwdIt end)
         {

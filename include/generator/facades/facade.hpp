@@ -10,6 +10,7 @@
 
 #include <generator/shape.hpp>
 #include <generator/intermediate.hpp>
+#include <generator/property.hpp>
 #include <generator/properties/properties.hpp>
 
 namespace generator { namespace detail {

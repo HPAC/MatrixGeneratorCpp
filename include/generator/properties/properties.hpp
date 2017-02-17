@@ -10,5 +10,6 @@
 #include <generator/properties/random.hpp>
 #include <generator/properties/zeros.hpp>
 #include <generator/properties/ones.hpp>
+#include <generator/properties/eye.hpp>
 
 #endif

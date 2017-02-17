@@ -6,7 +6,8 @@
 #ifndef LINALG_TESTS_GENERATOR_PROPERTIES_RANDOM_HPP
 #define LINALG_TESTS_GENERATOR_PROPERTIES_RANDOM_HPP
 
-#include <generator/properties/property_id.hpp>
+#include <generator/shape.hpp>
+#include <generator/intermediate.hpp>
 #include <generator/property.hpp>
 #include <generator/properties/filler.hpp>
 
@@ -64,7 +65,7 @@ namespace generator { namespace property {
     struct property;
 
     template<typename T>
-    struct property<T, hash<generator::property::random>()> :
+    struct property<T, generator::property::hash<generator::property::random>()> :
             detail::random_generator<T, false, false>
     {};
 
