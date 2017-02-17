@@ -25,10 +25,12 @@ struct eye_test : public testing::Test
 
 TYPED_TEST_CASE(eye_test, test_settings<>::types_to_test);
 
-template<typename MatType>
-void verify_left(MatType && mat, MatType && eye)
+template<typename MatType1, typename MatType2>
+void verify_left(MatType1 && mat, MatType2 && eye)
 {
-    typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t val_t;
+    // both floating types should be the same
+    typedef typename traits::matrix_traits< std::remove_reference_t<MatType1> >::value_t val_t;
+
     // Mat is (s, rows), eye is (rows, cols)
     // Result matrix is of size s x cols
     // If rows > cols then some columns from original matrix is gone
@@ -47,10 +49,12 @@ void verify_left(MatType && mat, MatType && eye)
     }
 }
 
-template<typename MatType>
-void verify_right(MatType && mat, MatType && eye)
+template<typename MatType1, typename MatType2>
+void verify_right(MatType1 && mat, MatType2 && eye)
 {
-    typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t val_t;
+    // both floating types should be the same
+    typedef typename traits::matrix_traits< std::remove_reference_t<MatType1> >::value_t val_t;
+
     // Mat is (cols, s), eye is (rows, cols)
     // Result matrix is of size rows x s
     // If rows > cols then additional rows not from original matrix should be zero
@@ -71,20 +75,46 @@ void verify_right(MatType && mat, MatType && eye)
     }
 }
 
-TYPED_TEST(eye_test, name)
-{
-    for(auto & sizes : test_settings<>::small_sizes)
-    {
-        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);
-
-        auto mat = this->gen.generate(generator::shape::general(42, rows), generator::property::random());
-        auto eye = this->gen.generate(generator::shape::general(rows, cols), generator::property::eye());
-        verify_left(mat, eye);
-        eye = this->gen.generate(generator::shape::general(rows, cols), generator::property::eye());
-        mat = this->gen.generate(generator::shape::general(cols, 42), generator::property::random());
-        verify_right(mat, eye);
-    }
+#define GENERATE_GENERAL_MATRIX_TEST(name, sizes_obj)   \
+TYPED_TEST(eye_test, general_##name)                      \
+{                                                       \
+    for(auto & sizes : test_settings<>::sizes_obj)      \
+    {                                                   \
+        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
+        auto mat = this->gen.generate(generator::shape::general(42, rows), generator::property::random());  \
+        auto eye = this->gen.generate(generator::shape::general(rows, cols), generator::property::eye());   \
+        verify_left(mat, eye);  \
+        eye = this->gen.generate(generator::shape::general(rows, cols), generator::property::eye());    \
+        mat = this->gen.generate(generator::shape::general(cols, 42), generator::property::random());   \
+        verify_right(mat, eye); \
+    }   \
 }
+
+#define GENERATE_HERMITIAN_MATRIX_TEST(name, shape_type, sizes_obj) \
+TYPED_TEST(eye_test, shape_type##_##name)                               \
+{                                                                   \
+    for(auto size : test_settings<>::sizes_obj)                     \
+    {                                                               \
+        auto mat = this->gen.generate(generator::shape::general(42, size), generator::property::random());  \
+        auto eye = this->gen.generate(generator::shape::shape_type(size), generator::property::eye());  \
+        verify_left(mat, eye);  \
+        eye = this->gen.generate(generator::shape::shape_type(size), generator::property::eye());   \
+        mat = this->gen.generate(generator::shape::general(size, 42), generator::property::random());   \
+        verify_right(mat, eye); \
+    }   \
+}
+
+
+
+
+GENERATE_GENERAL_MATRIX_TEST(small, small_sizes)
+GENERATE_GENERAL_MATRIX_TEST(medium, medium_sizes)
+
+GENERATE_HERMITIAN_MATRIX_TEST(small, self_adjoint, small_sq_sizes)
+GENERATE_HERMITIAN_MATRIX_TEST(medium, self_adjoint, medium_sq_sizes)
+
+GENERATE_HERMITIAN_MATRIX_TEST(small, diagonal, small_sq_sizes)
+GENERATE_HERMITIAN_MATRIX_TEST(medium, diagonal, medium_sq_sizes)
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
