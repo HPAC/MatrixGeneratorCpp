@@ -1,4 +1,7 @@
+
 module Benchmarker
+
+	include("Results.jl")
 
 	# Benchmarker resources
 	#
@@ -13,6 +16,8 @@ module Benchmarker
 	# https://github.com/schmrlng/CPUTime.jl/blob/master/src/CPUTime.jl
 	function run(iters::Int, f, args...)
 
+		timings = Array{Float64}(iters);
+
 		# Compile f and time functions
 		tic();
 		f(args...);
@@ -23,9 +28,10 @@ module Benchmarker
 			tic();
 			f(args...);
 			total_time = toq();
+			timings[i] = total_time;
 		end
 
-		println("Average time " * string(total_time / iters));
+		return Results(iters, timings);
 	end
 
 end

@@ -4,8 +4,6 @@ workspace()
 reload("Benchmarker")
 using Benchmarker;
 
-1+1
-println(2+2)
 
 function f(x::Int, y::Int)
   y::Float64 = y;
@@ -14,4 +12,4 @@ function f(x::Int, y::Int)
   end
 end
 
-Benchmarker.run(100, f, 100000, 1)
+println(Benchmarker.run(100, f, 100000, 1))
