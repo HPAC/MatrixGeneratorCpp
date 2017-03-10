@@ -12,4 +12,4 @@ function f(x::Int, y::Int)
   end
 end
 
-println(Benchmarker.run(100, f, 100000, 1))
+println(Benchmarker.run(1000, f, 100000, 1))

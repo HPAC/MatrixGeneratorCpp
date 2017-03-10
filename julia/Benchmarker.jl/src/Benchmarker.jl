@@ -1,6 +1,8 @@
 
 module Benchmarker
 
+	export run, Results
+
 	include("Results.jl")
 
 	# Benchmarker resources
