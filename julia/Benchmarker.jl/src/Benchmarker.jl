@@ -16,24 +16,45 @@ module Benchmarker
 	# Other benchmarkers
 	# https://github.com/johnmyleswhite/Benchmarks.jl/blob/master/src/benchmarkable.jl
 	# https://github.com/schmrlng/CPUTime.jl/blob/master/src/CPUTime.jl
-	function run(iters::Int, f, args...)
+
+	function run(iters, f, args...)
 
 		timings = Array{Float64}(iters);
-
 		# Compile f and time functions
 		tic();
 		f(args...);
 		toq();
 
-		total_time::Float64 = 0.0;
+		local total_time::Float64 = 0.0;
 		for i=1:iters
 			tic();
 			f(args...);
 			total_time = toq();
 			timings[i] = total_time;
 		end
-
 		return Results(iters, timings);
+		
+	end
+
+	macro time(ex)
+
+		quote
+			timings = Array{Float64}(100);
+			# Compile f and time functions
+			tic();
+			$(esc(ex));
+			toq();
+
+			local total_time::Float64 = 0.0;
+			for i=1:100
+				tic();
+				$(esc(ex));
+				total_time = toq();
+				timings[i] = total_time;
+			end
+			Results(100, timings);
+		end
+
 	end
 
 end
