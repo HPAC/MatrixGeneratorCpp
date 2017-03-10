@@ -1,9 +1,10 @@
 
 module Benchmarker
 
-	export run, Results
+	export measure
 
 	include("Results.jl")
+	include("Plotter.jl")
 
 	# Benchmarker resources
 	#
@@ -17,7 +18,7 @@ module Benchmarker
 	# https://github.com/johnmyleswhite/Benchmarks.jl/blob/master/src/benchmarkable.jl
 	# https://github.com/schmrlng/CPUTime.jl/blob/master/src/CPUTime.jl
 
-	function run(iters, f, args...)
+	function measure(iters, f, args...)
 
 		timings = Array{Float64}(iters);
 		# Compile f and time functions
@@ -33,7 +34,7 @@ module Benchmarker
 			timings[i] = total_time;
 		end
 		return Results(iters, timings);
-		
+
 	end
 
 	macro time(ex)

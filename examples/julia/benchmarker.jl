@@ -12,5 +12,5 @@ function f(x::Int, y::Int)
   end
 end
 
-println(@Benchmarker.run(f(100000, 1)))
+println(Benchmarker.measure(f(100000, 1)))
 println(@Benchmarker.time(f(100000, 1)))
