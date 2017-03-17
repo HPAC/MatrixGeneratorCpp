@@ -30,8 +30,12 @@ module Generator
   end
   const generator = GeneratorImpl()
 
+  function extract_type(obj)
+    return isa(obj, DataType) ? obj : typeof(obj)
+  end
+
   function generate{T <: ShapeType}(gen::GeneratorImpl, shape::T, properties)
-    return gen.generators[ Set(properties) ](shape)
+    return gen.generators[map(extract_type, properties)](shape, properties)
   end
 
 end
