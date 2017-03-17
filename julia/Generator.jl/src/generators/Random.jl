@@ -2,23 +2,26 @@
 using .Shape;
 using .Properties;
 
-#A Julia "enum"
 @enum ValuesType none=0 positive=1 negative=2
-#immutable ValuesType
-#  type::Int
-#end
 
-#const none = ValuesType(0);
-#const positive = ValuesType(1);
-#const negative = ValuesType(2);
+function define_random(functions)
+
+  functions[ Set([Properties.Random]) ] =
+    shape -> random(shape, none);
+  functions[ Set([Properties.Random, Properties.Positive])] =
+    shape -> random(shape, positive);
+  functions[ Set([Properties.Random, Properties.Negative])] =
+    shape -> random(shape, negative);
+
+end
 
 function random{T <: ValuesType}(shape::General, valTypes::T)
   if valTypes == none
-    println( "General, none" )
+    return rand(shape.rows, shape.cols)
   elseif valTypes == positive
-    println( "General, pos")
+    return rand(shape.rows, shape.cols)
   else
-    println( "General, neg")
+    return rand(shape.rows, shape.cols) * -1
   end
 end
 

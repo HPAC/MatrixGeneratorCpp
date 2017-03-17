@@ -13,7 +13,6 @@ module Shape
 
   immutable SelfAdjoint <: ShapeType
     rows::Int
-    cols::Int
   end
 
   immutable Diagonal
