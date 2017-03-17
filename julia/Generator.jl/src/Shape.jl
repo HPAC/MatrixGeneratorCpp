@@ -2,14 +2,18 @@
 
 module Shape
 
-  export General, SelfAdjoint
+  export ShapeType, General, SelfAdjoint
 
-  immutable General
+  abstract ShapeType
+
+  immutable General <: ShapeType
     rows::Int
     cols::Int
   end
 
-  immutable SelfAdjoint
+  immutable SelfAdjoint <: ShapeType
+    rows::Int
+    cols::Int
   end
 
   immutable Diagonal
