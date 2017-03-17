@@ -26,11 +26,6 @@ function random{T <: ValuesType}(shape::General, valTypes::T)
 end
 
 function random{T <: ValuesType}(shape::SelfAdjoint, valTypes::T)
-  if valTypes == none
-    println( "SelfAdjoint, none" )
-  elseif valTypes == positive
-    println( "SelfAdjoint, pos")
-  else
-    println( "SelfAdjoint, neg")
-  end
+  mat = random(Shape.General(shape.rows, shape.rows), valTypes)
+  return Symmetric(mat)
 end

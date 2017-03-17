@@ -17,9 +17,6 @@ module Generator
 
   include("generators/Random.jl")
 
-  #export Shape::General
-
-
   type GeneratorImpl
 
     generators::Dict
