@@ -1,10 +1,33 @@
 
 using .Shape;
+using .Properties;
 
-function random(shape::General, positive::Bool, negative::Bool)
-  @printf("Random general called with %d %d\n", positive, negative)
+#A Julia "enum"
+@enum ValuesType none=0 positive=1 negative=2
+#immutable ValuesType
+#  type::Int
+#end
+
+#const none = ValuesType(0);
+#const positive = ValuesType(1);
+#const negative = ValuesType(2);
+
+function random{T <: ValuesType}(shape::General, valTypes::T)
+  if valTypes == none
+    println( "General, none" )
+  elseif valTypes == positive
+    println( "General, pos")
+  else
+    println( "General, neg")
+  end
 end
 
-function random(shape::SelfAdjoint, positive::Bool, negative::Bool)
-  @printf("Random SelfAdjoint called with %d %d\n", positive, negative)
+function random{T <: ValuesType}(shape::SelfAdjoint, valTypes::T)
+  if valTypes == none
+    println( "SelfAdjoint, none" )
+  elseif valTypes == positive
+    println( "SelfAdjoint, pos")
+  else
+    println( "SelfAdjoint, neg")
+  end
 end

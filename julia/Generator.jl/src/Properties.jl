@@ -2,6 +2,8 @@
 
 module Properties
 
+  export Random, Positive, Negative
+
   immutable Random
   end
 
