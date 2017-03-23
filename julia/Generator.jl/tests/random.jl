@@ -1,18 +1,10 @@
 using Base.Test
 using Generator
 
-function verify(rows, cols, shape, properties, func)
-  mat = generate(shape, Set(properties))
-  @test size(mat, 1) == rows
-  @test size(mat, 2) == cols
-  if !isnull(func)
-    foreach(get(func), mat)
-  end
-  return mat
-end
+include("helpers.jl")
 
 matrix_sizes = [ [1, 1], [2, 2], [25, 50], [50, 25] ]
-matrix_sq_sizes = [ 1, 2, 33, 49 ]
+matrix_sq_sizes = [ [1, 1], [2, 2], [33, 33], [49, 49] ]
 properties = Dict()
 properties[ [Properties.Random] ] = Nullable()
 properties[ [Properties.Random(0, 2.0)] ] = Nullable(x -> @test x >= 0 && x <= 2)
@@ -34,70 +26,21 @@ properties[ [Properties.Random(-8.5, -7), Properties.Negative] ] = Nullable(x ->
 @test_throws ErrorException generate(Shape.General(1, 1),
   Set([Properties.Random(-0.5, 2), Properties.Negative]))
 
+types = [ (Shape.General, (x, y) -> Shape.General(x, y), matrix_sizes)
+          (Shape.Symmetric, (x, y) -> Shape.Symmetric(x), matrix_sq_sizes)
+          (Shape.Triangular, (x, y) -> Shape.Triangular(x, Shape.Upper), matrix_sq_sizes)
+          (Shape.Triangular, (x, y) -> Shape.Triangular(x, Shape.Lower), matrix_sq_sizes)
+          (Shape.Diagonal, (x, y) -> Shape.Diagonal(x), matrix_sq_sizes)
+        ]
+
 #General matrix
-for (prop, verificator) in properties
-  for cur_size in matrix_sizes
-    verify(cur_size[1], cur_size[2], Shape.General(cur_size[1], cur_size[2]),
-      prop, verificator)
-  end
-end
 
-#Symmetric matrix
-for (prop, verificator) in properties
-  for cur_size in matrix_sq_sizes
-    mat = verify(cur_size, cur_size, Shape.Symmetric(cur_size), prop, verificator)
-    @test issymmetric(mat)
-  end
-end
-
-#Triangular
-for (prop, verificator) in properties
-  for cur_size in matrix_sq_sizes
-    mat = generate(Shape.Triangular(cur_size, Shape.Upper), Set(prop))
-    @test size(mat, 1) == cur_size
-    @test size(mat, 2) == cur_size
-    if !isnull(verificator)
-      func = get(verificator)
-      for i=1:cur_size
-        for j=i:cur_size
-          func( mat[i, j] )
-        end
-      end
+for (datatype, creator, matrix_sizes) in types
+  for (prop, verificator) in properties
+    for cur_size in matrix_sizes
+      verify(cur_size[1], cur_size[2], creator(cur_size[1], cur_size[2]),
+        prop, verificator)
     end
-    @test istriu(mat)
   end
 end
 
-for (prop, verificator) in properties
-  for cur_size in matrix_sq_sizes
-    mat = generate(Shape.Triangular(cur_size, Shape.Lower), Set(prop))
-    @test size(mat, 1) == cur_size
-    @test size(mat, 2) == cur_size
-    if !isnull(verificator)
-      func = get(verificator)
-      for i=1:cur_size
-        for j=1:i
-          func( mat[i, j] )
-        end
-      end
-    end
-    @test istril(mat)
-  end
-end
-
-#Diagonal
-
-for (prop, verificator) in properties
-  for cur_size in matrix_sq_sizes
-    mat = generate(Shape.Diagonal(cur_size), Set(prop))
-    @test size(mat, 1) == cur_size
-    @test size(mat, 2) == cur_size
-    if !isnull(verificator)
-      func = get(verificator)
-      for i=1:cur_size
-        func( mat[i, i] )
-      end
-    end
-    @test isdiag(mat)
-  end
-end

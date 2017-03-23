@@ -27,3 +27,15 @@ function constant(shape::Shape.Symmetric, properties)
   mat = constant(Shape.General(shape.rows, shape.rows), properties)
   return Symmetric(mat)
 end
+
+function constant(shape::Shape.Triangular, properties)
+  mat = constant(Shape.General(shape.rows, shape.rows), properties)
+  return    shape.data_placement == Shape.Upper ?
+            UpperTriangular(mat) :
+            LowerTriangular(mat)
+end
+
+function constant(shape::Shape.Symmetric, properties)
+  mat = constant(Shape.General(1, shape.rows), properties)
+  return Diagonal( vec(mat) )
+end
