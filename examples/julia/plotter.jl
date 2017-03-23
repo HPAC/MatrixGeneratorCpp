@@ -15,3 +15,9 @@ for i=50:10:100
   Benchmarker.Plotter.add_data(plotter2, [i], @Benchmarker.time(matmul(i)));
 end
 Benchmarker.Plotter.finish(plotter2);
+
+plotter = Plotter.Plot{Float64}("julia_data2.txt");
+for i=50:10:100
+  Benchmarker.Plotter.add_data(plotter, @Benchmarker.time(matmul(i)));
+end
+Benchmarker.Plotter.finish(plotter);
