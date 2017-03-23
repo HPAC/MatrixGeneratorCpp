@@ -2,7 +2,7 @@
 module Generator
 
   export GeneratorImpl
-  export generator, generate
+  export generate
 
 
   include("Shape.jl")
@@ -34,8 +34,8 @@ module Generator
     return isa(obj, DataType) ? obj : typeof(obj)
   end
 
-  function generate{T <: ShapeType}(gen::GeneratorImpl, shape::T, properties)
-    return gen.generators[map(extract_type, properties)](shape, properties)
+  function generate{T <: ShapeType}(shape::T, properties)
+    return generator.generators[map(extract_type, properties)](shape, properties)
   end
 
 end
