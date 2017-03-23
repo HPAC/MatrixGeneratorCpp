@@ -23,4 +23,12 @@ module Properties
   immutable Negative
   end
 
+  immutable Constant
+    value::Float64
+
+    function Constant(value::Float64 = 0.0)
+      return new(value)
+    end
+  end
+
 end

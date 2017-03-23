@@ -2,7 +2,7 @@ using Base.Test
 using Generator
 
 function verify(rows, cols, shape, properties, func)
-  mat = generate(generator, shape, Set(properties))
+  mat = generate(shape, Set(properties))
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
   if !isnull(func)
@@ -27,7 +27,6 @@ properties[ [Properties.Random, Properties.Negative] ] = Nullable(x -> @test x <
 properties[ [Properties.Negative, Properties.Random(-1.5, 0)] ] = Nullable(x -> @test x <= 0)
 properties[ [Properties.Random(-8.5, -7), Properties.Negative] ] = Nullable(x -> @test x <= 0)
 
-
 #General matrix
 for (prop, verificator) in properties
   for cur_size in matrix_sizes
@@ -46,7 +45,7 @@ end
 
 #Incorrect properties
 @test_throws ErrorException [Properties.Random(0.3, 0)]
-@test_throws ErrorException generate(generator, Shape.General(1, 1),
+@test_throws ErrorException generate(Shape.General(1, 1),
   Set([Properties.Random(-1.5, 1), Properties.Positive]))
-@test_throws ErrorException generate(generator, Shape.General(1, 1),
+@test_throws ErrorException generate(Shape.General(1, 1),
   Set([Properties.Random(-0.5, 2), Properties.Negative]))

@@ -16,6 +16,7 @@ module Generator
   export Properties
 
   include("generators/Random.jl")
+  include("generators/Constant.jl")
 
   type GeneratorImpl
 
@@ -24,6 +25,7 @@ module Generator
     function GeneratorImpl()
       a = Dict{Set{DataType}, Any}();
       define_random(a);
+      define_constant(a);
       return new(a)
     end
 
