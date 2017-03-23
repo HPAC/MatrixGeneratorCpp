@@ -27,6 +27,13 @@ properties[ [Properties.Random, Properties.Negative] ] = Nullable(x -> @test x <
 properties[ [Properties.Negative, Properties.Random(-1.5, 0)] ] = Nullable(x -> @test x <= 0)
 properties[ [Properties.Random(-8.5, -7), Properties.Negative] ] = Nullable(x -> @test x <= 0)
 
+#Incorrect properties
+@test_throws ErrorException [Properties.Random(0.3, 0)]
+@test_throws ErrorException generate(Shape.General(1, 1),
+  Set([Properties.Random(-1.5, 1), Properties.Positive]))
+@test_throws ErrorException generate(Shape.General(1, 1),
+  Set([Properties.Random(-0.5, 2), Properties.Negative]))
+
 #General matrix
 for (prop, verificator) in properties
   for cur_size in matrix_sizes
@@ -43,9 +50,54 @@ for (prop, verificator) in properties
   end
 end
 
-#Incorrect properties
-@test_throws ErrorException [Properties.Random(0.3, 0)]
-@test_throws ErrorException generate(Shape.General(1, 1),
-  Set([Properties.Random(-1.5, 1), Properties.Positive]))
-@test_throws ErrorException generate(Shape.General(1, 1),
-  Set([Properties.Random(-0.5, 2), Properties.Negative]))
+#Triangular
+for (prop, verificator) in properties
+  for cur_size in matrix_sq_sizes
+    mat = generate(Shape.Triangular(cur_size, Shape.Upper), Set(prop))
+    @test size(mat, 1) == cur_size
+    @test size(mat, 2) == cur_size
+    if !isnull(verificator)
+      func = get(verificator)
+      for i=1:cur_size
+        for j=i:cur_size
+          func( mat[i, j] )
+        end
+      end
+    end
+    @test istriu(mat)
+  end
+end
+
+for (prop, verificator) in properties
+  for cur_size in matrix_sq_sizes
+    mat = generate(Shape.Triangular(cur_size, Shape.Lower), Set(prop))
+    @test size(mat, 1) == cur_size
+    @test size(mat, 2) == cur_size
+    if !isnull(verificator)
+      func = get(verificator)
+      for i=1:cur_size
+        for j=1:i
+          func( mat[i, j] )
+        end
+      end
+    end
+    @test istril(mat)
+  end
+end
+
+#Diagonal
+
+for (prop, verificator) in properties
+  for cur_size in matrix_sq_sizes
+    mat = generate(Shape.Diagonal(cur_size), Set(prop))
+    @test size(mat, 1) == cur_size
+    @test size(mat, 2) == cur_size
+    if !isnull(verificator)
+      func = get(verificator)
+      for i=1:cur_size
+        func( mat[i, i] )
+      end
+    end
+    @test isdiag(mat)
+  end
+end

@@ -61,3 +61,17 @@ function random{T <: ValuesType}(shape::Shape.Symmetric, properties, valTypes::T
   mat = random(Shape.General(shape.rows, shape.rows), properties, valTypes)
   return Symmetric(mat)
 end
+
+function random{T <: ValuesType}(shape::Shape.Triangular, properties, valTypes::T)
+  # fill whole matrix, one part will be ignored
+  mat = random(Shape.General(shape.rows, shape.rows), properties, valTypes)
+  return    shape.data_placement == Shape.Upper ?
+            UpperTriangular(mat) :
+            LowerTriangular(mat)
+end
+
+function random{T <: ValuesType}(shape::Shape.Diagonal, properties, valTypes::T)
+  # fill one row 
+  mat = random(Shape.General(1, shape.rows), properties, valTypes)
+  return Diagonal( vec(mat) )
+end

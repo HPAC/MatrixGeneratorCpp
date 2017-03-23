@@ -15,6 +15,14 @@ module Shape
     rows::Int
   end
 
-  immutable Diagonal
+  @enum Triangularity Upper=1 Lower=2
+
+  immutable Triangular <: ShapeType
+    rows::Int
+    data_placement::Triangularity
+  end
+
+  immutable Diagonal <: ShapeType
+    rows::Int
   end
 end
