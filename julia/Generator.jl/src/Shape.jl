@@ -11,7 +11,7 @@ module Shape
     cols::Int
   end
 
-  immutable SelfAdjoint <: ShapeType
+  immutable Symmetric <: ShapeType
     rows::Int
   end
 

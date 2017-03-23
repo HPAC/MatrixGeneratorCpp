@@ -12,7 +12,7 @@ function define_constant(functions)
 
 end
 
-function constant(shape::General, properties)
+function constant(shape::Shape.General, properties)
 
   const_prop = first(properties)
   if isa(const_prop, DataType)
@@ -23,7 +23,7 @@ function constant(shape::General, properties)
 
 end
 
-function constant(shape::SelfAdjoint, properties)
+function constant(shape::Shape.Symmetric, properties)
   mat = constant(Shape.General(shape.rows, shape.rows), properties)
   return Symmetric(mat)
 end

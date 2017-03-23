@@ -36,7 +36,7 @@ function get_bounds(properties, valTypes)
   end
 end
 
-function random{T <: ValuesType}(shape::General, properties, valTypes::T)
+function random{T <: ValuesType}(shape::Shape.General, properties, valTypes::T)
   low, high = get_bounds(properties, valTypes)
   if valTypes == none
     return rand(shape.rows, shape.cols) * (high - low) + low
@@ -57,7 +57,7 @@ function random{T <: ValuesType}(shape::General, properties, valTypes::T)
   end
 end
 
-function random{T <: ValuesType}(shape::SelfAdjoint, properties, valTypes::T)
+function random{T <: ValuesType}(shape::Shape.Symmetric, properties, valTypes::T)
   mat = random(Shape.General(shape.rows, shape.rows), properties, valTypes)
   return Symmetric(mat)
 end

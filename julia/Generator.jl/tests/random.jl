@@ -38,7 +38,7 @@ end
 #Symmetric matrix
 for (prop, verificator) in properties
   for cur_size in matrix_sq_sizes
-    mat = verify(cur_size, cur_size, Shape.SelfAdjoint(cur_size), prop, verificator)
+    mat = verify(cur_size, cur_size, Shape.Symmetric(cur_size), prop, verificator)
     @test issymmetric(mat)
   end
 end
