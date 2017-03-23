@@ -33,8 +33,6 @@ types = [ (Shape.General, (x, y) -> Shape.General(x, y), matrix_sizes)
           (Shape.Diagonal, (x, y) -> Shape.Diagonal(x), matrix_sq_sizes)
         ]
 
-#General matrix
-
 for (datatype, creator, matrix_sizes) in types
   for (prop, verificator) in properties
     for cur_size in matrix_sizes

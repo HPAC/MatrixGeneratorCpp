@@ -35,7 +35,7 @@ function constant(shape::Shape.Triangular, properties)
             LowerTriangular(mat)
 end
 
-function constant(shape::Shape.Symmetric, properties)
+function constant(shape::Shape.Diagonal, properties)
   mat = constant(Shape.General(1, shape.rows), properties)
   return Diagonal( vec(mat) )
 end
