@@ -18,7 +18,7 @@ module Plotter
       f = open(name, "w");
       full_labels = ["Time" "StdDev" "Min" "Max"];
       if !isempty(labels)
-        full_labels = hcat(labels', full_labels);
+        full_labels = hcat([permutedims(labels, [2, 1]), full_labels);
       end
       writedlm(f, full_labels, delimiter);
       return new{T}(f, delimiter);
