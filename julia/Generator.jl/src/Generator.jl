@@ -17,6 +17,7 @@ module Generator
 
   include("generators/Random.jl")
   include("generators/Constant.jl")
+  include("generators/SPD.jl")
 
   type GeneratorImpl
 
@@ -26,6 +27,7 @@ module Generator
       a = Dict{Set{DataType}, Any}();
       define_random(a);
       define_constant(a);
+      define_spd(a);
       return new(a)
     end
 

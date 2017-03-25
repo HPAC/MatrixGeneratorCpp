@@ -31,4 +31,7 @@ module Properties
     end
   end
 
+  immutable SPD
+  end
+
 end
