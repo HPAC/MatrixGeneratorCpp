@@ -34,4 +34,7 @@ module Properties
   immutable SPD
   end
 
+  immutable Orthogonal
+  end
+
 end

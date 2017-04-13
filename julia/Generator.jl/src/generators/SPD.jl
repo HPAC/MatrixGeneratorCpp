@@ -18,7 +18,7 @@ end
 function spd(shape::Shape.General, properties, positive::Bool)
 
   if shape.rows != shape.cols
-    throw(ErrorException("A nonsymmetric matrix cannot symmetric positive definite!"))
+    throw(ErrorException("A not square matrix cannot be symmetric positive definite!"))
   else
     return spd(Shape.Symmetric(shape.rows), properties, positive)
   end

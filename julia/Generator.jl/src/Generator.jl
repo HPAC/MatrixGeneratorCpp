@@ -18,6 +18,7 @@ module Generator
   include("generators/Random.jl")
   include("generators/Constant.jl")
   include("generators/SPD.jl")
+  include("generators/Orthogonal.jl")
 
   type GeneratorImpl
 
@@ -28,6 +29,7 @@ module Generator
       define_random(a);
       define_constant(a);
       define_spd(a);
+      define_orthogonal(a)
       return new(a)
     end
 
