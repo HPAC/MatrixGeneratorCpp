@@ -20,7 +20,7 @@ function spd(shape::Shape.General, properties, positive::Bool)
   if shape.rows != shape.cols
     throw(ErrorException("A not square matrix cannot be symmetric positive definite!"))
   else
-    return spd(Shape.Symmetric(shape.rows), properties, positive)
+    return spd(Shape.Symmetric(shape.rows), properties, positive).data
   end
 
 end
@@ -45,8 +45,6 @@ function spd(shape::Shape.Symmetric, properties, _positive::Bool)
   end
   # Avoid very low determinant
   mat = mat + eye(shape.rows)*3
-  #println(mat)
-  #println(det(mat))
   return Symmetric(mat' * mat)
 
 end
