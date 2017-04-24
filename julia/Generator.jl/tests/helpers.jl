@@ -3,6 +3,13 @@ function verify(rows, cols, shape::Shape.General, properties, func,
     func_gen = Nullable())
 
   mat = generate(shape, Set(properties))
+
+  if rows == 1
+    @test isa(mat, Array{Float64, 1})
+  else
+    @test isa(mat, Array{Float64, 2})
+  end  
+
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
   if !isnull(func)

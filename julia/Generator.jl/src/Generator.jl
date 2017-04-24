@@ -41,7 +41,12 @@ module Generator
   end
 
   function generate{T <: ShapeType}(shape::T, properties)
-    return generator.generators[map(extract_type, properties)](shape, properties)
+    mat = generator.generators[map(extract_type, properties)](shape, properties)
+    if isa(shape, Shape.General) && shape.rows == 1
+      return vec(mat)
+    else
+      return mat
+    end
   end
 
 end

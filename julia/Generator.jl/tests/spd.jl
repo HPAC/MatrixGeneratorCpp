@@ -19,8 +19,9 @@ properties[ [Properties.SPD, Properties.Positive] ] = Nullable(x -> @test x >= 0
 
 #For some reason isposdef is not overloaded for SymmetricMatrix
 #We have to treat it differently.
+# Also for general matrix: for a vector case 1x1 ensure that only element is > 0
 types = [ (Shape.General, (x, y) -> Shape.General(x, y), matrix_sq_sizes,
-            mat -> @test isposdef(mat.data))
+            mat -> @test size(mat, 1) > 1 ? issymmetric(mat) && isposdef(mat) : mat[1] > 0)
           (Shape.Symmetric, (x, y) -> Shape.Symmetric(x), matrix_sq_sizes,
             mat -> @test isposdef(mat.data))
           (Shape.Diagonal, (x, y) -> Shape.Diagonal(x), matrix_sq_sizes,
