@@ -16,7 +16,7 @@ function constant(shape::Shape.General, properties)
 
   const_prop = first(properties)
   if isa(const_prop, DataType)
-    return fill(0, (shape.rows, shape.cols))
+    return fill(0.0, (shape.rows, shape.cols))
   else
     return fill(const_prop.value, (shape.rows, shape.cols))
   end
