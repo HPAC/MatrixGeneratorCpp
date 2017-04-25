@@ -25,6 +25,7 @@ function verify(rows, cols, shape::Shape.Symmetric, properties, func,
     func_gen = Nullable())
 
   mat = generate(shape, Set(properties))
+  @test isa(mat, Symmetric)
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
   if !isnull(func)
@@ -47,6 +48,7 @@ function verify(rows, cols, shape::Shape.Triangular, properties, func,
   if !isnull(func)
     func_ = get(func)
     if shape.data_placement == Shape.Upper
+      @test isa(mat, UpperTriangular)
       for i=1:rows
         for j=i:rows
           func_( mat[i, j] )
@@ -54,6 +56,7 @@ function verify(rows, cols, shape::Shape.Triangular, properties, func,
       end
       @test istriu(mat)
     else
+      @test isa(mat, LowerTriangular)
       for i=1:rows
         for j=1:i
           func_( mat[i, j] )
@@ -72,6 +75,7 @@ function verify(rows, cols, shape::Shape.Diagonal, properties, func,
     func_gen = Nullable())
 
   mat = generate(shape, Set(properties))
+  @test isa(mat, Diagonal)
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
 
