@@ -4,8 +4,10 @@ function verify(rows, cols, shape::Shape.General, properties, func,
 
   mat = generate(shape, Set(properties))
 
-  if rows == 1
+  if cols == 1
     @test isa(mat, Array{Float64, 1})
+  elseif rows == 1
+    @test isa(mat, RowVector{Float64, Array{Float64, 1}})
   else
     @test isa(mat, Array{Float64, 2})
   end  
