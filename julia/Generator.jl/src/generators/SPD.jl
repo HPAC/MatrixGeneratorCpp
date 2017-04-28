@@ -2,8 +2,6 @@
 using .Shape;
 using .Properties;
 
-include("Random.jl")
-
 function define_spd(functions)
 
   functions[ Set([Properties.SPD]) ] =

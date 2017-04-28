@@ -5,8 +5,6 @@ using .Properties;
 # import to extend with a set support
 import Base.findfirst
 
-@enum ValuesType none=0 positive=1 negative=2
-
 function define_random(functions)
 
   functions[ Set([Properties.Random]) ] =
@@ -75,3 +73,4 @@ function random{T <: ValuesType}(shape::Shape.Diagonal, properties, valTypes::T)
   mat = random(Shape.General(1, shape.rows), properties, valTypes)
   return Diagonal( vec(mat) )
 end
+

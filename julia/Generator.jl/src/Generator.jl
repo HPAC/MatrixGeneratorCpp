@@ -4,7 +4,6 @@ module Generator
   export GeneratorImpl
   export generate
 
-
   include("Shape.jl")
   include("Properties.jl")
   #import shape types
@@ -14,6 +13,8 @@ module Generator
 
   using .Properties
   export Properties
+
+  @enum ValuesType none=0 positive=1 negative=2
 
   include("generators/Random.jl")
   include("generators/Constant.jl")

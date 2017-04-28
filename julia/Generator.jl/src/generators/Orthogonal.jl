@@ -2,10 +2,6 @@
 using .Shape;
 using .Properties;
 
-include("Random.jl")
-
-@enum ValuesType none=0 positive=1 negative=2
-
 function define_orthogonal(functions)
 
   functions[ Set([Properties.Orthogonal]) ] =
