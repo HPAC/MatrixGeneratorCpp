@@ -4,7 +4,7 @@ module Shape
 
   export ShapeType, General, SelfAdjoint
 
-  abstract ShapeType
+  abstract type ShapeType end
 
   immutable General <: ShapeType
     rows::Int
