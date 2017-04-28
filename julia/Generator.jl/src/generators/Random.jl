@@ -3,7 +3,7 @@ using .Shape;
 using .Properties;
 
 # import to extend with a set support
-import Base.findfirst
+#import Base.findfirst
 
 function define_random(functions)
 

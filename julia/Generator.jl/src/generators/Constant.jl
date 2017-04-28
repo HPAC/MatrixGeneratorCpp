@@ -2,9 +2,6 @@
 using .Shape;
 using .Properties;
 
-# import to extend with a set support
-import Base.findfirst
-
 function define_constant(functions)
 
   functions[ Set([Properties.Constant]) ] =
