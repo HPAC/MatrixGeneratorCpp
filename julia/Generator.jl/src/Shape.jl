@@ -2,7 +2,7 @@
 
 module Shape
 
-  export ShapeType, General, Symmetric
+  export ShapeType, General
 
   abstract ShapeType
 
