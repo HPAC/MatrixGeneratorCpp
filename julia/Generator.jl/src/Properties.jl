@@ -23,6 +23,9 @@ module Properties
   immutable Negative
   end
 
+  immutable Symmetric
+  end
+
   immutable Constant
     value::Float64
 

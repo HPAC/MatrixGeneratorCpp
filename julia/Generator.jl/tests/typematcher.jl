@@ -12,18 +12,32 @@ push!(other_properties, [Properties.Orthogonal, Properties.Random(2, 3)])
 
 # General
 shape_types = Set()
-push!(shape_types, Pair([Shape.General(2, 2)], Shape.Band(2, 2, 1, 1)))
+push!(shape_types, ([Shape.General(2, 2)], Shape.Band(2, 2, 1, 1), false))
+push!(shape_types, ([Shape.General(3, 2)], Shape.Band(3, 2, 2, 1), false))
+# Symmetric
+push!(shape_types, ([Shape.Symmetric(3)], Shape.Band(3, 3, 2, 2), true))
+push!(shape_types, ([Shape.Symmetric(3), Shape.General(3, 3)], Shape.Band(3, 3, 2, 2), true))
+#
+push!(shape_types, ([Shape.Symmetric(3)], Shape.Band(3, 3, 2, 2), true))
+push!(shape_types, ([Shape.Symmetric(3), Shape.General(3, 3)], Shape.Band(3, 3, 2, 2), true))
 
 # errors
 error_types = []
 push!(error_types, [Shape.General(2, 2), Shape.General(2, 1)])
+push!(error_types, [Shape.General(2, 2), Shape.Symmetric(3)])
 
 for shape in shape_types
 
   for properties in other_properties
     ret = Generator.get_shape_type( vcat(shape[1], properties) )
     @test shape[2] == ret[1]
-    @test properties == ret[2]
+    # if true then symmetry property should be added
+    if shape[3]
+      @test ret[2][1:length(ret[2])-1] == properties
+      @test ret[2][length(ret[2])] == Properties.Symmetric
+    else
+      @test properties == ret[2]
+    end
   end
 
 end

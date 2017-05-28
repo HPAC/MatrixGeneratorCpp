@@ -1,12 +1,20 @@
 
+# returns (f, g, h)
+# f - true if it is a shape type
+# g - true if's symmetric
+# h - type
 function cast_type(property)
   if isa(property, Shape.General)
     # matrix (m, n) with bands m -1, n-1
     m = property.rows
     n = property.cols
-    return Pair(true, Shape.Band(m, n, m - 1, n - 1))
+    return (true, false, Shape.Band(m, n, m - 1, n - 1))
+  elseif isa(property, Shape.Symmetric)
+    # matrix (m, n) with bands m -1, n-1
+    m = property.rows
+    return (true, true, Shape.Band(m, m, m - 1, m - 1))
   else
-    return Pair(false, property)
+    return (false, false, property)
   end
 end
 
@@ -36,15 +44,21 @@ function get_shape_type(properties)
 
   shape = Nullable{Shape.Band}()
   other_properties = []
+  symmetric = false
 
   for p in properties
     res = cast_type(p)
     if res[1]
-      shape = merge_shapes(shape, res[2])
+      shape = merge_shapes(shape, res[3])
+      if res[2]
+        symmetric = true
+      end
     else
       push!(other_properties, p)
     end
   end
-
+  if symmetric
+    push!(other_properties, Properties.Symmetric)
+  end
   return Pair(shape, other_properties)
 end
