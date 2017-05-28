@@ -4,7 +4,7 @@ module Shape
 
   export ShapeType, General, SelfAdjoint
 
-  abstract type ShapeType end
+  abstract ShapeType
 
   immutable General <: ShapeType
     rows::Int
@@ -25,4 +25,18 @@ module Shape
   immutable Diagonal <: ShapeType
     rows::Int
   end
+
+  immutable Band <: ShapeType
+    rows::Int
+    cols::Int
+    lower_bandwidth::Int
+    upper_bandwidth::Int
+  end
+
+  function ==(a::Band, b::Band)
+      return a.rows == b.rows && a.cols == b.cols &&
+        a.lower_bandwidth == b.lower_bandwidth &&
+        a.upper_bandwidth == b.upper_bandwidth
+  end
+
 end

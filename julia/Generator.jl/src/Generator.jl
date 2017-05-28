@@ -6,6 +6,7 @@ module Generator
 
   include("Shape.jl")
   include("Properties.jl")
+  include("TypeMatcher.jl")
   #import shape types
   using .Shape
   #export General, ShapeType, SelfAdjoint
