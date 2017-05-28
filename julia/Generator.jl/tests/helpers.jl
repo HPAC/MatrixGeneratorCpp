@@ -10,7 +10,7 @@ function verify(rows, cols, shape::Shape.General, properties, func,
     @test isa(mat, RowVector{Float64, Array{Float64, 1}})
   else
     @test isa(mat, Array{Float64, 2})
-  end  
+  end
 
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
@@ -91,5 +91,5 @@ function verify(rows, cols, shape::Shape.Diagonal, properties, func,
   if !isnull(func_gen)
     get(func_gen)(mat)
   end
-  
+
 end

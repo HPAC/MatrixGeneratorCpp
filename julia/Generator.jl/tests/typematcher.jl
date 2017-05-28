@@ -14,6 +14,9 @@ push!(other_properties, [Properties.Orthogonal, Properties.Random(2, 3)])
 shape_types = Set()
 push!(shape_types, Pair([Shape.General(2, 2)], Shape.Band(2, 2, 1, 1)))
 
+# errors
+error_types = []
+push!(error_types, [Shape.General(2, 2), Shape.General(2, 1)])
 
 for shape in shape_types
 
@@ -23,4 +26,10 @@ for shape in shape_types
     @test properties == ret[2]
   end
 
+end
+
+for shape in error_types
+  for properties in other_properties
+    @test_throws ErrorException Generator.get_shape_type( vcat(shape, properties) )
+  end
 end

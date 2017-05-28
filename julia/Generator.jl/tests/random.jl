@@ -41,4 +41,3 @@ for (datatype, creator, matrix_sizes) in types
     end
   end
 end
-

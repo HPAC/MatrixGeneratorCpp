@@ -21,11 +21,11 @@ end
   a general positive/negative matrix would not have orthogonal columns.
 """
 function orthogonal(shape::Shape.General, properties, type_::ValuesType)
-  
+
   if type_ != none
     throw(ErrorException("Only diagonal orthogonal matrix can be positive/negative!"))
   end
-  
+
   if shape.rows != shape.cols
     throw(ErrorException("A non-square matrix cannot be orthogonal!"))
   else
@@ -36,7 +36,7 @@ function orthogonal(shape::Shape.General, properties, type_::ValuesType)
 end
 
 """
-  Some orthogonal matrices are symmetric - all diagonal matrices, 
+  Some orthogonal matrices are symmetric - all diagonal matrices,
 """
 function orthogonal(shape::Shape.Symmetric, properties, type_::ValuesType)
   throw(ErrorException("Symmetric orthogonal matrices are not supported!"))
@@ -61,6 +61,6 @@ function orthogonal(shape::Shape.Diagonal, properties, type_::ValuesType)
   else
     vals = ones(shape.rows)
   end
-  
+
   return Diagonal(vals)
 end

@@ -9,7 +9,7 @@ module Generator
   include("TypeMatcher.jl")
   #import shape types
   using .Shape
-  #export General, ShapeType, SelfAdjoint
+  #export General, ShapeType
   export Shape
 
   using .Properties
