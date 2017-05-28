@@ -13,6 +13,20 @@ function cast_type(property)
     # matrix (m, n) with bands m -1, n-1
     m = property.rows
     return (true, true, Shape.Band(m, m, m - 1, m - 1))
+  elseif isa(property, Shape.Triangular)
+    # matrix (m, n) with bands m -1, n-1
+    m = property.rows
+    if property.data_placement == Shape.Upper
+      return (true, true, Shape.Band(m, m, 0, m - 1))
+    else
+      return (true, true, Shape.Band(m, m, m - 1, 0))
+    end
+  elseif isa(property, Shape.Diagonal)
+    # matrix (m, n) with bands m -1, n-1
+    m = property.rows
+    return (true, true, Shape.Band(m, m, 0, 0))
+  elseif isa(property, Shape.Band)
+    return (true, false, property)
   else
     return (false, false, property)
   end
@@ -36,7 +50,7 @@ function merge_shapes(shape, new_shape)
         ))
   end
   lower_band = min(shape.lower_bandwidth, new_shape.lower_bandwidth)
-  upper_band = max(shape.upper_bandwidth, new_shape.upper_bandwidth)
+  upper_band = min(shape.upper_bandwidth, new_shape.upper_bandwidth)
   return Shape.Band(shape.rows, shape.cols, lower_band, upper_band)
 end
 
@@ -50,9 +64,7 @@ function get_shape_type(properties)
     res = cast_type(p)
     if res[1]
       shape = merge_shapes(shape, res[3])
-      if res[2]
-        symmetric = true
-      end
+      symmetric |= res[2]
     else
       push!(other_properties, p)
     end
