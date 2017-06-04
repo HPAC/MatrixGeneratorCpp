@@ -8,23 +8,23 @@ function cast_type(property)
     # matrix (m, n) with bands m -1, n-1
     m = property.rows
     n = property.cols
-    return (true, false, Shape.Band(m, n, m - 1, n - 1))
+    return (true, false, Shape.Band(m, n, m - 1, n - 1, false))
   elseif isa(property, Shape.Symmetric)
     # matrix (m, n) with bands m -1, n-1
     m = property.rows
-    return (true, true, Shape.Band(m, m, m - 1, m - 1))
+    return (true, true, Shape.Band(m, m, m - 1, m - 1, true))
   elseif isa(property, Shape.Triangular)
     # matrix (m, n) with bands m -1, n-1
     m = property.rows
     if property.data_placement == Shape.Upper
-      return (true, false, Shape.Band(m, m, 0, m - 1))
+      return (true, false, Shape.Band(m, m, 0, m - 1, false))
     else
-      return (true, false, Shape.Band(m, m, m - 1, 0))
+      return (true, false, Shape.Band(m, m, m - 1, 0, false))
     end
   elseif isa(property, Shape.Diagonal)
     # matrix (m, n) with bands m -1, n-1
     m = property.rows
-    return (true, true, Shape.Band(m, m, 0, 0))
+    return (true, true, Shape.Band(m, m, 0, 0, true))
   elseif isa(property, Shape.Band)
     return (true, false, property)
   else
@@ -51,7 +51,8 @@ function merge_shapes(shape, new_shape)
   end
   lower_band = min(shape.lower_bandwidth, new_shape.lower_bandwidth)
   upper_band = min(shape.upper_bandwidth, new_shape.upper_bandwidth)
-  return Shape.Band(shape.rows, shape.cols, lower_band, upper_band)
+  symmetric = shape.symmetric || new_shape.symmetric
+  return Shape.Band(shape.rows, shape.cols, lower_band, upper_band, symmetric)
 end
 
 function get_shape_type(properties)
@@ -59,7 +60,6 @@ function get_shape_type(properties)
   shape = Nullable{Shape.Band}()
   other_properties = []
   symmetric = false
-  has_symmetric = false
 
   for p in properties
     res = cast_type(p)
@@ -68,16 +68,12 @@ function get_shape_type(properties)
       symmetric |= res[2]
     else
       if isa(p, Properties.Symmetric) || p == Properties.Symmetric
-        has_symmetric = true
         symmetric = true
       end
       push!(other_properties, p)
     end
   end
   if symmetric
-    if !has_symmetric
-      push!(other_properties, Properties.Symmetric)
-    end
     # verify if banded matrix can be symmetric
     if shape.rows != shape.cols || shape.lower_bandwidth != shape.upper_bandwidth
       throw(ErrorException(
@@ -86,6 +82,7 @@ function get_shape_type(properties)
             shape.rows, shape.cols, shape.lower_bandwidth, shape.upper_bandwidth)
           ))
     end
+    shape.symmetric = true
   end
   return Pair(shape, other_properties)
 end

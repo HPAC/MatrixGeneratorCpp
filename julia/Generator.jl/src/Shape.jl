@@ -1,4 +1,5 @@
 
+import Base.==
 
 module Shape
 
@@ -26,17 +27,19 @@ module Shape
     rows::Int
   end
 
-  immutable Band <: ShapeType
+  type Band <: ShapeType
     rows::Int
     cols::Int
     lower_bandwidth::Int
     upper_bandwidth::Int
+    symmetric::Bool
   end
 
-  function ==(a::Band, b::Band)
-      return a.rows == b.rows && a.cols == b.cols &&
-        a.lower_bandwidth == b.lower_bandwidth &&
-        a.upper_bandwidth == b.upper_bandwidth
-  end
+end
 
+function ==(a::Shape.Band, b::Shape.Band)
+  return a.rows == b.rows && a.cols == b.cols &&
+    a.lower_bandwidth == b.lower_bandwidth &&
+    a.upper_bandwidth == b.upper_bandwidth &&
+    a.symmetric == b.symmetric
 end
