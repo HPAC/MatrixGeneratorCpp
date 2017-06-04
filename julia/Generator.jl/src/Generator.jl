@@ -25,14 +25,16 @@ module Generator
   type GeneratorImpl
 
     generators::Dict
+    generic_generators::Dict
 
     function GeneratorImpl()
       a = Dict{Set{DataType}, Any}();
+      generic_gen = Dict{DataType, Any}();
       define_random(a);
       define_constant(a);
       define_spd(a);
       define_orthogonal(a)
-      return new(a)
+      return new(a, generic_gen)
     end
 
   end
@@ -55,6 +57,11 @@ module Generator
     else
       return mat
     end
+  end
+
+  function generate(properties)
+    shape, other_properties = get_get_shape_type(properties)
+    #mat = generator.generators[map(extract_type, properties)](shape, properties)
   end
 
 end

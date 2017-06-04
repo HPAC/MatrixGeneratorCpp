@@ -27,7 +27,7 @@ end
 
 function constant(shape::Shape.Triangular, properties)
   mat = constant(Shape.General(shape.rows, shape.rows), properties)
-  return    shape.data_placement == Shape.Upper ?
+  return shape.data_placement == Shape.Upper ?
             UpperTriangular(mat) :
             LowerTriangular(mat)
 end

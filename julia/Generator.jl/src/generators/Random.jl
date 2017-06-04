@@ -34,6 +34,10 @@ function get_bounds(properties, valTypes)
   end
 end
 
+
+function random{T <: ValuesType}(shape::Shape.Band, properties, is_symmetric::Bool, valTypes::T)
+end
+
 function random{T <: ValuesType}(shape::Shape.General, properties, valTypes::T)
   low, high = get_bounds(properties, valTypes)
   if valTypes == none
