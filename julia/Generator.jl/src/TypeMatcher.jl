@@ -142,6 +142,14 @@ function cast_band(shape::Shape.Band)
 end
 
 function apply_band(shape::Shape.General, original_shape, matrix)
+  for i=1:shape.rows
+    for j=1:(i-original_shape.lower_bandwidth-1)
+      matrix[i, j] = 0.0
+    end
+    for j=(i+original_shape.upper_bandwidth+1):shape.cols
+      matrix[i, j] = 0.0
+    end
+  end
 end
 
 function apply_band(shape::Shape.Symmetric, original_shape, matrix)

@@ -88,3 +88,29 @@ function verify(rows, cols, shape::Shape.Diagonal, mat, func,
   end
 
 end
+
+function verify(rows, cols, shape::Shape.Band, mat, func,
+    func_gen = Nullable())
+
+  @test size(mat, 1) == rows
+  @test size(mat, 2) == cols
+
+  if !isnull(func)
+    func_ = get(func)
+    for i=1:shape.rows
+      for j=1:(i-shape.lower_bandwidth-1)
+        @test mat[i, j] ≈ 0.0
+      end
+      for j=max(1, i-shape.lower_bandwidth):min(cols, i+shape.upper_bandwidth)
+        func_( mat[i, j] )
+      end
+      for j=(i+shape.upper_bandwidth+1):shape.cols
+        @test mat[i, j] ≈ 0.0
+      end
+    end
+  end
+  if !isnull(func_gen)
+    get(func_gen)(mat)
+  end
+
+end

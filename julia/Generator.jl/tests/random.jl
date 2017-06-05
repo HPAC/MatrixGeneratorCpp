@@ -55,10 +55,10 @@ push!(shape_types, ([Shape.Symmetric(3), Shape.General(3, 3)], Shape.Symmetric(3
 push!(shape_types, ([Shape.Triangular(3, Shape.Upper), Shape.General(3, 3)], Shape.Triangular(3, Shape.Upper)))
 push!(shape_types, ([Shape.Triangular(4, Shape.Lower), Shape.General(4, 4)], Shape.Triangular(4, Shape.Lower)))
 push!(shape_types, ([Shape.Triangular(4, Shape.Lower), Shape.Triangular(4, Shape.Upper)], Shape.Diagonal(4)))
-# Band
-#push!(shape_types, ([Shape.General(2, 2), Shape.Band(2, 2, 1, 0, false)], Shape.Band(2, 2, 1, 0, false)))
-#push!(shape_types, ([Shape.General(5, 4), Shape.Band(5, 4, 4, 3, false)], Shape.Band(5, 4, 4, 3, false)))
-#push!(shape_types, ([Shape.General(5, 4), Shape.Band(5, 4, 4, 3, false), Shape.Band(5, 4, 2, 3, false)], Shape.Band(5, 4, 2, 3, false)))
+# Band non-symmetric
+push!(shape_types, ([Shape.General(2, 2), Shape.Band(2, 2, 1, 0, false)], Shape.Band(2, 2, 1, 0, false)))
+push!(shape_types, ([Shape.General(5, 4), Shape.Band(5, 4, 4, 3, false)], Shape.Band(5, 4, 4, 3, false)))
+push!(shape_types, ([Shape.General(5, 4), Shape.Band(5, 4, 4, 3, false), Shape.Band(5, 4, 2, 3, false)], Shape.Band(5, 4, 2, 3, false)))
 #push!(shape_types, ([Shape.Symmetric(5), Shape.Band(5, 5, 4, 3, false), Shape.Band(5, 5, 2, 2, false)], Shape.Band(5, 5, 2, 2, true)))
 #push!(shape_types, ([Shape.Triangular(5, Shape.Upper), Shape.Band(5, 5, 4, 3, false), Shape.Band(5, 5, 2, 3, false)], Shape.Band(5, 5, 0, 3, false)))
 #push!(shape_types, ([Shape.Triangular(5, Shape.Lower), Shape.Band(5, 5, 4, 3, false), Shape.Band(5, 5, 2, 3, false)], Shape.Band(5, 5, 2, 0, false)))
@@ -67,7 +67,7 @@ push!(shape_types, ([Shape.Triangular(4, Shape.Lower), Shape.Triangular(4, Shape
 for (shape, shape_dst) in shape_types
   for (prop, verificator) in properties
     mat = generate( vcat(shape, prop) )
-    verify(shape_dst.rows, isa(shape_dst, Shape.General) ? shape_dst.cols : shape_dst.rows,
-      shape_dst, mat, verificator)
+    cols = isa(shape_dst, Shape.General) || isa(shape_dst, Shape.Band) ? shape_dst.cols : shape_dst.rows
+    verify(shape_dst.rows, cols, shape_dst, mat, verificator)
   end
 end
