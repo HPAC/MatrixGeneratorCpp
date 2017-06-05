@@ -5,7 +5,7 @@ using .Properties;
 # import to extend with a set support
 #import Base.findfirst
 
-function define_random(functions)
+function define_random(functions, generic_functions)
 
   functions[ Set([Properties.Random]) ] =
     (shape, props) -> random(shape, props, none);
@@ -13,6 +13,9 @@ function define_random(functions)
     (shape, props) -> random(shape, props, positive);
   functions[ Set([Properties.Random, Properties.Negative])] =
     (shape, props) -> random(shape, props, negative);
+
+  generic_functions[Properties.Random] =
+    (shape, val_types, props) -> random(shape, val_types, props)
 
 end
 
@@ -34,8 +37,7 @@ function get_bounds(properties, valTypes)
   end
 end
 
-
-function random{T <: ValuesType}(shape::Shape.Band, properties, is_symmetric::Bool, valTypes::T)
+function random{T <: ValuesType}(shape::Shape.Band, properties, valTypes::T)
 end
 
 function random{T <: ValuesType}(shape::Shape.General, properties, valTypes::T)

@@ -15,8 +15,6 @@ module Generator
   using .Properties
   export Properties
 
-  @enum ValuesType none=0 positive=1 negative=2
-
   include("generators/Random.jl")
   include("generators/Constant.jl")
   include("generators/SPD.jl")
@@ -30,10 +28,10 @@ module Generator
     function GeneratorImpl()
       a = Dict{Set{DataType}, Any}();
       generic_gen = Dict{DataType, Any}();
-      define_random(a);
+      define_random(a, generic_gen);
       define_constant(a);
       define_spd(a);
-      define_orthogonal(a)
+      define_orthogonal(a);
       return new(a, generic_gen)
     end
 
@@ -60,8 +58,16 @@ module Generator
   end
 
   function generate(properties)
-    shape, other_properties = get_get_shape_type(properties)
-    #mat = generator.generators[map(extract_type, properties)](shape, properties)
+    shape, other_properties = get_shape_type(properties)
+    val_types, major_prop = extract_basic_properties(properties)
+    mat = generator.generic_generators[extract_type(major_prop)](shape, other_properties, val_types)
+    if shape.cols == 1
+      return vec(mat)
+    elseif shape.rows == 1
+      return vec(mat)'
+    else
+      return mat
+    end
   end
 
 end

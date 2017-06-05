@@ -1,4 +1,6 @@
 
+@enum ValuesType none=0 positive=1 negative=2
+
 # returns (f, g, h)
 # f - true if it is a shape type
 # g - true if's symmetric
@@ -89,20 +91,34 @@ end
 
 function extract_basic_properties(properties)
 
-  is_symmetric = false
-  is_positive = false
-  is_negative = false
+  valTypes = none
   major_property = Nullable()
+  major_properties = [Properties.Constant, Properties.Random,
+    Properties.Orthogonal, Properties.SPD]
 
   for p in properties
-    if isa(p, Properties.Symmetric)
-      is_symmetric = true
-    elseif isa(p, Properties.Positive)
-      is_positive = true
-    elseif isa(p, Properties.Positive)
-      is_negative = true
-    elseif isnull(major_property) && isa(p, Properties.Constant)
-
+    if isa(p, Properties.Positive)
+      valTypes = positive
+    elseif isa(p, Properties.Negative)
+      valTypes = negative
+    else
+      for prop in major_properties
+        if p == prop || isa(p, prop)
+          if isnull(major_property)
+            major_property = p
+          else
+            throw(ErrorException("Clash between major properties: %s %s",
+              major_property, p
+            ))
+          end
+        end
+      end
     end
   end
+
+  if isnull(major_property)
+    throw(ErrorException("No major property!"))
+  end
+
+  return (valTypes, major_property)
 end
