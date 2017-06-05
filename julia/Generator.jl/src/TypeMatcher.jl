@@ -97,9 +97,9 @@ function extract_basic_properties(properties)
     Properties.Orthogonal, Properties.SPD]
 
   for p in properties
-    if isa(p, Properties.Positive)
+    if p == Properties.Positive || isa(p, Properties.Positive)
       valTypes = positive
-    elseif isa(p, Properties.Negative)
+    elseif p == Properties.Negative || isa(p, Properties.Negative)
       valTypes = negative
     else
       for prop in major_properties
@@ -121,4 +121,32 @@ function extract_basic_properties(properties)
   end
 
   return (valTypes, major_property)
+end
+
+function cast_band(shape::Shape.Band)
+
+  if shape.lower_bandwidth == 0 && shape.upper_bandwidth == 0
+    return Shape.Diagonal(shape.rows)
+  elseif shape.lower_bandwidth == 0
+    return Shape.Triangular(shape.rows, Shape.Upper)
+  elseif shape.upper_bandwidth == 0
+    return Shape.Triangular(shape.rows, Shape.Lower)
+  else
+    if shape.symmetric
+      return Shape.Symmetric(shape.rows)
+    else
+      return Shape.General(shape.rows, shape.cols)
+    end
+  end
+
+end
+
+function apply_band(shape::Shape.General, original_shape, matrix)
+end
+
+function apply_band(shape::Shape.Symmetric, original_shape, matrix)
+end
+
+# Triangular, Diagonal - don't do anything
+function apply_band(shape, original_shape, matrix)
 end

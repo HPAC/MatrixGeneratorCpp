@@ -1,8 +1,6 @@
 
-function verify(rows, cols, shape::Shape.General, properties, func,
+function verify(rows, cols, shape::Shape.General, mat, func,
     func_gen = Nullable())
-
-  mat = generate(shape, Set(properties))
 
   if cols == 1
     @test isa(mat, Array{Float64, 1})
@@ -23,10 +21,9 @@ function verify(rows, cols, shape::Shape.General, properties, func,
 
 end
 
-function verify(rows, cols, shape::Shape.Symmetric, properties, func,
+function verify(rows, cols, shape::Shape.Symmetric, mat, func,
     func_gen = Nullable())
 
-  mat = generate(shape, Set(properties))
   @test isa(mat, Symmetric)
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
@@ -40,10 +37,9 @@ function verify(rows, cols, shape::Shape.Symmetric, properties, func,
 
 end
 
-function verify(rows, cols, shape::Shape.Triangular, properties, func,
+function verify(rows, cols, shape::Shape.Triangular, mat, func,
     func_gen = Nullable())
 
-  mat = generate(shape, Set(properties))
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
 
@@ -73,10 +69,9 @@ function verify(rows, cols, shape::Shape.Triangular, properties, func,
 
 end
 
-function verify(rows, cols, shape::Shape.Diagonal, properties, func,
+function verify(rows, cols, shape::Shape.Diagonal, mat, func,
     func_gen = Nullable())
 
-  mat = generate(shape, Set(properties))
   @test isa(mat, Diagonal)
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols

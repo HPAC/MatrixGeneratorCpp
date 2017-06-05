@@ -28,6 +28,15 @@ function findfirst(f::Function, set::Set)
   return nothing
 end
 
+function findfirst(f::Function, set::Array)
+  for element in set
+    if f(element)
+      return element
+    end
+  end
+  return nothing
+end
+
 function get_bounds(properties, valTypes)
   rand_prop = findfirst(x -> x == Properties.Random || isa(x, Properties.Random), properties)
   if rand_prop == Properties.Random
@@ -38,6 +47,13 @@ function get_bounds(properties, valTypes)
 end
 
 function random{T <: ValuesType}(shape::Shape.Band, properties, valTypes::T)
+
+  # verify if we can use one of easy generators
+  special_shape = cast_band(shape)
+  mat = random(special_shape, properties, valTypes)
+  # apply band to remove unnecessary elems
+  apply_band(special_shape, shape, mat)
+  return mat
 end
 
 function random{T <: ValuesType}(shape::Shape.General, properties, valTypes::T)
