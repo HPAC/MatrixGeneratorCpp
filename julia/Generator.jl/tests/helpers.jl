@@ -97,8 +97,8 @@ function verify(rows, cols, shape::Shape.Band, mat, func,
 
   if !isnull(func)
     func_ = get(func)
-    for i=1:shape.rows
-      for j=1:(i-shape.lower_bandwidth-1)
+    for i=1:rows
+      for j=1:min(cols, i-shape.lower_bandwidth-1)
         @test mat[i, j] ≈ 0.0
       end
       for j=max(1, i-shape.lower_bandwidth):min(cols, i+shape.upper_bandwidth)

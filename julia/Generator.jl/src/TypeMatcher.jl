@@ -127,9 +127,9 @@ function cast_band(shape::Shape.Band)
 
   if shape.lower_bandwidth == 0 && shape.upper_bandwidth == 0
     return Shape.Diagonal(shape.rows)
-  elseif shape.lower_bandwidth == 0
+  elseif shape.lower_bandwidth == 0 && shape.upper_bandwidth + 1 == shape.cols && shape.cols == shape.rows
     return Shape.Triangular(shape.rows, Shape.Upper)
-  elseif shape.upper_bandwidth == 0
+  elseif shape.upper_bandwidth == 0 && shape.lower_bandwidth + 1 == shape.rows && shape.cols == shape.rows
     return Shape.Triangular(shape.rows, Shape.Lower)
   else
     if shape.symmetric
@@ -142,10 +142,19 @@ function cast_band(shape::Shape.Band)
 end
 
 function apply_band(shape::Shape.General, original_shape, matrix)
+
+  if original_shape.lower_bandwidth + 1 == shape.rows &&
+      original_shape.upper_bandwidth + 1 == shape.cols
+    return
+  end
+
   for i=1:shape.rows
-    for j=1:(i-original_shape.lower_bandwidth-1)
+    println(i, " ", i-original_shape.lower_bandwidth-1, " ", shape.cols )
+    for j=1:min(shape.cols, i-original_shape.lower_bandwidth-1)
+      println("Dest ", i, " ", j)
       matrix[i, j] = 0.0
     end
+    println(i, original_shape.upper_bandwidth, shape.cols)
     for j=(i+original_shape.upper_bandwidth+1):shape.cols
       matrix[i, j] = 0.0
     end
@@ -153,6 +162,11 @@ function apply_band(shape::Shape.General, original_shape, matrix)
 end
 
 function apply_band(shape::Shape.Symmetric, original_shape, matrix)
+  for i=1:shape.rows
+    for j=1:(i-original_shape.lower_bandwidth-1)
+      matrix[i, j] = 0.0
+    end
+  end
 end
 
 # Triangular, Diagonal - don't do anything

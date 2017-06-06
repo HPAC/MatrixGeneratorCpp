@@ -50,6 +50,8 @@ function random{T <: ValuesType}(shape::Shape.Band, properties, valTypes::T)
 
   # verify if we can use one of easy generators
   special_shape = cast_band(shape)
+  println("Special shape: ", special_shape)
+  println("Band shape: ", shape)
   mat = random(special_shape, properties, valTypes)
   # apply band to remove unnecessary elems
   apply_band(special_shape, shape, mat)
