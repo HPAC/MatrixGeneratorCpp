@@ -29,7 +29,7 @@ module Generator
       a = Dict{Set{DataType}, Any}();
       generic_gen = Dict{DataType, Any}();
       define_random(a, generic_gen);
-      define_constant(a);
+      define_constant(a, generic_gen);
       define_spd(a);
       define_orthogonal(a);
       return new(a, generic_gen)

@@ -2,6 +2,7 @@ using Base.Test
 using Generator
 
 include("helpers.jl")
+include("band_types.jl")
 
 matrix_sizes = [ [1, 1], [2, 2], [25, 50], [50, 25] ]
 matrix_sq_sizes = [ [1, 1], [2, 2], [33, 33], [49, 49] ]
@@ -24,8 +25,19 @@ types = [ (Shape.General, (x, y) -> Shape.General(x, y), matrix_sizes)
 for (datatype, creator, matrix_sizes) in types
   for (prop, verificator) in properties
     for cur_size in matrix_sizes
+      mat = generate(creator(cur_size[1], cur_size[2]), Set(prop))
       verify(cur_size[1], cur_size[2], creator(cur_size[1], cur_size[2]),
-        prop, verificator)
+        mat, verificator)
     end
+  end
+end
+
+band_shapes = generate_band_types()
+
+for (shape, shape_dst) in band_shapes
+  for (prop, verificator) in properties
+    mat = generate( vcat(shape, prop) )
+    cols = isa(shape_dst, Shape.General) || isa(shape_dst, Shape.Band) ? shape_dst.cols : shape_dst.rows
+    verify(shape_dst.rows, cols, shape_dst, mat, verificator)
   end
 end
