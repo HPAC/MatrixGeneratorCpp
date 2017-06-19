@@ -30,8 +30,8 @@ module Generator
       generic_gen = Dict{DataType, Any}();
       define_random(a, generic_gen);
       define_constant(a, generic_gen);
-      define_spd(a);
-      define_orthogonal(a);
+      define_spd(a, generic_gen);
+      define_orthogonal(a, generic_gen);
       return new(a, generic_gen)
     end
 

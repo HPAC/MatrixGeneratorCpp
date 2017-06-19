@@ -2,7 +2,7 @@
 using .Shape;
 using .Properties;
 
-function define_spd(functions)
+function define_spd(functions, generic_functions)
 
   functions[ Set([Properties.SPD]) ] =
     (shape, props) -> spd(shape, props, false);
@@ -10,8 +10,25 @@ function define_spd(functions)
   functions[ Set([Properties.SPD, Properties.Positive]) ] =
     (shape, props) -> spd(shape, props, true);
 
+  generic_functions[Properties.SPD] =
+    (shape, val_types, props) -> spd(shape, val_types, props)
 end
 
+function spd(shape::Shape.Band, properties, valTypes)
+
+  # verify if we can use one of easy generators
+  special_shape = cast_band(shape)
+  if (special_shape == Shape.General || special_shape == Shape.Symmetric) &&
+    (shape.upper_bandwidth + 1 != shape.cols || shape.lower_bandwidth + 1 != shape.rows)
+    throw(ErrorException("Banded SPD not supported!"))
+  end
+  if valTypes == negative
+    throw(ErrorException("SPD cannot have all negative values!"))
+end
+  mat = spd(special_shape, properties, valTypes == positive)
+  # apply band to remove unnecessary elems
+  return apply_band(special_shape, shape, mat)
+end
 
 function spd(shape::Shape.General, properties, positive::Bool)
 

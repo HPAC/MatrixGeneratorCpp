@@ -2,7 +2,7 @@
 using .Shape;
 using .Properties;
 
-function define_orthogonal(functions)
+function define_orthogonal(functions, generic_functions)
 
   functions[ Set([Properties.Orthogonal]) ] =
     (shape, props) -> orthogonal(shape, props, none);
@@ -13,6 +13,21 @@ function define_orthogonal(functions)
   functions[ Set([Properties.Orthogonal, Properties.Negative]) ] =
     (shape, props) -> orthogonal(shape, props, negative);
 
+  generic_functions[Properties.Orthogonal] =
+    (shape, val_types, props) -> orthogonal(shape, val_types, props)
+end
+
+function orthogonal(shape::Shape.Band, properties, valTypes)
+
+  # verify if we can use one of easy generators
+  special_shape = cast_band(shape)
+  if (special_shape == Shape.General || special_shape == Shape.Symmetric) &&
+    (shape.upper_bandwidth + 1 != shape.cols || shape.lower_bandwidth + 1 != shape.rows)
+    throw(ErrorException("Banded orthogonal not supported!"))
+  end  
+  mat = orthogonal(special_shape, properties, valTypes)
+  # apply band to remove unnecessary elems
+  return apply_band(special_shape, shape, mat)
 end
 
 """
