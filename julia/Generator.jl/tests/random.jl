@@ -1,8 +1,6 @@
 using Base.Test
 using Generator
 
-include("helpers.jl")
-include("band_types.jl")
 
 matrix_sizes = [ [1, 1], [2, 2], [25, 50], [50, 25] ]
 matrix_sq_sizes = [ [1, 1], [2, 2], [33, 33], [49, 49] ]
