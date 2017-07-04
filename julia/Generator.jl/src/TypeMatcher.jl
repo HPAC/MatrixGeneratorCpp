@@ -35,8 +35,8 @@ function cast_type(property)
 end
 
 function merge_shapes(shape, new_shape)
-
-  if isnull(shape)
+  
+  if isa(shape, Nullable) && isnull(shape)
     return new_shape
   end
 
@@ -104,7 +104,7 @@ function extract_basic_properties(properties)
     else
       for prop in major_properties
         if p == prop || isa(p, prop)
-          if isnull(major_property)
+          if isa(major_property, Nullable) && isnull(major_property)
             major_property = p
           else
             throw(ErrorException("Clash between major properties: %s %s",
@@ -116,7 +116,7 @@ function extract_basic_properties(properties)
     end
   end
 
-  if isnull(major_property)
+  if isa(major_property, Nullable) && isnull(major_property)
     throw(ErrorException("No major property!"))
   end
 
