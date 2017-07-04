@@ -21,7 +21,7 @@ function orthogonal(shape::Shape.Band, properties, valTypes)
 
   # verify if we can use one of easy generators
   special_shape = cast_band(shape)
-  if (special_shape == Shape.General || special_shape == Shape.Symmetric) &&
+  if (isa(special_shape, Shape.General) || isa(special_shape, Shape.Symmetric)) &&
     (shape.upper_bandwidth + 1 != shape.cols || shape.lower_bandwidth + 1 != shape.rows)
     throw(ErrorException("Banded orthogonal not supported!"))
   end  
