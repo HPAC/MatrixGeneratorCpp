@@ -12,59 +12,62 @@ push!(other_properties, [Properties.Orthogonal, Properties.Random(2, 3)])
 
 # General
 shape_types = Set()
-push!(shape_types, ([Shape.General(2, 2)], Shape.Band(2, 2, 1, 1, false)))
-push!(shape_types, ([Shape.General(3, 2)], Shape.Band(3, 2, 2, 1, false)))
+push!(shape_types, ([2, 2], [Shape.General], [false, Shape.Band(1, 1)]))
+push!(shape_types, ([3, 2],[Shape.General], [false, Shape.Band(2, 1)]))
 # Symmetric
-push!(shape_types, ([Shape.Symmetric(3)], Shape.Band(3, 3, 2, 2, true)))
-push!(shape_types, ([Shape.Symmetric(3), Shape.General(3, 3)], Shape.Band(3, 3, 2, 2, true)))
+push!(shape_types, ([3, 3], [Shape.Symmetric], [true, Shape.Band(2, 2)]))
+push!(shape_types, ([3, 3], [Shape.Symmetric, Shape.General], [true, Shape.Band(2, 2)]))
 # Triangular
-push!(shape_types, ([Shape.Triangular(3, Shape.Upper)], Shape.Band(3, 3, 0, 2, false)))
-push!(shape_types, ([Shape.Triangular(4, Shape.Lower)], Shape.Band(4, 4, 3, 0, false)))
-push!(shape_types, ([Shape.Triangular(3, Shape.Upper), Shape.General(3, 3)], Shape.Band(3, 3, 0, 2, false)))
+push!(shape_types, ([3, 3], [Shape.Triangular(Shape.Upper)], [false, Shape.Band(0, 2)]))
+push!(shape_types, ([4, 3], [Shape.Triangular(Shape.Lower)], [false, Shape.Band(3, 0)]))
+push!(shape_types, ([3, 4], [Shape.Triangular(Shape.Upper), Shape.General], [false, Shape.Band(0, 3)]))
 # upper & lower -> Diagonal
-push!(shape_types, ([Shape.Triangular(4, Shape.Lower), Shape.Triangular(4, Shape.Upper)], Shape.Band(4, 4, 0, 0, false)))
+push!(shape_types, ([4, 4], [Shape.Triangular(Shape.Lower), Shape.Triangular(Shape.Upper)], [false, Shape.Band(0, 0)]))
 # Diagonal
-push!(shape_types, ([Shape.Diagonal(3)], Shape.Band(3, 3, 0, 0, true)))
-push!(shape_types, ([Shape.Diagonal(3), Shape.Triangular(3, Shape.Upper)], Shape.Band(3, 3, 0, 0, true)))
-push!(shape_types, ([Shape.General(5, 5), Shape.Diagonal(5)], Shape.Band(5, 5, 0, 0, true)))
-push!(shape_types, ([Shape.Diagonal(3), Shape.Triangular(3, Shape.Upper), Shape.General(3, 3)], Shape.Band(3, 3, 0, 0, true)))
-push!(shape_types, ([Shape.Diagonal(3), Shape.Triangular(3, Shape.Lower), Shape.Symmetric(3)], Shape.Band(3, 3, 0, 0, true)))
+push!(shape_types, ([3, 3], [Shape.Diagonal], [false, Shape.Band(0, 0)]))
+push!(shape_types, ([3, 3], [Shape.Diagonal, Shape.Triangular(Shape.Upper)], [false, Shape.Band(0, 0)]))
+push!(shape_types, ([5, 5], [Shape.General, Shape.Diagonal], [false, Shape.Band(0, 0)]))
+push!(shape_types, ([3, 3], [Shape.Diagonal, Shape.Triangular(Shape.Upper), Shape.General], [false, Shape.Band(0, 0)]))
+push!(shape_types, ([3, 3], [Shape.Diagonal, Shape.Triangular(Shape.Lower), Shape.Symmetric], [true, Shape.Band(0, 0)]))
 # Band
-push!(shape_types, ([Shape.General(2, 2), Shape.Band(2, 2, 1, 0, false)], Shape.Band(2, 2, 1, 0, false)))
-push!(shape_types, ([Shape.General(5, 4), Shape.Band(5, 4, 4, 3, false)], Shape.Band(5, 4, 4, 3, false)))
-push!(shape_types, ([Shape.General(5, 4), Shape.Band(5, 4, 4, 3, false), Shape.Band(5, 4, 2, 3, false)], Shape.Band(5, 4, 2, 3, false)))
-push!(shape_types, ([Shape.Symmetric(5), Shape.Band(5, 5, 4, 3, false), Shape.Band(5, 5, 2, 2, false)], Shape.Band(5, 5, 2, 2, true)))
-push!(shape_types, ([Shape.Triangular(5, Shape.Upper), Shape.Band(5, 5, 4, 3, false), Shape.Band(5, 5, 2, 3, false)], Shape.Band(5, 5, 0, 3, false)))
-push!(shape_types, ([Shape.Triangular(5, Shape.Lower), Shape.Band(5, 5, 4, 3, false), Shape.Band(5, 5, 2, 3, false)], Shape.Band(5, 5, 2, 0, false)))
-push!(shape_types, ([Shape.Diagonal(5), Shape.Band(5, 5 , 4, 3, false), Shape.Band(5, 5, 2, 3, false)], Shape.Band(5, 5, 0, 0, true)))
+push!(shape_types, ([2, 2], [Shape.General, Shape.Band(1, 0)], [false, Shape.Band(1, 0)]))
+push!(shape_types, ([5, 4], [Shape.General, Shape.Band(4, 3)], [false, Shape.Band(4, 3)]))
+push!(shape_types, ([5, 4], [Shape.General, Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(2, 3)]))
+push!(shape_types, ([5, 5], [Shape.Symmetric, Shape.Band(4, 3), Shape.Band(2, 2)], [true, Shape.Band(2, 2)]))
+push!(shape_types, ([5, 4], [Shape.Triangular(Shape.Upper), Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(0, 3)]))
+push!(shape_types, ([4, 5], [Shape.Triangular(Shape.Lower), Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(2, 0)]))
+push!(shape_types, ([5, 5], [Shape.Diagonal, Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(0, 0)]))
 
 # errors
-error_types = []
-push!(error_types, [Shape.General(2, 2), Shape.General(2, 1)])
-push!(error_types, [Shape.General(2, 2), Shape.Symmetric(3)])
-push!(error_types, [Shape.General(2, 2), Shape.Symmetric(3), Shape.Triangular(5, Shape.Upper)])
+#error_types = []
+#push!(error_types, [Shape.General(2, 2), Shape.General(2, 1)])
+#push!(error_types, [Shape.General(2, 2), Shape.Symmetric(3)])
+#push!(error_types, [Shape.General(2, 2), Shape.Symmetric(3), Shape.Triangular(5, Shape.Upper)])
 # clash between symmetry and unsymmetric size
-push!(error_types, [Shape.General(2, 1), Properties.Symmetric])
-push!(error_types, [Shape.Symmetric(3), Shape.General(5, 4)])
-push!(error_types, ([Shape.Triangular(3, Shape.Lower), Shape.Symmetric(3)]))
-push!(error_types, ([Shape.Triangular(3, Shape.Lower), Shape.Symmetric(3), Shape.Band(3, 3, 2, 0, false)]))
-push!(error_types, ([Shape.Triangular(3, Shape.Lower), Shape.Symmetric(3), Shape.Band(3, 3, 2, 0, true)]))
+#push!(error_types, [Shape.General(2, 1), Properties.Symmetric])
+#push!(error_types, [Shape.Symmetric(3), Shape.General(5, 4)])
+#push!(error_types, ([Shape.Triangular(3, Shape.Lower), Shape.Symmetric(3)]))
+#push!(error_types, ([Shape.Triangular(3, Shape.Lower), Shape.Symmetric(3), Shape.Band(3, 3, 2, 0, false)]))
+#push!(error_types, ([Shape.Triangular(3, Shape.Lower), Shape.Symmetric(3), Shape.Band(3, 3, 2, 0, true)]))
 
 for shape in shape_types
 
   for properties in other_properties
-    ret = Generator.get_shape_type( vcat(shape[1], properties) )
+    ret = Generator.get_shape_type( shape[1], vcat(shape[2], properties) )
+    println(shape[2])
     # TEST: correct returned shape
-    @test shape[2] == ret[1]
+    @test shape[3][2] == ret[1]
+    # TEST: symmetry'
+    @test shape[3][1] == ret[2]
     # TEST: correct properties
-    @test ret[2] == properties
+    @test ret[3] == properties
   end
 
 end
 
-for shape in error_types
-  for properties in other_properties
+#for shape in error_types
+#  for properties in other_properties
     # TEST: incorrect matrix types & properties
-    @test_throws ErrorException Generator.get_shape_type( vcat(shape, properties) )
-  end
-end
+#    @test_throws ErrorException Generator.get_shape_type( vcat(shape, properties) )
+#  end
+#end

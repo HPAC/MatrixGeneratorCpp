@@ -58,7 +58,7 @@ module Generator
   end
 
   function generate(properties)
-    shape, other_properties = get_shape_type(properties)
+    shape, symmetry, other_properties = get_shape_type(properties)
     val_types, major_prop = extract_basic_properties(properties)
     mat = generator.generic_generators[extract_type(major_prop)](shape, other_properties, val_types)
     if shape.cols == 1

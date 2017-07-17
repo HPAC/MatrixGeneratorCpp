@@ -1,33 +1,32 @@
 
 @enum ValuesType none=0 positive=1 negative=2
 
+function isa_obj_type(obj, obj_type)
+  return obj == obj_type || isa(obj, obj_type)
+end
+
 # returns (f, g, h)
 # f - true if it is a shape type
 # g - true if's symmetric
 # h - type
-function cast_type(property)
-  if isa(property, Shape.General)
+function cast_type(rows, cols, property)
+  if isa_obj_type(property, Shape.General)
     # matrix (m, n) with bands m -1, n-1
-    m = property.rows
-    n = property.cols
-    return (true, false, Shape.Band(m, n, m - 1, n - 1, false))
-  elseif isa(property, Shape.Symmetric)
+    return (true, false, Shape.Band(rows - 1, cols - 1))
+  elseif isa_obj_type(property, Shape.Symmetric)
     # matrix (m, n) with bands m -1, n-1
-    m = property.rows
-    return (true, true, Shape.Band(m, m, m - 1, m - 1, true))
-  elseif isa(property, Shape.Triangular)
+    return (true, true, Shape.Band(rows - 1, cols - 1))
+  elseif isa_obj_type(property, Shape.Triangular)
     # matrix (m, n) with bands m -1, n-1
-    m = property.rows
     if property.data_placement == Shape.Upper
-      return (true, false, Shape.Band(m, m, 0, m - 1, false))
+      return (true, false, Shape.Band(0, cols - 1))
     else
-      return (true, false, Shape.Band(m, m, m - 1, 0, false))
+      return (true, false, Shape.Band(rows - 1, 0))
     end
-  elseif isa(property, Shape.Diagonal)
+  elseif isa_obj_type(property, Shape.Diagonal)
     # matrix (m, n) with bands m -1, n-1
-    m = property.rows
-    return (true, true, Shape.Band(m, m, 0, 0, true))
-  elseif isa(property, Shape.Band)
+    return (true, false, Shape.Band(0, 0))
+  elseif isa_obj_type(property, Shape.Band)
     return (true, false, property)
   else
     return (false, false, property)
@@ -35,7 +34,7 @@ function cast_type(property)
 end
 
 function merge_shapes(shape, new_shape)
-  
+
   if isa(shape, Nullable) && isnull(shape)
     return new_shape
   end
@@ -43,28 +42,21 @@ function merge_shapes(shape, new_shape)
   # For two band matrices
   # (m, n, k1, k2)
   # (p, q, l1, l2)
-  # (m, n) == (p, q) must hold
-  # and the result matrix will be the one with a smaller bandwidth
-  if shape.rows != new_shape.rows || shape.cols != new_shape.cols
-    throw(ErrorException(
-        @sprintf("Clash between sizes matrix sizes: (%d, %d) versus (%d, %d)!",
-          shape.rows, shape.cols, new_shape.rows, new_shape.cols)
-        ))
-  end
+  # the result matrix will be the one with a smaller bandwidth
   lower_band = min(shape.lower_bandwidth, new_shape.lower_bandwidth)
   upper_band = min(shape.upper_bandwidth, new_shape.upper_bandwidth)
-  symmetric = shape.symmetric || new_shape.symmetric
-  return Shape.Band(shape.rows, shape.cols, lower_band, upper_band, symmetric)
+  return Shape.Band(lower_band, upper_band)
 end
 
-function get_shape_type(properties)
+function get_shape_type(mat_size, properties)
 
   shape = Nullable{Shape.Band}()
   other_properties = []
   symmetric = false
+  rows, cols = mat_size
 
   for p in properties
-    res = cast_type(p)
+    res = cast_type(rows, cols, p)
     if res[1]
       shape = merge_shapes(shape, res[3])
       symmetric |= res[2]
@@ -75,18 +67,7 @@ function get_shape_type(properties)
       push!(other_properties, p)
     end
   end
-  if symmetric
-    # verify if banded matrix can be symmetric
-    if shape.rows != shape.cols || shape.lower_bandwidth != shape.upper_bandwidth
-      throw(ErrorException(
-          @sprintf("Symmetric types clashing with an unsymmetric band matrix of
-            size (%f, %f) and band (%f, %f)!",
-            shape.rows, shape.cols, shape.lower_bandwidth, shape.upper_bandwidth)
-          ))
-    end
-    shape.symmetric = true
-  end
-  return Pair(shape, other_properties)
+  return (shape, symmetric, other_properties)
 end
 
 function extract_basic_properties(properties)
