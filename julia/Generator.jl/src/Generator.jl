@@ -42,12 +42,12 @@ module Generator
     return isa(obj, DataType) ? obj : typeof(obj)
   end
 
-  function generate{T <: ShapeType}(shape::T, properties)
-    mat = generator.generators[map(extract_type, properties)](shape, properties)
+  function generate{T <: ShapeType}(size, shape::T, properties)
+    mat = generator.generators[map(extract_type, properties)](size, shape, properties)
     if isa(shape, Shape.General)
-      if shape.cols == 1
+      if size[2] == 1
         return vec(mat)
-      elseif shape.rows == 1
+      elseif size[1] == 1
         return vec(mat)'
       else
         return mat

@@ -5,10 +5,10 @@ using .Properties;
 function define_spd(functions, generic_functions)
 
   functions[ Set([Properties.SPD]) ] =
-    (shape, props) -> spd(shape, props, false);
+    (size, shape, props) -> spd(size..., shape, props, false);
 
   functions[ Set([Properties.SPD, Properties.Positive]) ] =
-    (shape, props) -> spd(shape, props, true);
+    (size, shape, props) -> spd(size..., shape, props, true);
 
   generic_functions[Properties.SPD] =
     (shape, val_types, props) -> spd(shape, val_types, props)
