@@ -14,28 +14,27 @@ function define_spd(functions, generic_functions)
     (shape, val_types, props) -> spd(shape, val_types, props)
 end
 
-function spd(shape::Shape.Band, properties, valTypes)
+function spd{T}(packed_shape::Tuple{T, Shape.Band, Bool, Int, Int}, properties, valTypes)
 
-  # verify if we can use one of easy generators
-  special_shape = cast_band(shape)
+  special_shape, shape, symmetric, rows, cols = packed_shape
   if (special_shape == Shape.General || special_shape == Shape.Symmetric) &&
-    (shape.upper_bandwidth + 1 != shape.cols || shape.lower_bandwidth + 1 != shape.rows)
+    (shape.upper_bandwidth + 1 != cols || shape.lower_bandwidth + 1 != rows)
     throw(ErrorException("Banded SPD not supported!"))
   end
   if valTypes == negative
     throw(ErrorException("SPD cannot have all negative values!"))
-end
-  mat = spd(special_shape, properties, valTypes == positive)
+  end
+  mat = spd(rows, cols, special_shape, properties, valTypes == positive)
   # apply band to remove unnecessary elems
-  return apply_band(special_shape, shape, mat)
+  return apply_band(special_shape, shape, rows, cols, mat)
 end
 
-function spd(shape::Shape.General, properties, positive::Bool)
+function spd(rows, cols, shape::Shape.General, properties, positive::Bool)
 
-  if shape.rows != shape.cols
+  if rows != cols
     throw(ErrorException("A not square matrix cannot be symmetric positive definite!"))
   else
-    return spd(Shape.Symmetric(shape.rows), properties, positive).data
+    return spd(rows, cols, Shape.Symmetric(), properties, positive).data
   end
 
 end
@@ -49,28 +48,32 @@ end
   The proof is trivial - express matrix determinant with Laplace expansion, starting
   from a first row.
 """
-function spd(shape::Shape.Symmetric, properties, _positive::Bool)
+function spd(rows, cols, shape::Shape.Symmetric, properties, _positive::Bool)
+
+  if rows != cols
+    throw(ErrorException("Non-square matrix passed to a symmetric generator!"))
+  end
 
   if _positive
-    mat = random(Shape.Triangular(shape.rows, Shape.Upper),
+    mat = random(rows, cols, Shape.Triangular(Shape.Upper),
       Set([Properties.Random]), positive)
   else
-    mat = random(Shape.Triangular(shape.rows, Shape.Upper),
+    mat = random(rows, cols, Shape.Triangular(Shape.Upper),
       Set([Properties.Random(-1, 1)]), none)
   end
   # Avoid very low determinant
-  mat = mat + eye(shape.rows)*3
+  mat = mat + eye(rows)*3
   return Symmetric(mat' * mat)
 
 end
 
-function spd(shape::Shape.Triangular, properties, positive::Bool)
+function spd(rows, cols, shape::Shape.Triangular, properties, positive::Bool)
   throw(ErrorException("Triangular matrix cannot be symmetric positive definite!"))
 end
 
 """
   A diagonal matrix is SPD iff all entries are positive.
 """
-function spd(shape::Shape.Diagonal, properties, positive::Bool)
-  return Diagonal( vec(rand(shape.rows, 1)) )
+function spd(rows, cols, shape::Shape.Diagonal, properties, positive::Bool)
+  return Diagonal( vec(rand(rows, 1)) )
 end

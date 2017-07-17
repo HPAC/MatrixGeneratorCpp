@@ -48,49 +48,51 @@ end
 
 function random{T <: ValuesType}(shape::Shape.Band, properties, valTypes::T)
 
-  # verify if we can use one of easy generators
-  special_shape = cast_band(shape)
+
   mat = random(special_shape, properties, valTypes)
   # apply band to remove unnecessary elems
   return apply_band(special_shape, shape, mat)
 end
 
-function random{T <: ValuesType}(shape::Shape.General, properties, valTypes::T)
+function random{T <: ValuesType}(rows, cols, shape::Shape.General, properties, valTypes::T)
   low, high = get_bounds(properties, valTypes)
   if valTypes == none
-    return rand(shape.rows, shape.cols) * (high - low) + low
+    return rand(rows, cols) * (high - low) + low
   elseif valTypes == positive
     if low < 0
       throw(ErrorException(
         @sprintf("Clash between lower bound %f of Random and Positive!", low)
         ))
     end
-    return rand(shape.rows, shape.cols) * (high - low) + low
+    return rand(rows, cols) * (high - low) + low
   else
     if high > 0
       throw(ErrorException(
         @sprintf("Clash between upper bound %f of Random and Negative!", high)
         ))
     end
-    return rand(shape.rows, shape.cols) * (high - low) + low
+    return rand(rows, cols) * (high - low) + low
   end
 end
 
-function random{T <: ValuesType}(shape::Shape.Symmetric, properties, valTypes::T)
-  mat = random(Shape.General(shape.rows, shape.rows), properties, valTypes)
+function random{T <: ValuesType}(rows, cols, shape::Shape.Symmetric, properties, valTypes::T)
+  if rows != cols
+    throw(ErrorException("Non-square matrix passed to a symmetric generator!"))
+  end
+  mat = random(rows, rows, Shape.General(), properties, valTypes)
   return Symmetric(mat)
 end
 
-function random{T <: ValuesType}(shape::Shape.Triangular, properties, valTypes::T)
+function random{T <: ValuesType}(rows, cols, shape::Shape.Triangular, properties, valTypes::T)
   # fill whole matrix, one part will be ignored
-  mat = random(Shape.General(shape.rows, shape.rows), properties, valTypes)
-  return    shape.data_placement == Shape.Upper ?
+  mat = random(rows, cols, Shape.General(), properties, valTypes)
+  return  shape.data_placement == Shape.Upper ?
             UpperTriangular(mat) :
             LowerTriangular(mat)
 end
 
-function random{T <: ValuesType}(shape::Shape.Diagonal, properties, valTypes::T)
+function random{T <: ValuesType}(rows, cols, shape::Shape.Diagonal, properties, valTypes::T)
   # fill one row
-  mat = random(Shape.General(1, shape.rows), properties, valTypes)
+  mat = random(1, rows, Shape.General(), properties, valTypes)
   return Diagonal( vec(mat) )
 end

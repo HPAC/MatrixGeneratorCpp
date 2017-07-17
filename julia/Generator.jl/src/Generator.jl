@@ -57,13 +57,16 @@ module Generator
     end
   end
 
-  function generate(properties)
-    shape, symmetry, other_properties = get_shape_type(properties)
+  function generate(size, properties)
+    shape, symmetric, other_properties = get_shape_type(size, properties)
+    special_shape = cast_band(size, symmetric, shape)
     val_types, major_prop = extract_basic_properties(properties)
-    mat = generator.generic_generators[extract_type(major_prop)](shape, other_properties, val_types)
-    if shape.cols == 1
+    mat = generator.generic_generators[extract_type(major_prop)](
+        (special_shape, shape, symmetric, size...), other_properties, val_types
+      )
+    if size[2] == 1
       return vec(mat)
-    elseif shape.rows == 1
+    elseif size[1] == 1
       return vec(mat)'
     else
       return mat

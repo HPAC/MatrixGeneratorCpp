@@ -54,7 +54,6 @@ for shape in shape_types
 
   for properties in other_properties
     ret = Generator.get_shape_type( shape[1], vcat(shape[2], properties) )
-    println(shape[2])
     # TEST: correct returned shape
     @test shape[3][2] == ret[1]
     # TEST: symmetry'

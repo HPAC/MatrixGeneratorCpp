@@ -104,46 +104,48 @@ function extract_basic_properties(properties)
   return (valTypes, major_property)
 end
 
-function cast_band(shape::Shape.Band)
+function cast_band(mat_size, symmetric::Bool, shape::Shape.Band)
+
+  rows, cols = mat_size
 
   if shape.lower_bandwidth == 0 && shape.upper_bandwidth == 0
-    return Shape.Diagonal(shape.rows)
-  elseif shape.lower_bandwidth == 0 && shape.upper_bandwidth + 1 == shape.cols && shape.cols == shape.rows
-    return Shape.Triangular(shape.rows, Shape.Upper)
-  elseif shape.upper_bandwidth == 0 && shape.lower_bandwidth + 1 == shape.rows && shape.cols == shape.rows
-    return Shape.Triangular(shape.rows, Shape.Lower)
+    return Shape.Diagonal()
+  elseif shape.lower_bandwidth == 0
+    return Shape.Triangular(Shape.Upper)
+  elseif shape.upper_bandwidth == 0
+    return Shape.Triangular(Shape.Lower)
   else
-    if shape.symmetric
-      return Shape.Symmetric(shape.rows)
+    if symmetric && rows == cols
+      return Shape.Symmetric()
     else
-      return Shape.General(shape.rows, shape.cols)
+      return Shape.General()
     end
   end
 
 end
 
-function apply_band(shape::Shape.General, original_shape, matrix)
+function apply_band(shape::Shape.General, original_shape, rows, cols, matrix)
 
-  if original_shape.lower_bandwidth + 1 == shape.rows &&
-      original_shape.upper_bandwidth + 1 == shape.cols
+  if original_shape.lower_bandwidth + 1 == rows &&
+      original_shape.upper_bandwidth + 1 == cols
     return matrix
   end
 
-  for i=1:shape.rows
-    for j=1:min(shape.cols, i-original_shape.lower_bandwidth-1)
+  for i=1:rows
+    for j=1:min(cols, i - original_shape.lower_bandwidth - 1)
       matrix[i, j] = 0.0
     end
-    for j=(i+original_shape.upper_bandwidth+1):shape.cols
+    for j=(i + original_shape.upper_bandwidth + 1):cols
       matrix[i, j] = 0.0
     end
   end
   return matrix
 end
 
-function apply_band(shape::Shape.Symmetric, original_shape, matrix)
+function apply_band(shape::Shape.Symmetric, original_shape, rows, cols, matrix)
   nonsymm = matrix.data
-  for i=1:shape.rows
-    for j=1:min(shape.rows, i-original_shape.lower_bandwidth-1)
+  for i=1:rows
+    for j=1:min(rows, i - original_shape.lower_bandwidth - 1)
       nonsymm[i, j] = 0.0
     end
   end
@@ -151,6 +153,6 @@ function apply_band(shape::Shape.Symmetric, original_shape, matrix)
 end
 
 # Triangular, Diagonal - don't do anything
-function apply_band(shape, original_shape, matrix)
+function apply_band(shape, original_shape, rows, cols, matrix)
   return matrix
 end
