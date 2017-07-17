@@ -95,19 +95,18 @@ function verify(rows, cols, shape::Shape.Band, mat, func,
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
 
-  if !isnull(func)
-    func_ = get(func)
-    for i=1:rows
+  for i=1:rows
       for j=1:min(cols, i-shape.lower_bandwidth-1)
         @test mat[i, j] ≈ 0.0
       end
       for j=max(1, i-shape.lower_bandwidth):min(cols, i+shape.upper_bandwidth)
-        func_( mat[i, j] )
+        if !isnull(func)
+          get(func)( mat[i, j] )
+        end
       end
-      for j=(i+shape.upper_bandwidth+1):shape.cols
+      for j=(i+shape.upper_bandwidth+1):cols
         @test mat[i, j] ≈ 0.0
       end
-    end
   end
   if !isnull(func_gen)
     get(func_gen)(mat)

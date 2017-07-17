@@ -2,39 +2,39 @@
 function generate_band_types(withSymmetric::Bool=true,withTriangular::Bool=true, withBanded::Bool=true)
 
   shape_types = Set()
-  push!(shape_types, ([Shape.General(2, 2)], Shape.General(2, 2)))
-  push!(shape_types, ([Shape.General(3, 2)], Shape.General(3, 2)))
+  push!(shape_types, ([2, 2], [Shape.General], Shape.General()))
+  push!(shape_types, ([3, 2], [Shape.General], Shape.General()))
   # Symmetric
   if withSymmetric
-    push!(shape_types, ([Shape.Symmetric(3)], Shape.Symmetric(3)))
-    push!(shape_types, ([Shape.Symmetric(3), Shape.General(3, 3)], Shape.Symmetric(3)))
+    push!(shape_types, ([3, 3], [Shape.Symmetric], Shape.Symmetric()))
+    push!(shape_types, ([3, 3], [Shape.Symmetric, Shape.General], Shape.Symmetric()))
   end
   # Triangular
   if withTriangular
-    push!(shape_types, ([Shape.Triangular(3, Shape.Upper), Shape.General(3, 3)], Shape.Triangular(3, Shape.Upper)))
-    push!(shape_types, ([Shape.Triangular(4, Shape.Lower), Shape.General(4, 4)], Shape.Triangular(4, Shape.Lower)))
+    push!(shape_types, ([3, 3], [Shape.Triangular(Shape.Upper), Shape.General], Shape.Triangular(Shape.Upper)))
+    push!(shape_types, ([4, 4], [Shape.Triangular(Shape.Lower), Shape.General], Shape.Triangular(Shape.Lower)))
   end
-  push!(shape_types, ([Shape.Triangular(4, Shape.Lower), Shape.Triangular(4, Shape.Upper)], Shape.Diagonal(4)))
+  push!(shape_types, ([4, 4], [Shape.Triangular(Shape.Lower), Shape.Triangular(Shape.Upper)], Shape.Diagonal()))
   if withBanded
     # Band non-symmetric
-    push!(shape_types, ([Shape.General(1, 1)], Shape.Band(1, 1, 0, 0)))
-    push!(shape_types, ([Shape.General(2, 2), Shape.Band(2, 2, 1, 0)], Shape.Band(2, 2, 1, 0)))
-    push!(shape_types, ([Shape.General(3, 2), Shape.Band(3, 2, 1, 1)], Shape.Band(3, 2, 1, 1)))
-    push!(shape_types, ([Shape.General(3, 2), Shape.Band(3, 2, 0, 1)], Shape.Band(3, 2, 0, 1)))
-    push!(shape_types, ([Shape.General(5, 4), Shape.Band(5, 4, 4, 3)], Shape.Band(5, 4, 4, 3)))
+    push!(shape_types, ([1, 1], [Shape.General], Shape.Band(0, 0)))
+    push!(shape_types, ([2, 2], [Shape.General, Shape.Band(1, 0)], Shape.Band(1, 0)))
+    push!(shape_types, ([3, 2], [Shape.General, Shape.Band(1, 1)], Shape.Band(1, 1)))
+    push!(shape_types, ([3, 2], [Shape.General, Shape.Band(0, 1)], Shape.Band(0, 1)))
+    push!(shape_types, ([5, 4], [Shape.General, Shape.Band(4, 3)], Shape.Band(4, 3)))
     # band sizes with very non-square matrices
-    push!(shape_types, ([Shape.General(1, 3), Shape.Band(1, 3, 0, 1)], Shape.Band(1, 3, 0, 1)))
-    push!(shape_types, ([Shape.General(3, 1), Shape.Band(3, 1, 1, 0)], Shape.Band(3, 1, 1, 0)))
-    push!(shape_types, ([Shape.General(5, 2), Shape.Band(5, 2, 0, 1)], Shape.Band(5, 2, 0, 1)))
-    push!(shape_types, ([Shape.General(2, 5), Shape.Band(2, 5, 1, 0)], Shape.Band(2, 5, 1, 0)))
-    push!(shape_types, ([Shape.General(5, 4), Shape.Band(5, 4, 4, 3), Shape.Band(5, 4, 2, 3)], Shape.Band(5, 4, 2, 3)))
-    push!(shape_types, ([Shape.Triangular(5, Shape.Upper), Shape.Band(5, 5, 4, 3), Shape.Band(5, 5, 2, 3)], Shape.Band(5, 5, 0, 3)))
-    push!(shape_types, ([Shape.Triangular(5, Shape.Lower), Shape.Band(5, 5, 4, 3), Shape.Band(5, 5, 2, 3)], Shape.Band(5, 5, 2, 0)))
+    push!(shape_types, ([1, 3], [Shape.General, Shape.Band(0, 1)], Shape.Band(0, 1)))
+    push!(shape_types, ([3, 1], [Shape.General, Shape.Band(1, 0)], Shape.Band(1, 0)))
+    push!(shape_types, ([5, 2], [Shape.General, Shape.Band(0, 1)], Shape.Band( 0, 1)))
+    push!(shape_types, ([2 ,5], [Shape.General, Shape.Band(1, 0)], Shape.Band( 1, 0)))
+    push!(shape_types, ([5, 4], [Shape.General, Shape.Band(4, 3), Shape.Band(2, 3)], Shape.Band(2, 3)))
+    push!(shape_types, ([5, 5], [Shape.Triangular(Shape.Upper), Shape.Band(4, 3), Shape.Band(2, 3)], Shape.Band(0, 3)))
+    push!(shape_types, ([5 ,5], [Shape.Triangular(Shape.Lower), Shape.Band(4, 3), Shape.Band(2, 3)], Shape.Band(2, 0)))
     # Band symmetric
-    push!(shape_types, ([Shape.Symmetric(1)], Shape.Band(1, 1, 0, 0, true)))
-    push!(shape_types, ([Shape.Symmetric(5), Shape.Band(5, 5, 4, 4)], Shape.Band(5, 5, 4, 4)))
-    push!(shape_types, ([Shape.Symmetric(5), Shape.Band(5, 5, 4, 3), Shape.Band(5, 5, 2, 2)], Shape.Band(5, 5, 2, 2)))
-    push!(shape_types, ([Shape.Diagonal(5), Shape.Band(5, 5 , 4, 3), Shape.Band(5, 5, 2, 3)], Shape.Band(5, 5, 0, 0)))
+    push!(shape_types, ([1, 1], [Shape.Symmetric], Shape.Band(0, 0)))
+    push!(shape_types, ([5, 5], [Shape.Symmetric, Shape.Band(4, 4)], Shape.Band(4, 4)))
+    push!(shape_types, ([5, 5], [Shape.Symmetric, Shape.Band(4, 3), Shape.Band(2, 2)], Shape.Band(2, 2)))
+    push!(shape_types, ([5, 5], [Shape.Diagonal, Shape.Band(4, 3), Shape.Band(2, 3)], Shape.Band(0, 0)))
   end
 
   return shape_types

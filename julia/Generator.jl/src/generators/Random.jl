@@ -8,11 +8,11 @@ using .Properties;
 function define_random(functions, generic_functions)
 
   functions[ Set([Properties.Random]) ] =
-    (shape, props) -> random(shape, props, none);
+    (size, shape, props) -> random(size..., shape, props, none);
   functions[ Set([Properties.Random, Properties.Positive])] =
-    (shape, props) -> random(shape, props, positive);
+    (size, shape, props) -> random(size..., shape, props, positive);
   functions[ Set([Properties.Random, Properties.Negative])] =
-    (shape, props) -> random(shape, props, negative);
+    (size, shape, props) -> random(size..., shape, props, negative);
 
   generic_functions[Properties.Random] =
     (shape, val_types, props) -> random(shape, val_types, props)
@@ -46,12 +46,12 @@ function get_bounds(properties, valTypes)
   end
 end
 
-function random{T <: ValuesType}(shape::Shape.Band, properties, valTypes::T)
+function random{T, U <: ValuesType}(packed_shape::Tuple{T, Shape.Band, Bool, Int, Int}, properties, valTypes::U)
 
-
-  mat = random(special_shape, properties, valTypes)
+  special_shape, shape, symmetric, rows, cols = packed_shape
+  mat = random(rows, cols, special_shape, properties, valTypes)
   # apply band to remove unnecessary elems
-  return apply_band(special_shape, shape, mat)
+  return apply_band(special_shape, shape, rows, cols, mat)
 end
 
 function random{T <: ValuesType}(rows, cols, shape::Shape.General, properties, valTypes::T)
