@@ -46,7 +46,6 @@ band_shapes = generate_band_types()
 for (size, shape, shape_dst) in band_shapes
   for (prop, verificator) in properties
     mat = generate( size, vcat(shape, prop) )
-    verify(size..., mat, verificator)
-    verify(size[1], size[2], shape_dst, mat, Nullable(), Nullable(verificator))
+    verify(size..., shape_dst, mat, verificator, Nullable())
   end
 end

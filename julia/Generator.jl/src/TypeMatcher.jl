@@ -110,9 +110,9 @@ function cast_band(mat_size, symmetric::Bool, shape::Shape.Band)
 
   if shape.lower_bandwidth == 0 && shape.upper_bandwidth == 0
     return Shape.Diagonal()
-  elseif shape.lower_bandwidth == 0
+  elseif shape.lower_bandwidth == 0 && rows == cols && shape.upper_bandwidth + 1 == cols
     return Shape.Triangular(Shape.Upper)
-  elseif shape.upper_bandwidth == 0
+  elseif shape.upper_bandwidth == 0 && rows == cols && shape.lower_bandwidth + 1 == rows
     return Shape.Triangular(Shape.Lower)
   else
     if symmetric && rows == cols

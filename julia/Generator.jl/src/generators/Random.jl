@@ -47,7 +47,6 @@ function get_bounds(properties, valTypes)
 end
 
 function random{T, U <: ValuesType}(packed_shape::Tuple{T, Shape.Band, Bool, Int, Int}, properties, valTypes::U)
-
   special_shape, shape, symmetric, rows, cols = packed_shape
   mat = random(rows, cols, special_shape, properties, valTypes)
   # apply band to remove unnecessary elems
