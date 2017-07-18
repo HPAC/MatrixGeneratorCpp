@@ -13,10 +13,10 @@ module Shape
   immutable Symmetric <: ShapeType
   end
 
-  @enum Triangularity Upper=1 Lower=2
+  immutable LowerTriangular <: ShapeType
+  end
 
-  immutable Triangular <: ShapeType
-    data_placement::Triangularity
+  immutable UpperTriangular <: ShapeType
   end
 
   immutable Diagonal <: ShapeType

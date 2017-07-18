@@ -11,9 +11,9 @@ properties[ [Properties.SPD, Properties.Positive] ] = Nullable(x -> @test x >= 0
 #Incorrect shapes
 @test_throws ErrorException generate([1, 2], Shape.General(), Set([Properties.SPD]))
 @test_throws ErrorException generate([2, 1], Shape.General(), Set([Properties.SPD]))
-@test_throws ErrorException generate([3, 3], Shape.Triangular(Shape.Upper),
+@test_throws ErrorException generate([3, 3], Shape.UpperTriangular(),
   Set([Properties.SPD]))
-@test_throws ErrorException generate([3, 3], Shape.Triangular(Shape.Lower),
+@test_throws ErrorException generate([3, 3], Shape.LowerTriangular(),
   Set([Properties.SPD]))
 
 #For some reason isposdef is not overloaded for SymmetricMatrix

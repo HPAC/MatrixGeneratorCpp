@@ -82,12 +82,16 @@ function random{T <: ValuesType}(rows, cols, shape::Shape.Symmetric, properties,
   return Symmetric(mat)
 end
 
-function random{T <: ValuesType}(rows, cols, shape::Shape.Triangular, properties, valTypes::T)
+function random{T <: ValuesType}(rows, cols, shape::Shape.UpperTriangular, properties, valTypes::T)
   # fill whole matrix, one part will be ignored
   mat = random(rows, cols, Shape.General(), properties, valTypes)
-  return  shape.data_placement == Shape.Upper ?
-            UpperTriangular(mat) :
-            LowerTriangular(mat)
+  return UpperTriangular(mat)
+end
+
+function random{T <: ValuesType}(rows, cols, shape::Shape.LowerTriangular, properties, valTypes::T)
+  # fill whole matrix, one part will be ignored
+  mat = random(rows, cols, Shape.General(), properties, valTypes)
+  return LowerTriangular(mat)
 end
 
 function random{T <: ValuesType}(rows, cols, shape::Shape.Diagonal, properties, valTypes::T)

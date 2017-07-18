@@ -57,7 +57,11 @@ function orthogonal(rows, cols, shape::Shape.Symmetric, properties, type_::Value
   throw(ErrorException("Symmetric orthogonal matrices are not supported!"))
 end
 
-function orthogonal(rows, cols, shape::Shape.Triangular, properties, type_::ValuesType)
+function orthogonal(rows, cols, shape::Shape.UpperTriangular, properties, type_::ValuesType)
+  throw(ErrorException("Triangular matrix cannot be orthogonal!"))
+end
+
+function orthogonal(rows, cols, shape::Shape.LowerTriangular, properties, type_::ValuesType)
   throw(ErrorException("Triangular matrix cannot be orthogonal!"))
 end
 

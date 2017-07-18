@@ -16,13 +16,12 @@ function cast_type(rows, cols, property)
   elseif isa_obj_type(property, Shape.Symmetric)
     # matrix (m, n) with bands m -1, n-1
     return (true, true, Shape.Band(rows - 1, cols - 1))
-  elseif isa_obj_type(property, Shape.Triangular)
-    # matrix (m, n) with bands m -1, n-1
-    if property.data_placement == Shape.Upper
-      return (true, false, Shape.Band(0, cols - 1))
-    else
-      return (true, false, Shape.Band(rows - 1, 0))
-    end
+  elseif isa_obj_type(property, Shape.LowerTriangular)
+    # triangular matrix (m, n) with bands m -1, 0
+    return (true, false, Shape.Band(rows - 1, 0))
+  elseif isa_obj_type(property, Shape.UpperTriangular)
+    # triangular matrix (m, n) with bands 0, n -1
+    return (true, false, Shape.Band(0, cols - 1))
   elseif isa_obj_type(property, Shape.Diagonal)
     # matrix (m, n) with bands m -1, n-1
     return (true, false, Shape.Band(0, 0))
@@ -111,9 +110,9 @@ function cast_band(mat_size, symmetric::Bool, shape::Shape.Band)
   if shape.lower_bandwidth == 0 && shape.upper_bandwidth == 0
     return Shape.Diagonal()
   elseif shape.lower_bandwidth == 0 && rows == cols && shape.upper_bandwidth + 1 == cols
-    return Shape.Triangular(Shape.Upper)
+    return Shape.UpperTriangular()
   elseif shape.upper_bandwidth == 0 && rows == cols && shape.lower_bandwidth + 1 == rows
-    return Shape.Triangular(Shape.Lower)
+    return Shape.LowerTriangular()
   else
     if symmetric && rows == cols
       return Shape.Symmetric()

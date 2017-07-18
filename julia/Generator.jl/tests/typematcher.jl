@@ -18,24 +18,24 @@ push!(shape_types, ([3, 2],[Shape.General], [false, Shape.Band(2, 1)]))
 push!(shape_types, ([3, 3], [Shape.Symmetric], [true, Shape.Band(2, 2)]))
 push!(shape_types, ([3, 3], [Shape.Symmetric, Shape.General], [true, Shape.Band(2, 2)]))
 # Triangular
-push!(shape_types, ([3, 3], [Shape.Triangular(Shape.Upper)], [false, Shape.Band(0, 2)]))
-push!(shape_types, ([4, 3], [Shape.Triangular(Shape.Lower)], [false, Shape.Band(3, 0)]))
-push!(shape_types, ([3, 4], [Shape.Triangular(Shape.Upper), Shape.General], [false, Shape.Band(0, 3)]))
+push!(shape_types, ([3, 3], [Shape.UpperTriangular()], [false, Shape.Band(0, 2)]))
+push!(shape_types, ([4, 3], [Shape.LowerTriangular()], [false, Shape.Band(3, 0)]))
+push!(shape_types, ([3, 4], [Shape.UpperTriangular(), Shape.General], [false, Shape.Band(0, 3)]))
 # upper & lower -> Diagonal
-push!(shape_types, ([4, 4], [Shape.Triangular(Shape.Lower), Shape.Triangular(Shape.Upper)], [false, Shape.Band(0, 0)]))
+push!(shape_types, ([4, 4], [Shape.LowerTriangular(), Shape.UpperTriangular()], [false, Shape.Band(0, 0)]))
 # Diagonal
 push!(shape_types, ([3, 3], [Shape.Diagonal], [false, Shape.Band(0, 0)]))
-push!(shape_types, ([3, 3], [Shape.Diagonal, Shape.Triangular(Shape.Upper)], [false, Shape.Band(0, 0)]))
+push!(shape_types, ([3, 3], [Shape.Diagonal, Shape.UpperTriangular()], [false, Shape.Band(0, 0)]))
 push!(shape_types, ([5, 5], [Shape.General, Shape.Diagonal], [false, Shape.Band(0, 0)]))
-push!(shape_types, ([3, 3], [Shape.Diagonal, Shape.Triangular(Shape.Upper), Shape.General], [false, Shape.Band(0, 0)]))
-push!(shape_types, ([3, 3], [Shape.Diagonal, Shape.Triangular(Shape.Lower), Shape.Symmetric], [true, Shape.Band(0, 0)]))
+push!(shape_types, ([3, 3], [Shape.Diagonal, Shape.UpperTriangular(), Shape.General], [false, Shape.Band(0, 0)]))
+push!(shape_types, ([3, 3], [Shape.Diagonal, Shape.LowerTriangular(), Shape.Symmetric], [true, Shape.Band(0, 0)]))
 # Band
 push!(shape_types, ([2, 2], [Shape.General, Shape.Band(1, 0)], [false, Shape.Band(1, 0)]))
 push!(shape_types, ([5, 4], [Shape.General, Shape.Band(4, 3)], [false, Shape.Band(4, 3)]))
 push!(shape_types, ([5, 4], [Shape.General, Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(2, 3)]))
 push!(shape_types, ([5, 5], [Shape.Symmetric, Shape.Band(4, 3), Shape.Band(2, 2)], [true, Shape.Band(2, 2)]))
-push!(shape_types, ([5, 4], [Shape.Triangular(Shape.Upper), Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(0, 3)]))
-push!(shape_types, ([4, 5], [Shape.Triangular(Shape.Lower), Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(2, 0)]))
+push!(shape_types, ([5, 4], [Shape.UpperTriangular(), Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(0, 3)]))
+push!(shape_types, ([4, 5], [Shape.LowerTriangular(), Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(2, 0)]))
 push!(shape_types, ([5, 5], [Shape.Diagonal, Shape.Band(4, 3), Shape.Band(2, 3)], [false, Shape.Band(0, 0)]))
 
 # errors

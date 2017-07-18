@@ -12,9 +12,9 @@ properties[ [Properties.Orthogonal, Properties.Negative] ] = Nullable(x -> @test
 @test_throws ErrorException generate([2, 1], Shape.General(), Set([Properties.Orthogonal]))
 @test_throws ErrorException generate([4, 4], Shape.Symmetric(), Set([Properties.Orthogonal]))
 @test_throws ErrorException generate([2, 2], Shape.Symmetric(), Set([Properties.Orthogonal]))
-@test_throws ErrorException generate([3, 3], Shape.Triangular(Shape.Upper),
+@test_throws ErrorException generate([3, 3], Shape.UpperTriangular(),
   Set([Properties.Orthogonal]))
-@test_throws ErrorException generate([3, 3], Shape.Triangular(Shape.Lower),
+@test_throws ErrorException generate([3, 3], Shape.LowerTriangular(),
   Set([Properties.Orthogonal]))
 
 #Incorrect combination

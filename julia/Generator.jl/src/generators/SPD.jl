@@ -55,10 +55,10 @@ function spd(rows, cols, shape::Shape.Symmetric, properties, _positive::Bool)
   end
 
   if _positive
-    mat = random(rows, cols, Shape.Triangular(Shape.Upper),
+    mat = random(rows, cols, Shape.UpperTriangular(),
       Set([Properties.Random]), positive)
   else
-    mat = random(rows, cols, Shape.Triangular(Shape.Upper),
+    mat = random(rows, cols, Shape.UpperTriangular(),
       Set([Properties.Random(-1, 1)]), none)
   end
   # Avoid very low determinant
@@ -67,7 +67,11 @@ function spd(rows, cols, shape::Shape.Symmetric, properties, _positive::Bool)
 
 end
 
-function spd(rows, cols, shape::Shape.Triangular, properties, positive::Bool)
+function spd(rows, cols, shape::Shape.UpperTriangular, properties, positive::Bool)
+  throw(ErrorException("Triangular matrix cannot be symmetric positive definite!"))
+end
+
+function spd(rows, cols, shape::Shape.LowerTriangular, properties, positive::Bool)
   throw(ErrorException("Triangular matrix cannot be symmetric positive definite!"))
 end
 

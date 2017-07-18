@@ -39,11 +39,14 @@ function constant(rows, cols, shape::Shape.Symmetric, properties)
   return Symmetric(mat)
 end
 
-function constant(rows, cols, shape::Shape.Triangular, properties)
+function constant(rows, cols, shape::Shape.LowerTriangular, properties)
   mat = constant(rows, cols, Shape.General(), properties)
-  return shape.data_placement == Shape.Upper ?
-            UpperTriangular(mat) :
-            LowerTriangular(mat)
+  return LowerTriangular(mat)
+end
+
+function constant(rows, cols, shape::Shape.UpperTriangular, properties)
+  mat = constant(rows, cols, Shape.General(), properties)
+  return UpperTriangular(mat)
 end
 
 function constant(rows, cols, shape::Shape.Diagonal, properties)

@@ -27,8 +27,8 @@ properties[ [Properties.Random(-8.5, -7), Properties.Negative] ] = Nullable(x ->
 
 types = [ (Shape.General(), matrix_sizes)
           (Shape.Symmetric(), matrix_sq_sizes)
-          (Shape.Triangular(Shape.Upper), matrix_sq_sizes)
-          (Shape.Triangular(Shape.Lower), matrix_sq_sizes)
+          (Shape.UpperTriangular(), matrix_sq_sizes)
+          (Shape.LowerTriangular(), matrix_sq_sizes)
           (Shape.Diagonal(), matrix_sq_sizes)
         ]
 
