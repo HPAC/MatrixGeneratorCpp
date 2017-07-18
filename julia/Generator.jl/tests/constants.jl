@@ -12,29 +12,27 @@ properties[ [Properties.Constant(Float64(pi))] ] = Nullable(x -> @test x ≈ pi)
 
 
 #General matrix
-types = [ (Shape.General, (x, y) -> Shape.General(x, y), matrix_sizes)
-          (Shape.Symmetric, (x, y) -> Shape.Symmetric(x), matrix_sq_sizes)
-          (Shape.Triangular, (x, y) -> Shape.Triangular(x, Shape.Upper), matrix_sq_sizes)
-          (Shape.Triangular, (x, y) -> Shape.Triangular(x, Shape.Lower), matrix_sq_sizes)
-          (Shape.Diagonal, (x, y) -> Shape.Diagonal(x), matrix_sq_sizes)
+types = [ (Shape.General(), matrix_sizes)
+          (Shape.Symmetric(), matrix_sq_sizes)
+          (Shape.Triangular(Shape.Upper), matrix_sq_sizes)
+          (Shape.Triangular(Shape.Lower), matrix_sq_sizes)
+          (Shape.Diagonal(), matrix_sq_sizes)
         ]
 
-for (datatype, creator, matrix_sizes) in types
+for (datatype, matrix_sizes) in types
   for (prop, verificator) in properties
     for cur_size in matrix_sizes
-      mat = generate(creator(cur_size[1], cur_size[2]), Set(prop))
-      verify(cur_size[1], cur_size[2], creator(cur_size[1], cur_size[2]),
-        mat, verificator)
+      mat = generate([cur_size[1], cur_size[2]], datatype, Set(prop))
+      verify(cur_size[1], cur_size[2], datatype, mat, verificator)
     end
   end
 end
 
 band_shapes = generate_band_types()
 
-for (shape, shape_dst) in band_shapes
+for (size, shape, shape_dst) in band_shapes
   for (prop, verificator) in properties
-    mat = generate( vcat(shape, prop) )
-    cols = isa(shape_dst, Shape.General) || isa(shape_dst, Shape.Band) ? shape_dst.cols : shape_dst.rows
-    verify(shape_dst.rows, cols, shape_dst, mat, verificator)
+    mat = generate( size, vcat(shape, prop) )
+    verify(size..., shape_dst, mat, verificator, Nullable())
   end
 end
