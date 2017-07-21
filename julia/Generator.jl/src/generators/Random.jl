@@ -85,13 +85,13 @@ end
 function random{T <: ValuesType}(rows, cols, shape::Shape.UpperTriangular, properties, valTypes::T)
   # fill whole matrix, one part will be ignored
   mat = random(rows, cols, Shape.General(), properties, valTypes)
-  return UpperTriangular(mat)
+  return apply_upper_triangular(rows, cols, mat)
 end
 
 function random{T <: ValuesType}(rows, cols, shape::Shape.LowerTriangular, properties, valTypes::T)
   # fill whole matrix, one part will be ignored
   mat = random(rows, cols, Shape.General(), properties, valTypes)
-  return LowerTriangular(mat)
+  return apply_lower_triangular(rows, cols, mat)
 end
 
 function random{T <: ValuesType}(rows, cols, shape::Shape.Diagonal, properties, valTypes::T)

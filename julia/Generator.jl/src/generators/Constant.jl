@@ -41,12 +41,12 @@ end
 
 function constant(rows, cols, shape::Shape.LowerTriangular, properties)
   mat = constant(rows, cols, Shape.General(), properties)
-  return LowerTriangular(mat)
+  return apply_lower_triangular(rows, cols, mat)
 end
 
 function constant(rows, cols, shape::Shape.UpperTriangular, properties)
   mat = constant(rows, cols, Shape.General(), properties)
-  return UpperTriangular(mat)
+  return apply_upper_triangular(rows, cols, mat)
 end
 
 function constant(rows, cols, shape::Shape.Diagonal, properties)

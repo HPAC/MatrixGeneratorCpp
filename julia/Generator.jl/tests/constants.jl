@@ -14,8 +14,8 @@ properties[ [Properties.Constant(Float64(pi))] ] = Nullable(x -> @test x ≈ pi)
 #General matrix
 types = [ (Shape.General(), matrix_sizes)
           (Shape.Symmetric(), matrix_sq_sizes)
-          (Shape.UpperTriangular(), matrix_sq_sizes)
-          (Shape.LowerTriangular(), matrix_sq_sizes)
+          (Shape.UpperTriangular(), matrix_sizes)
+          (Shape.LowerTriangular(), matrix_sizes)
           (Shape.Diagonal(), matrix_sq_sizes)
         ]
 
@@ -33,6 +33,10 @@ band_shapes = generate_band_types()
 for (size, shape, shape_dst) in band_shapes
   for (prop, verificator) in properties
     mat = generate( size, vcat(shape, prop) )
+    println(size)
+    println(shape)
+    println(shape_dst)
+    println(mat)
     verify(size..., shape_dst, mat, verificator, Nullable())
   end
 end

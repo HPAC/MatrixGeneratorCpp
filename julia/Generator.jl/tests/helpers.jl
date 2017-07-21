@@ -43,16 +43,25 @@ function verify(rows, cols, shape::Shape.UpperTriangular, mat, func,
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
 
-  @test isa(mat, UpperTriangular)
+  if rows == cols
+    @test isa(mat, UpperTriangular)
+    @test istriu(mat)
+  else
+    for i=2:rows
+      for j=1:min(i-1, cols)
+        @test mat[i, j] ≈ 0.0
+      end
+    end
+  end
+
   if !isnull(func)
     func_ = get(func)
     for i=1:rows
-      for j=i:rows
+      for j=i:min(rows, cols)
         func_( mat[i, j] )
       end
     end
   end
-  @test istriu(mat)
   if !isnull(func_gen)
     get(func_gen)(mat)
   end
@@ -65,16 +74,25 @@ function verify(rows, cols, shape::Shape.LowerTriangular, mat, func,
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
 
-  @test isa(mat, LowerTriangular)
+
+  if rows == cols
+    @test isa(mat, LowerTriangular)
+    @test istril(mat)
+  else
+    for i=1:rows
+      for j=min(i, cols)+1:cols
+        @test mat[i, j] ≈ 0.0
+      end
+    end
+  end
   if !isnull(func)
     func_ = get(func)
     for i=1:rows
-      for j=1:i
+      for j=1:min(i, cols)
         func_( mat[i, j] )
       end
     end
   end
-  @test istril(mat)
   if !isnull(func_gen)
     get(func_gen)(mat)
   end

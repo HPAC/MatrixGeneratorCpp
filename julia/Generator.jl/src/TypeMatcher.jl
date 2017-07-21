@@ -109,9 +109,9 @@ function cast_band(mat_size, symmetric::Bool, shape::Shape.Band)
 
   if shape.lower_bandwidth == 0 && shape.upper_bandwidth == 0
     return Shape.Diagonal()
-  elseif shape.lower_bandwidth == 0 && rows == cols && shape.upper_bandwidth + 1 == cols
+  elseif shape.lower_bandwidth == 0
     return Shape.UpperTriangular()
-  elseif shape.upper_bandwidth == 0 && rows == cols && shape.lower_bandwidth + 1 == rows
+  elseif shape.upper_bandwidth == 0
     return Shape.LowerTriangular()
   else
     if symmetric && rows == cols
@@ -153,5 +153,31 @@ end
 
 # Triangular, Diagonal - don't do anything
 function apply_band(shape, original_shape, rows, cols, matrix)
+  return matrix
+end
+
+# Triangular, Diagonal - don't do anything
+function apply_upper_triangular(rows, cols, matrix)
+  if rows == cols
+    return UpperTriangular(matrix)
+  end
+  for i=1:rows
+    for j=1:min(i-1, cols)
+      matrix[i, j] = 0.0
+    end
+  end
+  return matrix
+end
+
+# Triangular, Diagonal - don't do anything
+function apply_lower_triangular(rows, cols, matrix)
+  if rows == cols
+    return LowerTriangular(matrix)
+  end
+  for i=1:rows
+    for j=i+1:cols
+      matrix[i, j] = 0.0
+    end
+  end
   return matrix
 end
