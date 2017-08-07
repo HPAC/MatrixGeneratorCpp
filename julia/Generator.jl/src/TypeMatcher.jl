@@ -134,6 +134,7 @@ function apply_band(shape::Shape.General, original_shape, rows, cols, matrix)
     for j=1:min(cols, i - original_shape.lower_bandwidth - 1)
       matrix[i, j] = 0.0
     end
+    println(j, i, i + original_shape.upper_bandwidth + 1, cols)
     for j=(i + original_shape.upper_bandwidth + 1):cols
       matrix[i, j] = 0.0
     end
@@ -151,12 +152,56 @@ function apply_band(shape::Shape.Symmetric, original_shape, rows, cols, matrix)
   return Symmetric(nonsymm, :L)
 end
 
+function apply_band(shape::Shape.UpperTriangular, original_shape, rows, cols, matrix)
+
+  if original_shape.upper_bandwidth + 1 == cols
+    return matrix
+  end
+
+  for i=1:rows
+    for j=(i + original_shape.upper_bandwidth + 1):cols
+      matrix[i, j] = 0.0
+    end
+  end
+
+  return matrix
+end
+
+function apply_band(shape::Shape.UpperTriangular, original_shape, rows, cols, matrix)
+
+  if original_shape.upper_bandwidth + 1 == cols
+    return matrix
+  end
+
+  for i=1:rows
+    for j=(i + original_shape.upper_bandwidth + 1):cols
+      matrix[i, j] = 0.0
+    end
+  end
+
+  return matrix
+end
+
+function apply_band(shape::Shape.LowerTriangular, original_shape, rows, cols, matrix)
+
+  if original_shape.lower_bandwidth + 1 == rows
+    return matrix
+  end
+
+  for i=1:rows
+    for j=1:(i - original_shape.lower_bandwidth - 1)
+      matrix[i, j] = 0.0
+    end
+  end
+
+  return matrix
+end
+
 # Triangular, Diagonal - don't do anything
 function apply_band(shape, original_shape, rows, cols, matrix)
   return matrix
 end
 
-# Triangular, Diagonal - don't do anything
 function apply_upper_triangular(rows, cols, matrix)
   if rows == cols
     return UpperTriangular(matrix)
@@ -169,7 +214,6 @@ function apply_upper_triangular(rows, cols, matrix)
   return matrix
 end
 
-# Triangular, Diagonal - don't do anything
 function apply_lower_triangular(rows, cols, matrix)
   if rows == cols
     return LowerTriangular(matrix)
