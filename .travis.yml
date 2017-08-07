@@ -13,4 +13,4 @@ addons:
     - clang-4.0
 
 script: 
-    - $CXX --version
+  - $CXX --version
