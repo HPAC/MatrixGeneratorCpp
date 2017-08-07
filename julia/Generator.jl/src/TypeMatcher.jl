@@ -106,7 +106,6 @@ end
 function cast_band(mat_size, symmetric::Bool, shape::Shape.Band)
 
   rows, cols = mat_size
-
   if shape.lower_bandwidth == 0 && shape.upper_bandwidth == 0
     return Shape.Diagonal()
   elseif shape.lower_bandwidth == 0
@@ -190,6 +189,7 @@ function apply_upper_triangular(rows, cols, matrix)
   if rows == cols
     return UpperTriangular(matrix)
   end
+  # remove lower triangular part
   for i=1:rows
     for j=1:min(i-1, cols)
       matrix[i, j] = 0.0
@@ -208,4 +208,15 @@ function apply_lower_triangular(rows, cols, matrix)
     end
   end
   return matrix
+end
+
+function apply_diagonal(rows, cols, matrix)
+  if rows == cols
+    return Diagonal( vec(matrix) )
+  end
+  mat = zeros(rows, cols)
+  for i=1:min(rows, cols)
+    mat[i, i] = matrix[i]
+  end
+  return mat
 end

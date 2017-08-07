@@ -50,6 +50,6 @@ function constant(rows, cols, shape::Shape.UpperTriangular, properties)
 end
 
 function constant(rows, cols, shape::Shape.Diagonal, properties)
-  mat = constant(1, rows, Shape.General(), properties)
-  return Diagonal( vec(mat) )
+  mat = constant(1, min(rows, cols), Shape.General(), properties)
+  return apply_diagonal(rows, cols, mat)
 end

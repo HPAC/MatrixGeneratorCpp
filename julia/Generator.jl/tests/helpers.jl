@@ -102,13 +102,15 @@ end
 function verify(rows, cols, shape::Shape.Diagonal, mat, func,
     func_gen = Nullable())
 
-  @test isa(mat, Diagonal)
+  if rows == cols
+    @test isa(mat, Diagonal)
+  end
   @test size(mat, 1) == rows
   @test size(mat, 2) == cols
 
   if !isnull(func)
     func_ = get(func)
-    for i=1:rows
+    for i=1:min(rows, cols)
       func_( mat[i, i] )
     end
     @test isdiag(mat)

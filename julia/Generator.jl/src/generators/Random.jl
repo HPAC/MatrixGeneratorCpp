@@ -96,6 +96,6 @@ end
 
 function random{T <: ValuesType}(rows, cols, shape::Shape.Diagonal, properties, valTypes::T)
   # fill one row
-  mat = random(1, rows, Shape.General(), properties, valTypes)
-  return Diagonal( vec(mat) )
+  mat = random(1, min(rows, cols), Shape.General(), properties, valTypes)
+  return apply_diagonal(rows, cols, mat)
 end

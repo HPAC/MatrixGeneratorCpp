@@ -1,7 +1,7 @@
 using Generator
 
 
-matrix_sizes = [ [1, 1], [2, 2], [25, 50], [50, 25] ]
+matrix_sizes = [ [1, 1], [2, 2], [3, 1], [1 ,3], [25, 50], [50, 25] ]
 matrix_sq_sizes = [ [1, 1], [2, 2], [33, 33], [49, 49] ]
 properties = Dict()
 properties[ [Properties.Constant] ] = Nullable(x -> @test x ≈ 0.0)
@@ -16,7 +16,7 @@ types = [ (Shape.General(), matrix_sizes)
           (Shape.Symmetric(), matrix_sq_sizes)
           (Shape.UpperTriangular(), matrix_sizes)
           (Shape.LowerTriangular(), matrix_sizes)
-          (Shape.Diagonal(), matrix_sq_sizes)
+          (Shape.Diagonal(), matrix_sizes)
         ]
 
 for (datatype, matrix_sizes) in types

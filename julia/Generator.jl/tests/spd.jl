@@ -1,8 +1,6 @@
 using Base.Test
 using Generator
 
-
-matrix_sizes = [ [1, 1], [2, 2], [25, 50], [50, 25] ]
 matrix_sq_sizes = [ [1, 1], [2, 2], [33, 33], [49, 49], [50, 50] ]
 properties = Dict()
 properties[ [Properties.SPD] ] = Nullable()

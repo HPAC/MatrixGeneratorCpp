@@ -79,5 +79,8 @@ end
   A diagonal matrix is SPD iff all entries are positive.
 """
 function spd(rows, cols, shape::Shape.Diagonal, properties, positive::Bool)
+  if rows != cols
+    throw(ErrorException("A non-square diagonal matrix cannot be symmetric positive definite!"))
+  end
   return Diagonal( vec(rand(rows, 1)) )
 end
