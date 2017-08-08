@@ -74,7 +74,7 @@ if(${WITH_TESTS})
     else()
         # don't update automatically
         ExternalProject_Add(googletest
-            GIT_REPOSITORY git@github.com:google/googletest.git
+            GIT_REPOSITORY https://github.com/google/googletest.git
             CMAKE_ARGS -DBUILD_GTEST=On
             PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
             UPDATE_DISCONNECTED 1
