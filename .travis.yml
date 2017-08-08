@@ -7,6 +7,8 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+    # CMake 3.5.1
+      - kalakris-cmake
       - llvm-toolchain-trusty-4.0
     packages:
       - g++-6
