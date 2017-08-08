@@ -16,7 +16,8 @@ addons:
       - liblapack-dev
 cache:
   apt: true
-
+  directories:
+  - "deps/blaze"
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-6"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-4.0"; fi
@@ -37,4 +38,4 @@ install:
 script:
   - mkdir build && cd build
   - cmake -DWITH_BLAZE=On -DWITH_EXAMPLES=On ..
-  - cmake --build 
+  - cmake --build .
