@@ -7,21 +7,22 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-    # CMake 3.5.1
-      - kalakris-cmake
       - llvm-toolchain-trusty-4.0
     packages:
       - g++-6
       - clang-4.0
       - libgtest-dev
       - libboost-all-dev
-      - cmake
 cache:
   apt: true
 
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-6"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-4.0"; fi
+# CMake 3.5 is required by Blaze; Trusty PPA's have 3.2.x
+  - wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.sh
+  - chmod a+x cmake-3.5.2-Linux-x86_64.sh
+  - sudo ./cmake-3.5.2-Linux-x86_64.sh --skip-license --prefix=/usr/local
   - pushd .
   - mkdir -p deps
   - cd deps
