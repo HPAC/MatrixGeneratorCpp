@@ -13,6 +13,7 @@ addons:
       - clang-4.0
       - libgtest-dev
       - libboost-all-dev
+      - cmake
 cache:
   apt: true
 
