@@ -37,5 +37,6 @@ install:
 
 script:
   - mkdir build && cd build
-  - cmake -DWITH_BLAZE=On -DWITH_EXAMPLES=On ..
+  - cmake -DWITH_BLAZE=On -DWITH_EXAMPLES=On -DWITH_TESTS=On ..
   - cmake --build .
+  - ctest -VV
