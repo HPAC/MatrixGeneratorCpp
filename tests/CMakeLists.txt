@@ -7,8 +7,8 @@ function(create_test test source)
         add_dependencies(${test} ${GTEST_DEPENDENCY})
     endif(GTEST_DEPENDENCY)
 
-    target_link_libraries(${test} ${LINK_LIBRARIES})
-    target_link_libraries(${test} ${GTEST_LINK_FLAGS})
+    target_link_libraries(${test} PRIVATE libtests)
+    target_link_libraries(${test} PRIVATE ${GTEST_LINK_FLAGS})
 
     add_test(NAME ${test} COMMAND ${test})
 
