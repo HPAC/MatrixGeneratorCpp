@@ -11,9 +11,22 @@ addons:
     packages:
       - g++-6
       - clang-4.0
+      - libgtest-dev
+      - libboost-all-dev
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-6"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-4.0"; fi
+  - pushd .
+  - mkdir -p deps
+  - cd deps
+  - if [ ! -d "blaze" ]; then export BUILD_BLAZE="yes"; else export BUILD_BLAZE="no"; fi
+  - if [ "$BUILD_BLAZE" == "yes" ]; mkdir blaze && cd blaze && git clone git@bitbucket.org:blaze-lib/blaze.git && mkdir build && mkdir install; fi
+  - if [ "$BUILD_BLAZE" == "yes" ]; cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../blaze && make install && cd ../install; fi
+  - if [ "$BUILD_BLAZE" == "no" ]; cd blaze/install ; fi
+  - export BLAZE_ROOT="$(pwd)"
+  - popd
 
-script: 
-  - $CXX --version
+script:
+  - mkdir build && cd build
+  - cmake -DWITH_BLAZE=On -DWITH_EXAMPLES=On ..
+  - cmake --build 
