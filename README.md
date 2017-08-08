@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mcopik/linalg_tests.svg?branch=master)](https://travis-ci.org/mcopik/linalg_tests)
+
 Requirements:
 - a C++14 compiler - currently tested only with GCC 5.4
 - [Eigen3](http://eigen.tuxfamily.org/index.php?title=Main_Page) - tested with 3.3.1

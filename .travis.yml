@@ -38,3 +38,8 @@ script:
   - cmake -DWITH_BLAZE=On -DWITH_EXAMPLES=On -DWITH_TESTS=On ..
   - cmake --build .
   - ctest -VV
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
