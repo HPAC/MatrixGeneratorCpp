@@ -11,11 +11,9 @@ addons:
     packages:
       - g++-6
       - clang-4.0
-      - libgtest-dev
       - libboost-all-dev
       - liblapack-dev
-cache:
-  apt: true
+#cache:
   #directories:
       #  - "deps/blaze/install"
 install:
