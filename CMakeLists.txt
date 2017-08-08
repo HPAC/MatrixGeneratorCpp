@@ -7,34 +7,45 @@ option(WITH_EXAMPLES "Build examples" Off)
 option(WITH_TESTS "Build tests" Off)
 option(TESTS_FORCE_BUILD "Build Gtest" Off)
 
+option(WITH_BLAZE "Use Blaze library")
+option(WITH_EIGEN "Use Eigen3 library")
+option(WITH_ARMADILLO "Use Blaze library")
+option(WITH_MTL4 "Use Blaze library")
+
 set(CMAKE_CXX_STANDARD 14)
 set(LINK_LIBRARIES "")
 
+add_library(libtests INTERFACE)
+
 #Armadillo
-find_package(Armadillo CONFIG REQUIRED)
-include_directories(${ARMADILLO_INCLUDE_DIRS})
-set(LINK_LIBRARIES ${ARMADILLO_LIBRARIES})
+if(${WITH_ARMADILLO})
+    find_package(Armadillo CONFIG REQUIRED)
+    include_directories(${ARMADILLO_INCLUDE_DIRS})
+    set(LINK_LIBRARIES ${ARMADILLO_LIBRARIES})
+    add_definitions(-DHAVE_ARMADILLO)
+endif()
 
 #Eigen
-find_package(Eigen3 CONFIG REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIRS})
+if(${WITH_EIGEN})
+    find_package(Eigen3 CONFIG REQUIRED)
+    include_directories(${EIGEN3_INCLUDE_DIRS})
+    add_definitions(-DHAVE_EIGEN)
+endif()
 
 #MTL4
-find_package(MTL CONFIG REQUIRED)
-include_directories(${MTL_INCLUDE_DIRS})
+if(${WITH_MTL4})
+    find_package(MTL CONFIG REQUIRED)
+    include_directories(${MTL_INCLUDE_DIRS})
+    add_definitions(-DHAVE_MTL4)
+endif()
 
 #Blaze
 #Currently no CMake support
-if(NOT Blaze_DIR)
-   message(FATAL_ERROR "Path to Blaze Blaze_DIR has to be defined")
+if(${WITH_BLAZE})
+    find_package(blaze CONFIG REQUIRED)
+    add_definitions(-DHAVE_BLAZE)
+    target_include_directories(libtests INTERFACE $<TARGET_PROPERTY:blaze::blaze,INTERFACE_INCLUDE_DIRECTORIES>)
 endif()
-#Simple correctness check
-if(EXISTS "${Blaze_DIR}/blaze/Blaze.h")
-   include_directories(${Blaze_DIR})
-else(EXISTS "${Blaze_DIR}/blaze/Blaze.h")
-   message(FATAL_ERROR "Could not locate blaze/Blaze.h in ${Blaze_DIR}")
-endif()
-
 #Warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     #Warnins for Clang/AppleClang
