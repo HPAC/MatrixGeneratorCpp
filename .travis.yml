@@ -23,7 +23,7 @@ install:
   - mkdir -p deps
   - cd deps
   - if [ ! -d "blaze" ]; then export BUILD_BLAZE="yes"; else export BUILD_BLAZE="no"; fi
-  - if [ "$BUILD_BLAZE" == "yes" ]; then mkdir blaze && cd blaze && git clone git@bitbucket.org:blaze-lib/blaze.git && mkdir build && mkdir install; fi
+  - if [ "$BUILD_BLAZE" == "yes" ]; then mkdir blaze && cd blaze && git clone https://bitbucket.org/blaze-lib/blaze.git && mkdir build && mkdir install; fi
   - if [ "$BUILD_BLAZE" == "yes" ]; then cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../blaze && make install && cd ../install; fi
   - if [ "$BUILD_BLAZE" == "no" ]; then cd blaze/install ; fi
   - export BLAZE_ROOT="$(pwd)"
