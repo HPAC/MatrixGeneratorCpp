@@ -141,7 +141,7 @@ namespace generator { namespace shape {
 
         // Update band type with a shape type, tuple unchanged
         template<typename OldTuple, typename Property,
-            typename = typename std::enable_if<is_shape_type<Property>::type>
+            typename = typename std::enable_if<is_shape_type<Property>::value>::type
         >
         std::tuple<band, OldTuple> from_properties(const matrix_size_t & size, const band & band_type,
             OldTuple && tuple, Property && property)
@@ -153,12 +153,12 @@ namespace generator { namespace shape {
         }
 
         template<typename OldTuple, typename Property, typename... Properties,
-            typename = typename std::enable_if<is_shape_type<Property>::type>
+            typename = typename std::enable_if<is_shape_type<Property>::value>::type
         >
         std::tuple<band, OldTuple> from_properties(const matrix_size_t & size, const band & band_type,
             OldTuple && tuple, Property && property, Properties &&... props)
         {
-            return from_properties(size,
+            return detail::from_properties(size,
                 merge_band(band_type, property.to_band(std::get<0>(size), std::get<1>(size))),
                 std::forward<OldTuple>(tuple),
                 std::forward<Properties>(props)...
@@ -166,18 +166,25 @@ namespace generator { namespace shape {
         }
 
         // Add non-shape type to an empty tuple
-        template<typename Property>
+        // These overloads are preferred over the generic implementation below only for
+        // empty_tuple taken as a rvalue ref. A bettter implementation requires SFINAE to disable
+        // other functions when OldTuple is empty_tuple.
+        template<typename Property,
+            typename = typename std::enable_if<!is_shape_type<Property>::value>::type
+        >
         std::tuple<band, std::tuple<Property>> from_properties(const matrix_size_t &,
-            const band & band_type, const empty_tuple & tuple, Property && property)
+            const band & band_type, empty_tuple && tuple, Property && property)
         {
             return std::make_tuple(band_type, std::make_tuple(property));
         }
 
-        template<typename Property, typename... Properties>
-        std::tuple<band, std::tuple<Property>> from_properties(const matrix_size_t & size,
-            const band & band_type, const empty_tuple & tuple, Property && property, Properties &&... props)
+        template<typename Property, typename... Properties,
+            typename = typename std::enable_if<!is_shape_type<Property>::value>::type
+        >
+        decltype(auto) from_properties(const matrix_size_t & size,
+            const band & band_type, empty_tuple && tuple, Property && property, Properties &&... props)
         {
-            return from_properties(size,
+            return detail::from_properties(size,
                 band_type,
                 std::make_tuple(std::forward<Property>(property)),
                 std::forward<Properties>(props)...
@@ -194,11 +201,10 @@ namespace generator { namespace shape {
         }
 
         template<typename OldTuple, typename Property, typename... Properties>
-        auto from_properties(const matrix_size_t & size, const band & band_type, OldTuple && tuple,
+        decltype(auto) from_properties(const matrix_size_t & size, const band & band_type, OldTuple && tuple,
             Property && property, Properties &&... props)
-            -> std::tuple<band, typename tuple_cat_result<OldTuple, Property>::type>
         {
-            return from_properties(size,
+            return detail::from_properties(size,
                 band_type,
                 std::tuple_cat(tuple, std::make_tuple(std::forward<Property>(property))),
                 std::forward<Properties>(props)...
