@@ -11,7 +11,10 @@
 
 namespace generator { namespace shape {
 
-    struct band;
+    struct matrix_size
+    {
+        uint32_t rows, cols;
+    };
 
     struct band
     {
@@ -24,7 +27,12 @@ namespace generator { namespace shape {
                 upper_bandwidth(upper_)
         {}
 
-        const band & to_band(uint32_t, uint32_t) const
+        band(const matrix_size & size):
+                lower_bandwidth(size.rows - 1),
+                upper_bandwidth(size.cols - 1)
+        {}
+
+        const band & to_band(const matrix_size &) const
         {
             return *this;
         }
@@ -34,9 +42,9 @@ namespace generator { namespace shape {
     {
         static constexpr bool symmetric = false;
 
-        band to_band(uint32_t rows, uint32_t cols) const
+        band to_band(const matrix_size & size) const
         {
-            return band(rows - 1, cols - 1);
+            return band(size.rows - 1, size.cols - 1);
         }
     };
 
@@ -44,12 +52,12 @@ namespace generator { namespace shape {
     {
         static constexpr bool symmetric = true;
 
-        band to_band(uint32_t rows, uint32_t cols) const
+        band to_band(const matrix_size & size) const
         {
-            if(rows != cols) {
+            if(size.rows != size.cols) {
                 throw std::runtime_error("Non-square matrix sizes passed to aself-adjoint matrix!");
             }
-            return band(rows - 1, cols - 1);
+            return band(size.rows - 1, size.cols - 1);
         }
     };
 
@@ -57,9 +65,9 @@ namespace generator { namespace shape {
     {
         static constexpr bool symmetric = false;
 
-        band to_band(uint32_t, uint32_t cols) const
+        band to_band(const matrix_size & size) const
         {
-            return band(0, cols - 1);
+            return band(0, size.cols - 1);
         }
     };
 
@@ -67,9 +75,9 @@ namespace generator { namespace shape {
     {
         static constexpr bool symmetric = false;
 
-        band to_band(uint32_t rows, uint32_t) const
+        band to_band(const matrix_size & size) const
         {
-            return band(rows - 1, 0);
+            return band(size.rows - 1, 0);
         }
     };
 
@@ -80,7 +88,7 @@ namespace generator { namespace shape {
         tridiagonal(): band(1, 1)
         {}
 
-        band to_band(uint32_t, uint32_t) const
+        band to_band(const matrix_size &) const
         {
             return band(1, 1);
         }
@@ -93,7 +101,7 @@ namespace generator { namespace shape {
         diagonal(): band(0, 0)
         {}
 
-        band to_band(uint32_t, uint32_t) const
+        band to_band(const matrix_size &) const
         {
             return band(0, 0);
         }
@@ -127,8 +135,6 @@ namespace generator { namespace shape {
 
     namespace detail {
 
-        typedef std::tuple<uint32_t, uint32_t> matrix_size_t;
-
         template<typename T1, typename T2>
         struct tuple_cat_result;
 
@@ -138,29 +144,29 @@ namespace generator { namespace shape {
             typedef std::tuple<T1..., T2> type;
         };
 
-        // Forward declaration
+        // Forward declarations
         template<typename OldTuple, typename Property,
             typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
         >
-        auto from_properties(const matrix_size_t &, const band & band_type, OldTuple && tuple,
+        auto from_properties(const matrix_size &, const band & band_type, OldTuple && tuple,
             Property && property)
             -> std::tuple<band, typename tuple_cat_result<OldTuple, Property>::type>;
 
         template<typename OldTuple, typename Property, typename... Properties,
             typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
         >
-        decltype(auto) from_properties(const matrix_size_t & size, const band & band_type, OldTuple && tuple,
+        decltype(auto) from_properties(const matrix_size & size, const band & band_type, OldTuple && tuple,
             Property && property, Properties &&... props);
 
         // Update band type with a shape type, tuple unchanged
         template<typename OldTuple, typename Property,
             typename std::enable_if<is_shape_type<Property>::value, int>::type = 0
         >
-        std::tuple<band, OldTuple> from_properties(const matrix_size_t & size, const band & band_type,
+        std::tuple<band, OldTuple> from_properties(const matrix_size & size, const band & band_type,
             OldTuple && tuple, Property && property)
         {
             return std::make_tuple(
-                merge_band(band_type, property.to_band(std::get<0>(size), std::get<1>(size))),
+                merge_band(band_type, property.to_band(size)),
                 tuple
                 );
         }
@@ -168,11 +174,11 @@ namespace generator { namespace shape {
         template<typename OldTuple, typename Property, typename... Properties,
             typename std::enable_if<is_shape_type<Property>::value, int>::type = 0
         >
-        decltype(auto) from_properties(const matrix_size_t & size, const band & band_type,
+        decltype(auto) from_properties(const matrix_size & size, const band & band_type,
             OldTuple && tuple, Property && property, Properties &&... props)
         {
             return detail::from_properties(size,
-                merge_band(band_type, property.to_band(std::get<0>(size), std::get<1>(size))),
+                merge_band(band_type, property.to_band(size)),
                 std::forward<OldTuple>(tuple),
                 std::forward<Properties>(props)...
                 );
@@ -182,7 +188,7 @@ namespace generator { namespace shape {
         template<typename OldTuple, typename Property,
             typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
         >
-        auto from_properties(const matrix_size_t &, const band & band_type, OldTuple && tuple,
+        auto from_properties(const matrix_size &, const band & band_type, OldTuple && tuple,
             Property && property)
             -> std::tuple<band, typename tuple_cat_result<OldTuple, Property>::type>
         {
@@ -192,7 +198,7 @@ namespace generator { namespace shape {
         template<typename OldTuple, typename Property, typename... Properties,
             typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
         >
-        decltype(auto) from_properties(const matrix_size_t & size, const band & band_type, OldTuple && tuple,
+        decltype(auto) from_properties(const matrix_size & size, const band & band_type, OldTuple && tuple,
             Property && property, Properties &&... props)
         {
             return detail::from_properties(size,
@@ -204,10 +210,10 @@ namespace generator { namespace shape {
     }
 
     template<typename... Properties>
-    decltype(auto) from_properties(const std::tuple<uint32_t, uint32_t> & size, Properties &&... props)
+    decltype(auto) from_properties(const matrix_size & size, Properties &&... props)
     {
         return detail::from_properties(size,
-            band(std::get<0>(size), std::get<1>(size)),
+            band(size),
             std::tuple<>{},
             std::forward<Properties>(props)...
             );
