@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Marcin Copik
+//  Copyright (c) 2016-2017 Marcin Copik
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,67 +6,96 @@
 #ifndef LINALG_TESTS_GENERATOR_SHAPE_HPP
 #define LINALG_TESTS_GENERATOR_SHAPE_HPP
 
+#include <stdexcept>
+
 namespace generator { namespace shape {
 
-    namespace detail {
+    struct band;
 
-        template<bool _SelfAdjoint>
-        struct general
+    struct band
+    {
+        static constexpr bool symmetric = false;
+        const uint32_t lower_bandwidth;
+        const uint32_t upper_bandwidth;
+
+        banded(uint32_t lower_, uint32_t upper_):
+                lower_bandwidth(lower_),
+                upper_bandwidth(upper_)
+        {}
+
+        const band & to_band(uint32_t, uint32_t) const
         {
-            //typedef _SelfAdjoint SelfAdjoint;
-            const uint32_t rows;
-            const uint32_t cols;
-            
-            constexpr general(uint32_t rows, uint32_t cols):
-                rows(rows),
-                cols(cols)
-            {}
-        };
-
-    }
-
-    struct general : detail::general<false>
-    {
-        constexpr general(uint32_t rows, uint32_t cols):
-            detail::general<false>(rows, cols) {}
+            return *this;
+        }
     };
 
-    struct self_adjoint : detail::general<true>
+    struct general
     {
-        constexpr self_adjoint(uint32_t rows):
-                detail::general<true>(rows, rows) {}
+        static constexpr bool symmetric = false;
+
+        band to_band(uint32_t rows, uint32_t cols) const
+        {
+            return band(rows - 1, cols - 1);
+        }
     };
 
-    struct triangular;
-
-    template<int SubDiagonals, int SuperDiagonals, bool Hermitian>
-    struct banded
+    struct self_adjoint
     {
-        static constexpr bool is_hermitian = Hermitian;
-        static constexpr int subdiagonals = SubDiagonals;
-        static constexpr int superdiagonals = SuperDiagonals;
-        const uint32_t rows;
-        const uint32_t cols;
+        static constexpr bool symmetric = true;
 
-        constexpr banded(uint32_t rows_, uint32_t cols_):
-                rows(rows_),
-                cols(cols_)
+        band to_band(uint32_t rows, uint32_t cols) const
+        {
+            if(rows != cols) {
+                throw std::runtime_error("Non-square matrix sizes passed to aself-adjoint matrix!");
+            }
+            return band(rows - 1, cols - 1);
+        }
+    };
+
+    struct upper_triangular
+    {
+        static constexpr bool symmetric = false;
+
+        band to_band(uint32_t, uint32_t cols) const
+        {
+            return band(0, cols - 1);
+        }
+    };
+
+    struct lower_triangular
+    {
+        static constexpr bool symmetric = false;
+
+        band to_band(uint32_t rows, uint32_t) const
+        {
+            return band(rows - 1, 0);
+        }
+    };
+
+    struct tridiagonal : public band
+    {
+        static constexpr bool symmetric = false;
+
+        tridiagonal(): band(1, 1)
         {}
+
+        band to_band(uint32_t, uint32_t) const
+        {
+            return band(1, 1);
+        }
     };
 
-    template<bool Hermitian>
-    struct tridiagonal : banded<1, 1, Hermitian>
+    struct diagonal : public band
     {
-        constexpr tridiagonal(uint32_t rows, uint32_t cols) :
-            banded<1, 1, Hermitian>(rows, rows)
-        {}
-    };
+        static constexpr bool symmetric = true;
 
-    struct diagonal : banded<0, 0, false>
-    {
-        constexpr diagonal(uint32_t rows) :
-            banded<0, 0, false>(rows, rows)
+        diagonal(): band(0, 0)
         {}
+
+        band to_band(uint32_t, uint32_t) const
+        {
+            return band(0, 0);
+        }
     };
 
 }}
