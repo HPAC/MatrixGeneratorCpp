@@ -17,117 +17,78 @@ namespace generator { namespace shape {
         uint32_t rows, cols;
     };
 
+    template<uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry = false>
     struct band
     {
-        uint32_t lower_bandwidth;
-        uint32_t upper_bandwidth;
-        bool symmetry;
-
-        constexpr band():
-                lower_bandwidth(std::numeric_limits<uint32_t>::max()),
-                upper_bandwidth(std::numeric_limits<uint32_t>::max()),
-                symmetry(false)
-        {}
-
-        constexpr band(uint32_t lower_, uint32_t upper_, bool symmetry_ = false):
-                lower_bandwidth(lower_),
-                upper_bandwidth(upper_),
-                symmetry(symmetry_)
-        {}
-
-        /*constexpr band(const matrix_size & size):
-                lower_bandwidth(size.rows - 1),
-                upper_bandwidth(size.cols - 1)
-        {}*/
-
-        constexpr band to_band() const
-        {
-            return *this;
-        }
+        static constexpr uint32_t lower_bandwidth = LowerBandwidth;
+        static constexpr uint32_t upper_bandwidth = UpperBandwidth;
+        static constexpr bool symmetry = Symmetry;
+        typedef band<LowerBandwidth, UpperBandwidth, Symmetry> band_type;
     };
-
-    /*struct general
-    {
-        constexpr band to_band(const matrix_size & size)
-        {
-            return band(size.rows - 1, size.cols - 1);
-        }
-    };*/
 
     struct self_adjoint
     {
-        constexpr band to_band() const
-        {
-            return band(std::numeric_limits<uint32_t>::max(),
-                        std::numeric_limits<uint32_t>::max(),
-                        true);
-        }
+        typedef band<
+            std::numeric_limits<uint32_t>::max(),
+            std::numeric_limits<uint32_t>::max(),
+            true
+        > band_type;
     };
 
     struct upper_triangular
     {
-        static constexpr bool symmetric = false;
-
-        constexpr upper_triangular() = default;
-
-        constexpr band to_band() const
-        {
-            return band(0, std::numeric_limits<uint32_t>::max());
-        }
+        typedef band<
+            0,
+            std::numeric_limits<uint32_t>::max(),
+            false
+        > band_type;
     };
 
     struct lower_triangular
     {
-        static constexpr bool symmetric = false;
-
-        constexpr lower_triangular() = default;
-
-        constexpr band to_band() const
-        {
-            return band(std::numeric_limits<uint32_t>::max(), 0);
-        }
+        typedef band<
+            std::numeric_limits<uint32_t>::max(),
+            0,
+            false
+        > band_type;
     };
 
-    struct tridiagonal : public band
+    struct tridiagonal
     {
-        static constexpr bool symmetric = false;
-
-        constexpr tridiagonal(): band(1, 1)
-        {}
-
-        constexpr band to_band() const
-        {
-            return band(1, 1, true);
-        }
+        typedef band<
+            1,
+            1,
+            true
+        > band_type;
     };
 
-    struct diagonal : public band
+    struct diagonal
     {
-        static constexpr bool symmetric = true;
-
-        constexpr diagonal(): band(0, 0)
-        {}
-
-        constexpr band to_band() const
-        {
-            return band(0, 0, true);
-        }
+        typedef band<
+            0,
+            0,
+            true
+        > band_type;
     };
 
-    constexpr band merge_band(const band first, const band second)
+    template<typename Matrix1, typename Matrix2>
+    struct merge_band
     {
-        return band(
-            std::min(first.lower_bandwidth, second.lower_bandwidth),
-            std::min(first.upper_bandwidth, second.upper_bandwidth),
-            first.symmetry | second.symmetry
-        );
-    }
+        typedef typename Matrix1::band_type band_1;
+        typedef typename Matrix2::band_type band_2;
+
+        typedef band<
+            std::min(band_1::lower_bandwidth, band_2::lower_bandwidth),
+            std::min(band_1::upper_bandwidth, band_2::upper_bandwidth),
+            band_1::symmetry | band_2::symmetry
+        > type;
+    };
 
     template<typename T>
     struct is_shape_type : std::false_type {};
 
-    template<>
-    struct is_shape_type<band> : std::true_type {};
+    template<uint32_t L, uint32_t U, bool S>
+    struct is_shape_type<band<L, U, S>> : std::true_type {};
     template<>
     struct is_shape_type<self_adjoint> : std::true_type {};
     template<>
@@ -150,74 +111,89 @@ namespace generator { namespace shape {
             typedef std::tuple<T1..., T2> type;
         };
 
-        // Forward declarations
-        template<typename OldTuple, typename Property,
-            typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
-        >
-        constexpr auto from_properties(band band_type, OldTuple && tuple,
-            Property && property)
-            -> std::tuple<band, std::tuple<band, typename tuple_cat_result<OldTuple, Property>::type>;
+        template<typename Band, typename OldTuple, typename Enable, typename... Properties>
+        struct from_properties;
 
-        template<typename OldTuple, typename Property, typename... Properties,
-            typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
+        template<typename Band, typename OldTuple, typename Property>
+        struct from_properties<
+            Band, OldTuple,
+            typename std::enable_if<is_shape_type<Property>::value, void>::type,
+            Property
         >
-        constexpr decltype(auto) from_properties(band band_type, OldTuple && tuple,
-            Property && property, Properties &&... props);
-
-        // Update band type with a shape type, tuple unchanged
-        template<typename OldTuple, typename Property,
-            typename std::enable_if<is_shape_type<Property>::value, int>::type = 0
-        >
-        constexpr std::tuple<band, OldTuple> from_properties(band band_type,
-            OldTuple && tuple, Property && property)
         {
-            return std::make_tuple(merge_band(band_type, property.to_band()), tuple);
-        }
+            typedef typename merge_band<Band, Property>::type band_type;
+            typedef OldTuple properties_type;
+        };
 
-        template<typename OldTuple, typename Property, typename... Properties,
-            typename std::enable_if<is_shape_type<Property>::value, int>::type = 0
-        >
-        constexpr decltype(auto) from_properties(band band_type,
-            OldTuple && tuple, Property && property, Properties &&... props)
-        {
-            return detail::from_properties(merge_band(band_type, property.to_band()),
-                std::forward<OldTuple>(tuple),
-                std::forward<Properties>(props)...
-                );
-        }
 
-        // Add non-shape type to a non-empty tuple
-        template<typename OldTuple, typename Property,
-            typename std::enable_if<!is_shape_type<Property>::value, int>::type
+        template<typename Band, typename OldTuple, typename Property>
+        struct from_properties<
+            Band, OldTuple,
+            typename std::enable_if<!is_shape_type<Property>::value, void>::type,
+            Property
         >
-        constexpr auto from_properties(band band_type, OldTuple && tuple,
-            Property && property)
-            -> std::tuple<band, typename tuple_cat_result<OldTuple, Property>::type>
         {
-            return std::make_tuple(band_type, std::tuple_cat(tuple, std::make_tuple(std::forward<Property>(property))));
-        }
+            typedef Band band_type;
+            typedef typename tuple_cat_result<OldTuple, Property>::type properties_type;
+        };
 
-        template<typename OldTuple, typename Property, typename... Properties,
-            typename std::enable_if<!is_shape_type<Property>::value, int>::type
+        template<
+            typename Band,
+            typename OldTuple,
+            typename Property,
+            typename... Properties
         >
-        constexpr decltype(auto) from_properties(band band_type, OldTuple && tuple,
-            Property && property, Properties &&... props)
+        struct from_properties<
+            Band, OldTuple,
+            typename std::enable_if<is_shape_type<Property>::value, void>::type,
+            Property, Properties...
+        >
         {
-            return detail::from_properties(band_type,
-                std::tuple_cat(tuple, std::make_tuple(std::forward<Property>(property))),
-                std::forward<Properties>(props)...
-                );
-        }
+            typedef from_properties<
+                typename merge_band<Band, Property>::type,
+                OldTuple,
+                void,
+                Properties...
+            > properties_t;
+            typedef typename properties_t::band_type band_type;
+            typedef typename properties_t::properties_type properties_type;
+        };
+
+        template<
+            typename Band,
+            typename OldTuple,
+            typename Property,
+            typename... Properties
+        >
+        struct from_properties<
+            Band, OldTuple,
+            typename std::enable_if<!is_shape_type<Property>::value, void>::type,
+            Property, Properties...
+        >
+        {
+            typedef from_properties<
+                Band,
+                typename tuple_cat_result<OldTuple, Property>::type,
+                void,
+                Properties...
+            > properties_t;
+            typedef typename properties_t::band_type band_type;
+            typedef typename properties_t::properties_type properties_type;
+        };
     }
 
     template<typename... Properties>
-    constexpr decltype(auto) from_properties(Properties &&... props)
+    struct from_properties
     {
-        return detail::from_properties(band(),
-            std::tuple<>{},
-            std::forward<Properties>(props)...
-            );
-    }
+        typedef detail::from_properties<
+            band<std::numeric_limits<uint32_t>::max(), std::numeric_limits<uint32_t>::max()>,
+            std::tuple<>,
+            void,
+            Properties...
+        > properties_t;
+        typedef typename properties_t::band_type band_type;
+        typedef typename properties_t::properties_type properties_type;
+    };
 
 }}
 
