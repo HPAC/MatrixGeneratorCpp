@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <functional>
+#include <exception>
 
 #include <generator/shape.hpp>
 
@@ -16,103 +17,107 @@ namespace generator { namespace intermediate {
     template<typename T> 
     struct general
     {
-        //using intermediate<Property, Generator>::rnd_gen_type;
-        //typedef typename intermediate<Property, Generator>::value_type value_type;
-
         general(const shape::matrix_size & size_) :
             size(size_),
             data(new T[size_.rows * size_.cols])
         {}
 
-        /*void fill(const rnd_gen_type & gen_func) override
-        {
-            Property::fill(*this, gen_func);
-        }
-
-        auto create() override
-        {
-            return Generator::create(*this);
-        }*/
-
         shape::matrix_size size;
         std::unique_ptr<T[]> data;
     };
 
-    /// Self-adjoint matrix is stored as a general matrix
-    /*template<typename T>
-    struct intermediate<T, generator::shape::self_adjoint> : 
-        intermediate<T, generator::shape::general>
+    template<typename T>
+    struct self_adjoint : general<T>
     {
-        typedef intermediate<T, generator::shape::general> base_t;
-        typedef typename base_t::type type;
-
-        static type create(const generator::shape::self_adjoint & gen)
+        self_adjoint(const shape::matrix_size & size_) :
+            general<T>(size_)
         {
-            return base_t::create(gen.rows, gen.rows);
+            if(size_.rows != size_.cols) {
+                throw std::runtime_error("Non-square matrix passed to self_adjoint!");
+            }
         }
     };
 
-    /// Diagonal matrix is stored as one row - 1D array
     template<typename T>
-    struct intermediate<T, generator::shape::diagonal>
+    struct upper_triangular : general<T>
     {
-        typedef std::unique_ptr<T[]> type;
-
-        static type create(const generator::shape::diagonal & gen)
+        upper_triangular(const shape::matrix_size & size_) :
+            general<T>(size_)
         {
-            return type(new T[gen.rows]);
         }
-    };*/
+    };
+
+    template<typename T>
+    struct lower_triangular : general<T>
+    {
+        lower_triangular(const shape::matrix_size & size_) :
+            general<T>(size_)
+        {
+        }
+    };
 
     template<typename T> 
     struct diagonal
     {
-        //using intermediate<Property, Generator>::rnd_gen_type;
-        //typedef typename intermediate<Property, Generator>::value_type value_type;
-
         diagonal(const shape::matrix_size & size_) :
             size(size_),
             data(new T[std::min(size_.rows, size_.cols)])
         {}
 
-        /*void fill(const rnd_gen_type & gen_func) override
-        {
-            Property::fill(*this, gen_func);
-        }
-
-        auto create() override
-        {
-            return Generator::create(*this);
-        }*/
-
         shape::matrix_size size;
         std::unique_ptr<T[]> data;
     };
 
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, typename = void>
-    struct intermediate_traits;
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, typename = void>
+    struct intermediate_selector;
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth>
-    struct intermediate_traits<
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry>
+    struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
+        Symmetry,
         typename std::enable_if<(LowerBandwidth > 0 && UpperBandwidth > 0)>::type
     >
     {
-        typedef general<T> type;
+        typedef typename std::conditional<Symmetry, self_adjoint<T>, general<T>>::type type;
     };
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth>
-    struct intermediate_traits<
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry>
+    struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
+        Symmetry,
         typename std::enable_if<(LowerBandwidth == 0 && UpperBandwidth == 0)>::type
     >
     {
         typedef diagonal<T> type;
+    };
+
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry>
+    struct intermediate_selector<
+        T,
+        LowerBandwidth,
+        UpperBandwidth,
+        Symmetry,
+        typename std::enable_if<(LowerBandwidth == 0 && UpperBandwidth > 0)>::type
+    >
+    {
+        typedef upper_triangular<T> type;
+    };
+
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry>
+    struct intermediate_selector<
+        T,
+        LowerBandwidth,
+        UpperBandwidth,
+        Symmetry,
+        typename std::enable_if<(LowerBandwidth > 0 && UpperBandwidth == 0)>::type
+    >
+    {
+        typedef lower_triangular<T> type;
     };
 }}
 

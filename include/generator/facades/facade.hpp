@@ -25,9 +25,6 @@ namespace generator { namespace detail {
     {
         typedef T value_t;
 
-        //template<typename Shape>
-        //using intermediate_t = typename shape::intermediate<T, Shape>::type;
-
         template<typename Shape>
         using matrix_t = typename MatrixType<T, Shape>::type;
 
@@ -59,10 +56,11 @@ namespace generator { namespace detail {
             // band_types is not usable in a constexpr since other properties are not constexpr
             // FIXME: better hash implementation, without this thing
             //typedef property::property<T, property::hash_computer< std::tuple_element<1, decltype(band_types)>>::hash() > property_t;
-            typedef typename intermediate::intermediate_traits<
+            typedef typename intermediate::intermediate_selector<
                 T,
                 band_type::lower_bandwidth,
-                band_type::upper_bandwidth
+                band_type::upper_bandwidth,
+                band_type::symmetry
                 >::type intermediate_t;
             intermediate_t matrix{size};
             property_t::fill(matrix,

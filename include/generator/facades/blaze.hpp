@@ -34,8 +34,8 @@ namespace generator {
         /// Hermitian and Symmetric in Blaze behaves identically for non-complex types
         /// Hence we can always use Hermitian
         /// \tparam T
-        /*template<typename T>
-        struct blaze_matrix_type<T, generator::shape::self_adjoint>
+        template<typename T>
+        struct blaze_matrix_type<T, generator::intermediate::self_adjoint<T>>
         {
             typedef blaze::HermitianMatrix< blaze::DynamicMatrix<T> > type;
 
@@ -43,7 +43,29 @@ namespace generator {
             {
                 return type(rows, ptr);
             }
-        };*/
+        };
+
+        template<typename T>
+        struct blaze_matrix_type<T, generator::intermediate::upper_triangular<T>>
+        {
+            typedef blaze::UpperMatrix< blaze::DynamicMatrix<T> > type;
+
+            static type create(uint32_t rows, uint32_t, T * ptr)
+            {
+                return type(rows, ptr);
+            }
+        };
+
+        template<typename T>
+        struct blaze_matrix_type<T, generator::intermediate::lower_triangular<T>>
+        {
+            typedef blaze::LowerMatrix< blaze::DynamicMatrix<T> > type;
+
+            static type create(uint32_t rows, uint32_t, T * ptr)
+            {
+                return type(rows, ptr);
+            }
+        };
 
         /// As long as we don't use block matrices,
         /// Hermitian and Symmetric in Blaze behaves identically for non-complex types
@@ -52,6 +74,7 @@ namespace generator {
         template<typename T>
         struct blaze_matrix_type<T, generator::intermediate::diagonal<T>>
         {
+            // FIXME: should we use here CompressedMatrix?
             typedef blaze::DiagonalMatrix< blaze::DynamicMatrix<T> > type;
 
             /// Blaze constructors expect an n*n matrix even for diagonal matrix
@@ -82,11 +105,9 @@ namespace generator {
             > base_t;
         typedef T value_t;
 
-        //template<typename Shape>
-        //using intermediate_t = typename base_t::template intermediate_t<Shape>;
 
         template<typename Intermediate>
-        using matrix_t = detail::blaze_matrix_type<T, std::decay_t<Intermediate>>;//typename base_t::template matrix_t<Intermediate>;
+        using matrix_t = detail::blaze_matrix_type<T, std::decay_t<Intermediate>>;
 
         generator(uint32_t seed = time(0)) :
                 base_t(seed)
@@ -95,7 +116,6 @@ namespace generator {
         template<typename Intermediate>
         typename matrix_t<Intermediate>::type create(Intermediate && intermediate)
         {
-            //return matrix_t<Shape>(data.get(), shape.rows, shape.cols);
             return matrix_t<Intermediate>::create(
                 intermediate.size.rows,
                 intermediate.size.cols,
