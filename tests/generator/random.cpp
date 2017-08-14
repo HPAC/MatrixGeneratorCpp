@@ -35,6 +35,22 @@ GENERATE_HERMITIAN_TEST(random_test, positive_medium, test_settings<>::medium_sq
 GENERATE_HERMITIAN_TEST(random_test, negative_small, test_settings<>::small_sq_sizes, generator::property::random(), generator::property::negative())
 GENERATE_HERMITIAN_TEST(random_test, negative_medium, test_settings<>::medium_sq_sizes, generator::property::random(), generator::property::negative())
 
+// FIXME: for Blaze, test only for square - what about else?
+GENERATE_UPPER_TRIANGULAR_TEST(random_test, small, test_settings<>::small_sq_sizes, generator::property::random())
+GENERATE_UPPER_TRIANGULAR_TEST(random_test, medium, test_settings<>::medium_sq_sizes, generator::property::random())
+GENERATE_UPPER_TRIANGULAR_TEST(random_test, positive_small, test_settings<>::small_sq_sizes, generator::property::random(), generator::property::positive())
+GENERATE_UPPER_TRIANGULAR_TEST(random_test, positive_medium, test_settings<>::medium_sq_sizes, generator::property::random(), generator::property::positive())
+GENERATE_UPPER_TRIANGULAR_TEST(random_test, negative_small, test_settings<>::small_sq_sizes, generator::property::random(), generator::property::negative())
+GENERATE_UPPER_TRIANGULAR_TEST(random_test, negative_medium, test_settings<>::medium_sq_sizes, generator::property::random(), generator::property::negative())
+
+// FIXME: for Blaze, test only for square - what about else?
+GENERATE_LOWER_TRIANGULAR_TEST(random_test, small, test_settings<>::small_sq_sizes, generator::property::random())
+GENERATE_LOWER_TRIANGULAR_TEST(random_test, medium, test_settings<>::medium_sq_sizes, generator::property::random())
+GENERATE_LOWER_TRIANGULAR_TEST(random_test, positive_small, test_settings<>::small_sq_sizes, generator::property::random(), generator::property::positive())
+GENERATE_LOWER_TRIANGULAR_TEST(random_test, positive_medium, test_settings<>::medium_sq_sizes, generator::property::random(), generator::property::positive())
+GENERATE_LOWER_TRIANGULAR_TEST(random_test, negative_small, test_settings<>::small_sq_sizes, generator::property::random(), generator::property::negative())
+GENERATE_LOWER_TRIANGULAR_TEST(random_test, negative_medium, test_settings<>::medium_sq_sizes, generator::property::random(), generator::property::negative())
+
 GENERATE_DIAGONAL_TEST(random_test, small, test_settings<>::small_sq_sizes, generator::property::random())
 GENERATE_DIAGONAL_TEST(random_test, medium, test_settings<>::medium_sq_sizes, generator::property::random())
 GENERATE_DIAGONAL_TEST(random_test, positive_small, test_settings<>::small_sq_sizes, generator::property::random(), generator::property::positive())

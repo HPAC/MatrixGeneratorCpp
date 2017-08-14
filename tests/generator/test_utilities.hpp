@@ -105,6 +105,52 @@ void verify_hermitian(MatType && mat, uint32_t rows, Properties &&... props)
 }
 
 template<typename MatType, typename ... Properties>
+void verify_upper_triangular(MatType && mat, uint32_t rows, /*uint32_t cols,*/ Properties &&... props)
+{
+    typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
+
+    EXPECT_EQ(mat.rows(), rows);
+    EXPECT_EQ(mat.columns(), rows);
+
+    // FIXME: add non-square tests
+    uint32_t cols = rows;
+    for(uint32_t i = 0; i < rows; ++i) {
+        // in a non-square matrix the upper bound on index might lower than i
+        uint32_t max_cols = std::min(i, cols);
+        //empty
+        for(uint32_t j = 0; j < max_cols; ++j) {
+            EXPECT_NEAR(mat(i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
+        }
+        for(uint32_t j = i; j < cols; ++j) {
+            verify<value_t>(mat(i, i), std::forward<Properties>(props)...); 
+        }
+    }
+}
+
+template<typename MatType, typename ... Properties>
+void verify_lower_triangular(MatType && mat, uint32_t rows, /*uint32_t cols,*/ Properties &&... props)
+{
+    typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
+
+    EXPECT_EQ(mat.rows(), rows);
+    EXPECT_EQ(mat.columns(), rows);
+
+    // FIXME: add non-square tests
+    uint32_t cols = rows;
+    for(uint32_t i = 0; i < rows; ++i) {
+        // in a non-square matrix the upper bound on index might lower than i
+        uint32_t max_cols = std::min(i + 1, cols);
+        for(uint32_t j = 0; j < max_cols; ++j) {
+            verify<value_t>(mat(i, i), std::forward<Properties>(props)...); 
+        }
+        //empty
+        for(uint32_t j = i + 1; j < cols; ++j) {
+            EXPECT_NEAR(mat(i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
+        }
+    }
+}
+
+template<typename MatType, typename ... Properties>
 void verify_diagonal(MatType && mat, uint32_t rows, Properties &&... props)
 {
     typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
@@ -113,8 +159,16 @@ void verify_diagonal(MatType && mat, uint32_t rows, Properties &&... props)
     EXPECT_EQ(mat.columns(), rows);
 
     for(uint32_t i = 0; i < rows; ++i) {
+        //empty
+        for(uint32_t j = 0; j < i; ++j) {
+            EXPECT_NEAR(mat(i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
+        }
         //diagonal
         verify<value_t>(mat(i, i), std::forward<Properties>(props)...);
+        //empty
+        for(uint32_t j = i + 1; j < rows; ++j) {
+            EXPECT_NEAR(mat(i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
+        }
     }
 }
 
@@ -123,7 +177,7 @@ TYPED_TEST(test_case_name, name_type##_test_##name) {   \
     for(auto & sizes : sizes_obj)            \
     {                                         \
         uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
-        auto mat = this->gen.generate(shape(rows, cols), __VA_ARGS__);  \
+        auto mat = this->gen.generate({rows, cols}, shape{}, __VA_ARGS__);  \
         verify_func(mat, rows, cols, __VA_ARGS__); \
     }   \
 }
@@ -132,16 +186,22 @@ TYPED_TEST(test_case_name, name_type##_test_##name) {   \
 TYPED_TEST(test_case_name, name_type##_test_##name) {   \
     for(auto rows : sizes_obj)            \
     {                                         \
-        auto mat = this->gen.generate(shape(rows), __VA_ARGS__);   \
+        auto mat = this->gen.generate({rows, rows}, shape{}, __VA_ARGS__);   \
         verify_func(mat, rows, __VA_ARGS__); \
     }   \
 }
 
 #define GENERATE_GENERAL_TEST(test_case_name, name, sizes_obj, ...)   \
-    GENERATE_MATRIX_TEST(test_case_name, generator::shape::general, verify_general, general, name, sizes_obj, __VA_ARGS__)
+    GENERATE_MATRIX_TEST(test_case_name, (generator::shape::band<1000,1000>), verify_general, general, name, sizes_obj, __VA_ARGS__)
 
 #define GENERATE_HERMITIAN_TEST(test_case_name, name, sizes_obj, ...)   \
     GENERATE_MATRIX_SQUARE_TEST(test_case_name, generator::shape::self_adjoint, verify_hermitian, hermitian, name, sizes_obj, __VA_ARGS__)
+
+#define GENERATE_UPPER_TRIANGULAR_TEST(test_case_name, name, sizes_obj, ...)   \
+    GENERATE_MATRIX_SQUARE_TEST(test_case_name, generator::shape::upper_triangular, verify_upper_triangular, upper_triangular, name, sizes_obj, __VA_ARGS__)
+
+#define GENERATE_LOWER_TRIANGULAR_TEST(test_case_name, name, sizes_obj, ...)   \
+    GENERATE_MATRIX_SQUARE_TEST(test_case_name, generator::shape::lower_triangular, verify_lower_triangular, lower_triangular, name, sizes_obj, __VA_ARGS__)
 
 #define GENERATE_DIAGONAL_TEST(test_case_name, name, sizes_obj, ...)   \
     GENERATE_MATRIX_SQUARE_TEST(test_case_name, generator::shape::diagonal, verify_diagonal, diagonal, name, sizes_obj, __VA_ARGS__)

@@ -32,6 +32,16 @@ namespace traits {
     {};
 
     template<typename T>
+    struct matrix_traits< blaze::UpperMatrix<blaze::DynamicMatrix<T>> > :
+        detail::blaze_matrix< blaze::UpperMatrix<blaze::DynamicMatrix<T>> >
+    {};
+
+    template<typename T>
+    struct matrix_traits< blaze::LowerMatrix<blaze::DynamicMatrix<T>> > :
+        detail::blaze_matrix< blaze::LowerMatrix<blaze::DynamicMatrix<T>> >
+    {};
+
+    template<typename T>
     struct matrix_traits< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>> > :
         detail::blaze_matrix< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>> >
     {};

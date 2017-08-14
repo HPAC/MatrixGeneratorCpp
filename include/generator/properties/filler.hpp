@@ -64,10 +64,10 @@ namespace generator { namespace property {
             for (uint32_t i = 0; i < rows; ++i) {
                 // from [i, 0] until [i, i] is reached
                 std::generate(ptr + cols * i,
-                    ptr + cols * i + i,
+                    ptr + cols * i + i + 1,
                     std::forward<F>(f)
                     );
-                for (uint32_t j = i; j < cols; ++j)
+                for (uint32_t j = i + 1; j < cols; ++j)
                     ptr[cols * i + j] = static_cast<T>(0.0);
             }
         }
