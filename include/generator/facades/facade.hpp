@@ -25,8 +25,8 @@ namespace generator { namespace detail {
     {
         typedef T value_t;
 
-        template<typename Shape>
-        using intermediate_t = typename shape::intermediate<T, Shape>::type;
+        //template<typename Shape>
+        //using intermediate_t = typename shape::intermediate<T, Shape>::type;
 
         template<typename Shape>
         using matrix_t = typename MatrixType<T, Shape>::type;
@@ -45,18 +45,44 @@ namespace generator { namespace detail {
 
         }
 
-        template<typename Shape, typename... Properties>
-        matrix_t<Shape> generate(Shape && shape, Properties &&...)
+        template<typename... Properties>
+        decltype(auto) generate(const shape::matrix_size & size, Properties &&... properties)
         {
             //auto data = dynamic_cast<GeneratorImpl*>(this)->template allocate( std::forward<Shape>(shape) );
-            intermediate_t<Shape> data = shape::intermediate<T, Shape>::create(std::forward<Shape>(shape));
-            property::property<T, property::hash<Properties...>()>::fill(
-                    std::forward<Shape>(shape), data,
+            //constexpr auto band_types = shape::from_properties(std::forward<Properties>(properties)...);
+
+            //constexpr auto band_types = shape::from_properties(std::forward<Properties>(properties)...);
+            typedef shape::from_properties<Properties...> filtered_properties;
+            typedef typename filtered_properties::band_type band_type;
+            typedef typename filtered_properties::properties_type properties_type;
+            typedef property::property<T, property::hash_tuple<properties_type>::value > property_t;
+            // band_types is not usable in a constexpr since other properties are not constexpr
+            // FIXME: better hash implementation, without this thing
+            //typedef property::property<T, property::hash_computer< std::tuple_element<1, decltype(band_types)>>::hash() > property_t;
+            typedef typename intermediate::intermediate_traits<
+                T,
+                band_type::lower_bandwidth,
+                band_type::upper_bandwidth
+                >::type intermediate_t;
+            intermediate_t matrix{size};
+            property_t::fill(matrix,
                     [&]() {
                         return distribution(rng);
                     }
                 );
-            return static_cast<GeneratorImpl*>(this)->template create<Shape, Properties...>(std::forward<Shape>(shape), std::move(data));
+            return static_cast<GeneratorImpl*>(this)->template create(matrix);
+            //std::unique_ptr<intermediate<Property, Generator>> intermediate = intermediate::from_band(size, std::get<0>(band_types));
+            //intermediate->fill()
+            //typedef  
+            //std::unique_ptr<intermediate<
+            //intermediate_t<Shape> data = shape::intermediate<T, Shape>::create(size, std::forward<Shape>(shape));
+            /*property::property<T, property::hash<Properties...>()>::fill(
+                    std::forward<Shape>(shape), data,
+                    [&]() {
+                        return distribution(rng);
+                    }
+                );*/
+            //return static_cast<GeneratorImpl*>(this)->template create<Shape, Properties...>(std::forward<Shape>(shape), std::move(data));
         }
     };
 

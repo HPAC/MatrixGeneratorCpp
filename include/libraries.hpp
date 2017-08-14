@@ -42,6 +42,8 @@ namespace library {
     struct arma {};
 #endif
 
+    struct plain {};
+
 }
 
 #endif

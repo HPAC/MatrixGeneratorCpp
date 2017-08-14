@@ -7,9 +7,9 @@
 #define LINALG_TESTS_GENERATOR_PROPERTIES_PROPERTIES_HPP
 
 #include <generator/properties/property_id.hpp>
-#include <generator/properties/random.hpp>
-#include <generator/properties/zeros.hpp>
-#include <generator/properties/ones.hpp>
+//#include <generator/properties/random.hpp>
+//#include <generator/properties/zeros.hpp>
+//#include <generator/properties/ones.hpp>
 #include <generator/properties/eye.hpp>
 
 #endif

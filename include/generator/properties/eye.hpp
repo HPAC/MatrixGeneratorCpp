@@ -7,6 +7,7 @@
 #define LINALG_PROPERTIES_EYE_HPP
 
 #include <generator/shape.hpp>
+#include <generator/intermediate.hpp>
 #include <generator/property.hpp>
 #include <generator/properties/filler.hpp>
 
@@ -33,27 +34,25 @@ namespace generator { namespace property {
     public:
 
         template<typename RndGen>
-        static void fill(const shape::general & shape,
-                        typename shape::intermediate<T, shape::general>::type & data,
+        static void fill(const intermediate::general<T> & shape,
                         RndGen &&)
         {
-            fill(data, shape.rows, shape.cols);
+            fill(shape.data, shape.size.rows, shape.size.cols);
         }
 
-        template<typename RndGen>
+        /*template<typename RndGen>
         static void fill(const shape::self_adjoint & shape,
                         typename shape::intermediate<T, shape::self_adjoint>::type & data,
                         RndGen &&)
         {
             fill(data, shape.rows, shape.rows);
-        }
+        }*/
 
         template<typename RndGen>
-        static void fill(const shape::diagonal & shape,
-                        typename shape::intermediate<T, shape::diagonal>::type & data,
+        static void fill(const intermediate::diagonal<T> & shape,
                         RndGen &&)
         {
-            std::fill(data.get(), data.get() + shape.rows, 1.0);
+            std::fill(shape.data.get(), shape.data.get() + shape.size.rows, 1.0);
         }
 
 

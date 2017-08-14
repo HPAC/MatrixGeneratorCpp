@@ -6,31 +6,40 @@
 #ifndef LINALG_TESTS_GENERATOR_INTERMEDIATE_HPP
 #define LINALG_TESTS_GENERATOR_INTERMEDIATE_HPP
 
+#include <memory>
+#include <functional>
+
 #include <generator/shape.hpp>
 
-namespace generator { namespace shape {
+namespace generator { namespace intermediate {
 
-    template<typename T, typename Shape>
-    struct intermediate;
-
-    template<typename T>
-    struct intermediate<T, generator::shape::general>
+    template<typename T> 
+    struct general
     {
-        typedef std::unique_ptr<T[]> type;
+        //using intermediate<Property, Generator>::rnd_gen_type;
+        //typedef typename intermediate<Property, Generator>::value_type value_type;
 
-        static type create(const generator::shape::general & gen)
+        general(const shape::matrix_size & size_) :
+            size(size_),
+            data(new T[size_.rows * size_.cols])
+        {}
+
+        /*void fill(const rnd_gen_type & gen_func) override
         {
-            return create(gen.rows, gen.cols);
+            Property::fill(*this, gen_func);
         }
-    protected:
-        static type create(uint32_t rows, uint32_t cols)
+
+        auto create() override
         {
-            return type(new T[rows * cols]);
-        }
+            return Generator::create(*this);
+        }*/
+
+        shape::matrix_size size;
+        std::unique_ptr<T[]> data;
     };
 
     /// Self-adjoint matrix is stored as a general matrix
-    template<typename T>
+    /*template<typename T>
     struct intermediate<T, generator::shape::self_adjoint> : 
         intermediate<T, generator::shape::general>
     {
@@ -53,8 +62,59 @@ namespace generator { namespace shape {
         {
             return type(new T[gen.rows]);
         }
+    };*/
+
+    template<typename T> 
+    struct diagonal
+    {
+        //using intermediate<Property, Generator>::rnd_gen_type;
+        //typedef typename intermediate<Property, Generator>::value_type value_type;
+
+        diagonal(const shape::matrix_size & size_) :
+            size(size_),
+            data(new T[std::min(size_.rows, size_.cols)])
+        {}
+
+        /*void fill(const rnd_gen_type & gen_func) override
+        {
+            Property::fill(*this, gen_func);
+        }
+
+        auto create() override
+        {
+            return Generator::create(*this);
+        }*/
+
+        shape::matrix_size size;
+        std::unique_ptr<T[]> data;
     };
 
+
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, typename = void>
+    struct intermediate_traits;
+
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth>
+    struct intermediate_traits<
+        T,
+        LowerBandwidth,
+        UpperBandwidth,
+        typename std::enable_if<(LowerBandwidth > 0 && UpperBandwidth > 0)>::type
+    >
+    {
+        typedef general<T> type;
+    };
+
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth>
+    struct intermediate_traits<
+        T,
+        LowerBandwidth,
+        UpperBandwidth,
+        typename std::enable_if<(LowerBandwidth == 0 && UpperBandwidth == 0)>::type
+    >
+    {
+        typedef diagonal<T> type;
+    };
 }}
+
 
 #endif
