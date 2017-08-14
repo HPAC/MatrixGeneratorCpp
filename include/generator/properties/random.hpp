@@ -20,44 +20,16 @@ namespace generator { namespace property {
         struct random_generator
         {
         public:
-            template<typename RndGen>
-            static void fill(const shape::general & shape,
-                            typename shape::intermediate<T, shape::general>::type & data,
-                            RndGen && gen)
+            template<typename Shape, typename RndGen>
+            static void fill(Shape && shape, RndGen && gen)
             {
-                Filler<false>::fill(shape.rows, shape.cols, data,
-                                    [&]() {
-                                        T val = gen();
-                                        return positive ? std::abs(val) : (negative ? -std::abs(val) : val);
-                                    });
+                detail::fill(std::forward<Shape>(shape),
+                        [&]() {
+                            T val = gen();
+                            return positive ? std::abs(val) : (negative ? -std::abs(val) : val);
+                        }
+                    );
             }
-
-            template<typename RndGen>
-            static void fill(const shape::self_adjoint & shape,
-                            typename shape::intermediate<T, shape::self_adjoint>::type & data,
-                            RndGen && gen)
-            {
-                Filler<true>::fill(shape.rows, shape.cols, data,
-                                    [&]() {
-                                        T val = gen();
-                                        return positive ? std::abs(val) : (negative ? -std::abs(val) : val);
-                                    });
-            }
-
-            template<typename RndGen>
-            static void fill(const shape::diagonal & shape,
-                            typename shape::intermediate<T, shape::diagonal>::type & data,
-                            RndGen && gen)
-            {
-                // Fill one row of a matrix according to our needs.
-                // Symmetry does not matter here.
-                Filler<false>::fill(shape.rows, 1, data,
-                                    [&]() {
-                                        T val = gen();
-                                        return positive ? std::abs(val) : (negative ? -std::abs(val) : val);
-                                    });
-            }
-
         };
     }
 

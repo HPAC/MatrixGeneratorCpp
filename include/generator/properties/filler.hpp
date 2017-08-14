@@ -14,36 +14,72 @@ namespace generator { namespace property {
 
     namespace detail {
 
-        template<bool symmetric>
-        struct Filler;
+        template<typename T, typename F>
+        void fill(const intermediate::general<T> & shape, F && f)
+        {
+            std::generate(shape.data.get(),
+                shape.data.get() + shape.size.rows * shape.size.cols,
+                std::forward<F>(f)
+                );
+        }
 
-        template<>
-        struct Filler<false> {
-            template<typename F, typename T>
-            static void fill(uint64_t rows, uint64_t cols, const std::unique_ptr<T[]> &ptr, F &&f) {
-                std::generate(ptr.get(), ptr.get() + rows * cols, std::forward<F>(f));
+        /// Generate upper triangle, copy data for lower triangle
+        template<typename T, typename F>
+        void fill(const intermediate::self_adjoint<T> & shape, F && f)
+        {
+            uint32_t rows = shape.size.rows, cols = shape.size.cols;
+            auto ptr = shape.data.get();
+            for (uint32_t i = 0; i < rows; ++i) {
+                for (uint32_t j = 0; j < i; ++j)
+                    ptr[cols * i + j] = ptr[cols * j + i];
+                // from [i, i] until [i+1, 0] is reached
+                std::generate(ptr + cols * i + i,
+                    ptr + cols * (i + 1),
+                    std::forward<F>(f)
+                    );
             }
-        };
+        }
 
-        template<>
-        struct Filler<true> {
-            /// Generate upper triangle, copy data for lower triangle
-            /// \tparam F
-            /// \tparam T
-            /// \param rows
-            /// \param cols
-            /// \param ptr
-            /// \param f
-            template<typename F, typename T>
-            static void fill(uint64_t rows, uint64_t cols, const std::unique_ptr<T[]> & ptr, F &&f) {
-                for (uint32_t i = 0; i < rows; ++i) {
-                    for (uint32_t j = 0; j < i; ++j)
-                        ptr[cols * i + j] = ptr[cols * j + i];
-                    // from [i, i] until [i+1, 0] is reached
-                    std::generate(ptr.get() + cols * i + i, ptr.get() + cols * (i + 1), std::forward<F>(f));
-                }
+        template<typename T, typename F>
+        void fill(const intermediate::upper_triangular<T> & shape, F && f)
+        {
+            uint32_t rows = shape.size.rows, cols = shape.size.cols;
+            auto ptr = shape.data.get();
+            for (uint32_t i = 0; i < rows; ++i) {
+                for (uint32_t j = 0; j < i; ++j)
+                    ptr[cols * i + j] = static_cast<T>(0.0);
+                // from [i, i] until [i+1, 0] is reached
+                std::generate(ptr + cols * i + i,
+                    ptr + cols * (i + 1),
+                    std::forward<F>(f)
+                    );
             }
-        };
+        }
+
+        template<typename T, typename F>
+        void fill(const intermediate::lower_triangular<T> & shape, F && f)
+        {
+            uint32_t rows = shape.size.rows, cols = shape.size.cols;
+            auto ptr = shape.data.get();
+            for (uint32_t i = 0; i < rows; ++i) {
+                // from [i, 0] until [i, i] is reached
+                std::generate(ptr + cols * i,
+                    ptr + cols * i + i,
+                    std::forward<F>(f)
+                    );
+                for (uint32_t j = i; j < cols; ++j)
+                    ptr[cols * i + j] = static_cast<T>(0.0);
+            }
+        }
+
+        template<typename T, typename F>
+        void fill(const intermediate::diagonal<T> & shape, F && f)
+        {
+            std::generate(shape.data.get(),
+                shape.data.get() + std::min(shape.size.rows, shape.size.cols),
+                std::forward<F>(f)
+                );
+        }
 
     }
 }}

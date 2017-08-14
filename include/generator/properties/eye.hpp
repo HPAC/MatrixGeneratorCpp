@@ -70,7 +70,6 @@ namespace generator { namespace property {
             std::fill(shape.data.get(), shape.data.get() + shape.size.rows, 1.0);
         }
 
-
     };
 
 }}
