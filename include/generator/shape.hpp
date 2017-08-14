@@ -68,6 +68,8 @@ namespace generator { namespace shape {
     {
         static constexpr bool symmetric = false;
 
+        constexpr upper_triangular() = default;
+
         constexpr band to_band() const
         {
             return band(0, std::numeric_limits<uint32_t>::max());
@@ -77,6 +79,8 @@ namespace generator { namespace shape {
     struct lower_triangular
     {
         static constexpr bool symmetric = false;
+
+        constexpr lower_triangular() = default;
 
         constexpr band to_band() const
         {
@@ -150,32 +154,30 @@ namespace generator { namespace shape {
         template<typename OldTuple, typename Property,
             typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
         >
-        constexpr auto from_properties(const band & band_type, OldTuple && tuple,
+        constexpr auto from_properties(band band_type, OldTuple && tuple,
             Property && property)
-            -> std::tuple<band, typename tuple_cat_result<OldTuple, Property>::type>;
+            -> std::tuple<band, std::tuple<band, typename tuple_cat_result<OldTuple, Property>::type>;
 
         template<typename OldTuple, typename Property, typename... Properties,
             typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
         >
-        constexpr decltype(auto) from_properties(const band & band_type, OldTuple && tuple,
+        constexpr decltype(auto) from_properties(band band_type, OldTuple && tuple,
             Property && property, Properties &&... props);
 
         // Update band type with a shape type, tuple unchanged
         template<typename OldTuple, typename Property,
             typename std::enable_if<is_shape_type<Property>::value, int>::type = 0
         >
-        constexpr std::tuple<band, OldTuple> from_properties(const band & band_type,
+        constexpr std::tuple<band, OldTuple> from_properties(band band_type,
             OldTuple && tuple, Property && property)
         {
-            return std::make_tuple(merge_band(band_type, property.to_band()),
-                tuple
-                );
+            return std::make_tuple(merge_band(band_type, property.to_band()), tuple);
         }
 
         template<typename OldTuple, typename Property, typename... Properties,
             typename std::enable_if<is_shape_type<Property>::value, int>::type = 0
         >
-        constexpr decltype(auto) from_properties(const band & band_type,
+        constexpr decltype(auto) from_properties(band band_type,
             OldTuple && tuple, Property && property, Properties &&... props)
         {
             return detail::from_properties(merge_band(band_type, property.to_band()),
@@ -186,9 +188,9 @@ namespace generator { namespace shape {
 
         // Add non-shape type to a non-empty tuple
         template<typename OldTuple, typename Property,
-            typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
+            typename std::enable_if<!is_shape_type<Property>::value, int>::type
         >
-        constexpr auto from_properties(const band & band_type, OldTuple && tuple,
+        constexpr auto from_properties(band band_type, OldTuple && tuple,
             Property && property)
             -> std::tuple<band, typename tuple_cat_result<OldTuple, Property>::type>
         {
@@ -196,9 +198,9 @@ namespace generator { namespace shape {
         }
 
         template<typename OldTuple, typename Property, typename... Properties,
-            typename std::enable_if<!is_shape_type<Property>::value, int>::type = 0
+            typename std::enable_if<!is_shape_type<Property>::value, int>::type
         >
-        constexpr decltype(auto) from_properties(const band & band_type, OldTuple && tuple,
+        constexpr decltype(auto) from_properties(band band_type, OldTuple && tuple,
             Property && property, Properties &&... props)
         {
             return detail::from_properties(band_type,
