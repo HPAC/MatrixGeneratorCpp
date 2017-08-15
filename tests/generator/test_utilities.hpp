@@ -61,6 +61,12 @@ void verify(T val, const generator::property::random &, const generator::propert
 }
 
 template<typename FloatingType, typename T>
+void verify(T val, const generator::property::constant & prop)
+{
+    EXPECT_NEAR(val, prop.fill_value, std::numeric_limits<FloatingType>::epsilon());
+}
+
+template<typename FloatingType, typename T>
 void verify(T val, const generator::property::zeros &)
 {
     EXPECT_NEAR(val, 0.0f, std::numeric_limits<FloatingType>::epsilon());
@@ -79,6 +85,7 @@ void verify_general(MatType && mat, uint32_t rows, uint32_t cols, Properties &&.
 
     EXPECT_EQ(mat.rows(), rows);
     EXPECT_EQ(mat.columns(), cols);
+
     for(uint32_t i = 0; i < rows; ++i) {
         for(uint32_t j = 0; j < cols; ++j) {
             verify<value_t>(mat(i, j), std::forward<Properties>(props)...);
