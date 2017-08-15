@@ -35,37 +35,37 @@ namespace generator { namespace property {
 
     public:
 
-        template<typename RndGen>
+        template<typename RndGen, typename... Properties>
         static void fill(const intermediate::general<T> & shape,
-                        RndGen &&)
+                        RndGen &&, Properties &&...)
         {
             fill(shape.data, shape.size.rows, shape.size.cols);
         }
 
-        template<typename RndGen>
+        template<typename RndGen, typename... Properties>
         static void fill(const intermediate::upper_triangular<T> & shape,
-                        RndGen &&)
+                        RndGen &&, Properties &&...)
         {
             fill(shape.data, shape.size.rows, shape.size.cols);
         }
 
-        template<typename RndGen>
+        template<typename RndGen, typename... Properties>
         static void fill(const intermediate::lower_triangular<T> & shape,
-                        RndGen &&)
+                        RndGen &&, Properties &&...)
         {
             fill(shape.data, shape.size.rows, shape.size.cols);
         }
 
-        template<typename RndGen>
+        template<typename RndGen, typename... Properties>
         static void fill(const intermediate::self_adjoint<T> & shape,
-                        RndGen &&)
+                        RndGen &&, Properties &&...)
         {
             fill(shape.data, shape.rows, shape.rows);
         }
 
-        template<typename RndGen>
+        template<typename RndGen, typename... Properties>
         static void fill(const intermediate::diagonal<T> & shape,
-                        RndGen &&)
+                        RndGen &&, Properties &&...)
         {
             std::fill(shape.data.get(), shape.data.get() + shape.size.rows, 1.0);
         }

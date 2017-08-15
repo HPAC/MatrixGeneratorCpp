@@ -19,9 +19,8 @@ namespace generator { namespace property {
                 bool negative = false>
         struct random_generator
         {
-        public:
-            template<typename Shape, typename RndGen>
-            static void fill(Shape && shape, RndGen && gen)
+            template<typename Shape, typename RndGen, typename... Properties>
+            static void fill(Shape && shape, RndGen && gen, Properties &&...)
             {
                 detail::fill(std::forward<Shape>(shape),
                         [&]() {

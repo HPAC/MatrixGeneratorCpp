@@ -13,9 +13,28 @@ namespace generator { namespace property {
     struct random   : property_t<0> {};
     struct positive : property_t<1> {};
     struct negative : property_t<2> {};
-    struct zeros    : property_t<3> {};
-    struct ones    	: property_t<4> {};
-    struct eye      : property_t<5> {};
+
+    struct constant : property_t<3>
+    {
+    	double fill_value;
+    	constexpr constant(double value_):
+    		fill_value(value_)
+    	{}
+    };
+    
+    struct zeros    : property_t<4>
+    {
+        constexpr static double fill_value = 0.0;
+    };
+
+    struct ones    	: property_t<5>
+    {
+        constexpr static double fill_value = 1.0;
+    };
+
+    struct eye      : property_t<6> {};
+    struct spd		: property_t<7> {};
+    struct orthogonal: property_t<8> {};
 
     template<typename T, uint64_t type>
     struct property;

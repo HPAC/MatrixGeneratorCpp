@@ -66,7 +66,8 @@ namespace generator { namespace detail {
             property_t::fill(matrix,
                     [&]() {
                         return distribution(rng);
-                    }
+                    },
+                    std::forward<Properties>(properties)...
                 );
             return static_cast<GeneratorImpl*>(this)->template create(matrix);
             //std::unique_ptr<intermediate<Property, Generator>> intermediate = intermediate::from_band(size, std::get<0>(band_types));
