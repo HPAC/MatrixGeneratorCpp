@@ -81,11 +81,11 @@ TYPED_TEST(eye_test, general_##name)                      \
     for(auto & sizes : test_settings<>::sizes_obj)      \
     {                                                   \
         uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
-        auto mat = this->gen.generate(generator::shape::general(42, rows), generator::property::random());  \
-        auto eye = this->gen.generate(generator::shape::general(rows, cols), generator::property::eye());   \
+        auto mat = this->gen.generate({42, rows}, generator::property::random());  \
+        auto eye = this->gen.generate({rows, cols}, generator::property::eye());   \
         verify_left(mat, eye);  \
-        eye = this->gen.generate(generator::shape::general(rows, cols), generator::property::eye());    \
-        mat = this->gen.generate(generator::shape::general(cols, 42), generator::property::random());   \
+        eye = this->gen.generate({rows, cols}, generator::property::eye());    \
+        mat = this->gen.generate({cols, 42}, generator::property::random());   \
         verify_right(mat, eye); \
     }   \
 }
@@ -95,16 +95,14 @@ TYPED_TEST(eye_test, shape_type##_##name)                               \
 {                                                                   \
     for(auto size : test_settings<>::sizes_obj)                     \
     {                                                               \
-        auto mat = this->gen.generate(generator::shape::general(42, size), generator::property::random());  \
-        auto eye = this->gen.generate(generator::shape::shape_type(size), generator::property::eye());  \
+        auto mat = this->gen.generate({42, size}, generator::property::random());  \
+        auto eye = this->gen.generate({size, size}, generator::shape::shape_type{}, generator::property::eye());  \
         verify_left(mat, eye);  \
-        eye = this->gen.generate(generator::shape::shape_type(size), generator::property::eye());   \
-        mat = this->gen.generate(generator::shape::general(size, 42), generator::property::random());   \
+        eye = this->gen.generate({size, size}, generator::shape::shape_type{}, generator::property::eye());   \
+        mat = this->gen.generate({size, 42}, generator::property::random());   \
         verify_right(mat, eye); \
     }   \
 }
-
-
 
 
 GENERATE_GENERAL_MATRIX_TEST(small, small_sizes)
@@ -112,6 +110,12 @@ GENERATE_GENERAL_MATRIX_TEST(medium, medium_sizes)
 
 GENERATE_HERMITIAN_MATRIX_TEST(small, self_adjoint, small_sq_sizes)
 GENERATE_HERMITIAN_MATRIX_TEST(medium, self_adjoint, medium_sq_sizes)
+
+GENERATE_HERMITIAN_MATRIX_TEST(small, upper_triangular, small_sq_sizes)
+GENERATE_HERMITIAN_MATRIX_TEST(medium, upper_triangular, medium_sq_sizes)
+
+GENERATE_HERMITIAN_MATRIX_TEST(small, lower_triangular, small_sq_sizes)
+GENERATE_HERMITIAN_MATRIX_TEST(medium, lower_triangular, medium_sq_sizes)
 
 GENERATE_HERMITIAN_MATRIX_TEST(small, diagonal, small_sq_sizes)
 GENERATE_HERMITIAN_MATRIX_TEST(medium, diagonal, medium_sq_sizes)

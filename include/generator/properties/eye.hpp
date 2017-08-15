@@ -60,7 +60,7 @@ namespace generator { namespace property {
         static void fill(const intermediate::self_adjoint<T> & shape,
                         RndGen &&, Properties &&...)
         {
-            fill(shape.data, shape.rows, shape.rows);
+            fill(shape.data, shape.size.rows, shape.size.rows);
         }
 
         template<typename RndGen, typename... Properties>
