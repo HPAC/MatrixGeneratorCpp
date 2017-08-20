@@ -27,19 +27,23 @@ struct test_settings<>
         > types_to_test;
 
     static constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> small_sizes{
-        make_tuple(1,1), make_tuple(2, 1), make_tuple(25, 50), make_tuple(50, 25)
+        make_tuple(1, 1), make_tuple(2, 1), make_tuple(25, 50), make_tuple(50, 25)
     };
-    static constexpr std::array< uint32_t, 4> small_sq_sizes{1, 2, 9, 25};
+    static constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> small_sq_sizes{
+        make_tuple(1, 1), make_tuple(2, 2), make_tuple(9, 9), make_tuple(25, 25)
+    };
     static constexpr std::array< std::tuple<uint32_t, uint32_t>, 2> medium_sizes{
         make_tuple(100, 100), make_tuple(199, 173)
     };
-    static constexpr std::array< uint32_t, 3> medium_sq_sizes{100, 103, 125};
+    static constexpr std::array< std::tuple<uint32_t, uint32_t>, 3> medium_sq_sizes{
+        make_tuple(100, 100), make_tuple(103, 103), std::make_tuple(125, 125)
+    };
 };
 
 constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> test_settings<>::small_sizes;
-constexpr std::array< uint32_t, 4> test_settings<>::small_sq_sizes;
+constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> test_settings<>::small_sq_sizes;
 constexpr std::array< std::tuple<uint32_t, uint32_t>, 2> test_settings<>::medium_sizes;
-constexpr std::array< uint32_t, 3> test_settings<>::medium_sq_sizes;
+constexpr std::array< std::tuple<uint32_t, uint32_t>, 3> test_settings<>::medium_sq_sizes;
 
 /// The additional template parameter is used because matrix access operator() may return
 /// an object with type other than a usual floating-point type. Example is DiagonalProxy in
@@ -78,6 +82,16 @@ void verify(T val, const generator::property::ones &)
     EXPECT_NEAR(val, 1.0f, std::numeric_limits<FloatingType>::epsilon());
 }
 
+template<typename FloatingType, typename T>
+void verify(T, const generator::property::spd &)
+{}
+
+template<typename FloatingType, typename T>
+void verify(T val, const generator::property::spd &, const generator::property::positive &)
+{
+    EXPECT_GT(val, 0.0f);
+}
+
 template<typename MatType, typename ... Properties>
 void verify_general(MatType && mat, uint32_t rows, uint32_t cols, Properties &&... props)
 {
@@ -94,7 +108,7 @@ void verify_general(MatType && mat, uint32_t rows, uint32_t cols, Properties &&.
 }
 
 template<typename MatType, typename ... Properties>
-void verify_hermitian(MatType && mat, uint32_t rows, Properties &&... props)
+void verify_hermitian(MatType && mat, uint32_t rows, uint32_t, Properties &&... props)
 {
     typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
 
@@ -112,7 +126,7 @@ void verify_hermitian(MatType && mat, uint32_t rows, Properties &&... props)
 }
 
 template<typename MatType, typename ... Properties>
-void verify_upper_triangular(MatType && mat, uint32_t rows, /*uint32_t cols,*/ Properties &&... props)
+void verify_upper_triangular(MatType && mat, uint32_t rows, uint32_t, Properties &&... props)
 {
     typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
 
@@ -135,7 +149,7 @@ void verify_upper_triangular(MatType && mat, uint32_t rows, /*uint32_t cols,*/ P
 }
 
 template<typename MatType, typename ... Properties>
-void verify_lower_triangular(MatType && mat, uint32_t rows, /*uint32_t cols,*/ Properties &&... props)
+void verify_lower_triangular(MatType && mat, uint32_t rows, uint32_t, Properties &&... props)
 {
     typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
 
@@ -158,7 +172,7 @@ void verify_lower_triangular(MatType && mat, uint32_t rows, /*uint32_t cols,*/ P
 }
 
 template<typename MatType, typename ... Properties>
-void verify_diagonal(MatType && mat, uint32_t rows, Properties &&... props)
+void verify_diagonal(MatType && mat, uint32_t rows, uint32_t, Properties &&... props)
 {
     typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
 
@@ -202,16 +216,16 @@ TYPED_TEST(test_case_name, name_type##_test_##name) {   \
     GENERATE_MATRIX_TEST(test_case_name, (generator::shape::band<1000,1000>), verify_general, general, name, sizes_obj, __VA_ARGS__)
 
 #define GENERATE_HERMITIAN_TEST(test_case_name, name, sizes_obj, ...)   \
-    GENERATE_MATRIX_SQUARE_TEST(test_case_name, generator::shape::self_adjoint, verify_hermitian, hermitian, name, sizes_obj, __VA_ARGS__)
+    GENERATE_MATRIX_TEST(test_case_name, generator::shape::self_adjoint, verify_hermitian, hermitian, name, sizes_obj, __VA_ARGS__)
 
 #define GENERATE_UPPER_TRIANGULAR_TEST(test_case_name, name, sizes_obj, ...)   \
-    GENERATE_MATRIX_SQUARE_TEST(test_case_name, generator::shape::upper_triangular, verify_upper_triangular, upper_triangular, name, sizes_obj, __VA_ARGS__)
+    GENERATE_MATRIX_TEST(test_case_name, generator::shape::upper_triangular, verify_upper_triangular, upper_triangular, name, sizes_obj, __VA_ARGS__)
 
 #define GENERATE_LOWER_TRIANGULAR_TEST(test_case_name, name, sizes_obj, ...)   \
-    GENERATE_MATRIX_SQUARE_TEST(test_case_name, generator::shape::lower_triangular, verify_lower_triangular, lower_triangular, name, sizes_obj, __VA_ARGS__)
+    GENERATE_MATRIX_TEST(test_case_name, generator::shape::lower_triangular, verify_lower_triangular, lower_triangular, name, sizes_obj, __VA_ARGS__)
 
 #define GENERATE_DIAGONAL_TEST(test_case_name, name, sizes_obj, ...)   \
-    GENERATE_MATRIX_SQUARE_TEST(test_case_name, generator::shape::diagonal, verify_diagonal, diagonal, name, sizes_obj, __VA_ARGS__)
+    GENERATE_MATRIX_TEST(test_case_name, generator::shape::diagonal, verify_diagonal, diagonal, name, sizes_obj, __VA_ARGS__)
 
 
 #endif

@@ -93,17 +93,17 @@ TYPED_TEST(eye_test, general_##name)                      \
 #define GENERATE_HERMITIAN_MATRIX_TEST(name, shape_type, sizes_obj) \
 TYPED_TEST(eye_test, shape_type##_##name)                               \
 {                                                                   \
-    for(auto size : test_settings<>::sizes_obj)                     \
-    {                                                               \
-        auto mat = this->gen.generate({42, size}, generator::property::random());  \
-        auto eye = this->gen.generate({size, size}, generator::shape::shape_type{}, generator::property::eye());  \
+    for(auto & sizes : test_settings<>::sizes_obj)                     \
+    {                                                                   \
+        uint32_t rows = std::get<0>(sizes), cols = std::get<1>(sizes);  \
+        auto mat = this->gen.generate({42, cols}, generator::property::random());  \
+        auto eye = this->gen.generate({cols, rows}, generator::shape::shape_type{}, generator::property::eye());  \
         verify_left(mat, eye);  \
-        eye = this->gen.generate({size, size}, generator::shape::shape_type{}, generator::property::eye());   \
-        mat = this->gen.generate({size, 42}, generator::property::random());   \
+        eye = this->gen.generate({rows, cols}, generator::shape::shape_type{}, generator::property::eye());   \
+        mat = this->gen.generate({cols, 42}, generator::property::random());   \
         verify_right(mat, eye); \
     }   \
 }
-
 
 GENERATE_GENERAL_MATRIX_TEST(small, small_sizes)
 GENERATE_GENERAL_MATRIX_TEST(medium, medium_sizes)
