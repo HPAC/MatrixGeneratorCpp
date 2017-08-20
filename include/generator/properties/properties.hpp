@@ -11,4 +11,8 @@
 #include <generator/properties/constant.hpp>
 #include <generator/properties/eye.hpp>
 
+#ifdef HAVE_BLAS
+#include <generator/properties/spd.hpp>
+#endif
+
 #endif

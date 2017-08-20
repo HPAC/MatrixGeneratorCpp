@@ -43,8 +43,7 @@ namespace generator { namespace intermediate {
     {
         upper_triangular(const shape::matrix_size & size_) :
             general<T>(size_)
-        {
-        }
+        {}
     };
 
     template<typename T>
@@ -52,8 +51,7 @@ namespace generator { namespace intermediate {
     {
         lower_triangular(const shape::matrix_size & size_) :
             general<T>(size_)
-        {
-        }
+        {}
     };
 
     template<typename T> 

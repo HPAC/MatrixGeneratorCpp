@@ -33,7 +33,11 @@ namespace generator { namespace property {
     };
 
     struct eye      : property_t<6> {};
+
+#ifdef HAVE_BLAS
     struct spd		: property_t<7> {};
+#endif
+
     struct orthogonal: property_t<8> {};
 
     template<typename T, uint64_t type>

@@ -6,8 +6,10 @@
 #ifndef LINALG_TESTS_GENERATOR_GENERATOR_HPP
 #define LINALG_TESTS_GENERATOR_GENERATOR_HPP
 
-#include <generator/facades/blaze.hpp>
 #include <generator/shape.hpp>
 #include <generator/property.hpp>
+#include <generator/properties/properties.hpp>
+//FIXME: create header for all facades
+#include <generator/facades/blaze.hpp>
 
 #endif

@@ -6,6 +6,8 @@ project(linalg_tests)
 option(WITH_EXAMPLES "Build examples" Off)
 option(WITH_TESTS "Build tests" Off)
 option(TESTS_FORCE_BUILD "Build Gtest" Off)
+option(WITH_BLAS "Build with BLAS" On)
+option(WITH_LAPACK "Build with LAPACK" On)
 
 option(WITH_BLAZE "Use Blaze library")
 option(WITH_EIGEN "Use Eigen3 library")
@@ -16,6 +18,16 @@ set(CMAKE_CXX_STANDARD 14)
 set(LINK_LIBRARIES "")
 
 add_library(libtests INTERFACE)
+
+#Look for BLAS
+if(${WITH_BLAS})
+    find_package(BLAS REQUIRED)
+    add_definitions(-DHAVE_BLAS)
+    target_compile_options(libtests INTERFACE ${BLAS_LINKER_FLAGS})
+    target_link_libraries(libtests INTERFACE ${BLAS_LIBRARIES})
+else()
+    message("Building without BLAS - SPD generator won't be available")
+endif()
 
 #Armadillo
 if(${WITH_ARMADILLO})
@@ -40,7 +52,6 @@ if(${WITH_MTL4})
 endif()
 
 #Blaze
-#Currently no CMake support
 if(${WITH_BLAZE})
     find_package(blaze CONFIG REQUIRED)
     add_definitions(-DHAVE_BLAZE)
