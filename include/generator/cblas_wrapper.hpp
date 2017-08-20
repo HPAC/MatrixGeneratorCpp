@@ -24,11 +24,11 @@ namespace generator { namespace cblas {
 	{
 		static void call(const shape::matrix_size & size,
 						const std::unique_ptr<float[]> & input,
-						std::unique_ptr<float[]> & output)
+						const std::unique_ptr<float[]> & output)
 		{
 			memcpy(output.get(), input.get(), sizeof(float) * size.rows * size.rows);
 			cblas_strmm(CblasRowMajor, CblasRight, CblasUpper, CblasTrans,
-						CblasNonUnit, size.rows, size.rows, 1.0, input.get(),
+						CblasNonUnit, size.rows, size.rows, 1.0f, input.get(),
 						size.rows, output.get(), size.rows);
 		}
 	};
@@ -39,7 +39,7 @@ namespace generator { namespace cblas {
 		// Performs multiplication matrix * matrix', writing result to output array
 		static void call(const shape::matrix_size & size,
 						const std::unique_ptr<double[]> & input,
-						std::unique_ptr<double[]> & output)
+						const std::unique_ptr<double[]> & output)
 		{
 			memcpy(output.get(), input.get(), sizeof(double) * size.rows * size.rows);
 			cblas_dtrmm(CblasRowMajor, CblasRight, CblasUpper, CblasTrans,
