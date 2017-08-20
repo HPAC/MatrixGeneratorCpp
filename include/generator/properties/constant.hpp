@@ -26,16 +26,26 @@ namespace generator { namespace property {
         template<>
         struct is_const_property<ones> : std::true_type {};
 
-        template<typename Property, typename... Properties>
-        auto call(Property && x, Properties &&...)
-            -> typename std::enable_if< is_const_property<Property>::value, double>::type
+        template<typename... Properties>
+        double call(const constant & x, Properties &&...)
         {
             return x.fill_value;
         }
 
+        // Avoid taking a reference via x.fill_value to static constexpr (would require a definition)
+        template<typename Property, typename... Properties>
+        auto call(Property &&, Properties &&...)
+        -> typename std::enable_if<
+            !std::is_same<constant, Property>::value && is_const_property<Property>::value,
+            double
+        >::type
+        {
+            return Property::fill_value;
+        }
+
         template<typename Property, typename... Properties>
         auto call(Property &&, Properties &&... props)
-            -> typename std::enable_if< !is_const_property<Property>::value, double>::type
+        -> typename std::enable_if< !is_const_property<Property>::value, double>::type
         {
             return call(std::forward<Properties>(props)...);
         }
