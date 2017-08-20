@@ -29,6 +29,16 @@ else()
     message("Building without BLAS - SPD generator won't be available")
 endif()
 
+#Look for LAPACK
+if(${WITH_LAPACK})
+    find_package(LAPACK REQUIRED)
+    add_definitions(-DHAVE_LAPACK)
+    target_compile_options(libtests INTERFACE ${LAPACK_LINKER_FLAGS})
+    target_link_libraries(libtests INTERFACE ${LAPACK_LIBRARIES})
+else()
+    message("Building without LAPACK - orthogonal generator won't be available")
+endif()
+
 #Armadillo
 if(${WITH_ARMADILLO})
     find_package(Armadillo CONFIG REQUIRED)
