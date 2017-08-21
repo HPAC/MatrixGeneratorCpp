@@ -36,7 +36,7 @@ install:
   - if [ "$BUILD_EIGEN" == "yes" ]; then mkdir eigen && cd eigen && hg clone https://bitbucket.org/eigen/eigen/ && mkdir build && mkdir install; fi
   - if [ "$BUILD_EIGEN" == "yes" ]; then cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../eigen && cmake --build . --target install && cd ../install; fi
   - if [ "$BUILD_EIGEN" == "no" ]; then cd eigen/install; fi
-  - export EIGEN_ROOT"$(pwd)"
+  - export EIGEN_ROOT="$(pwd)"
   - popd
 
 script:
