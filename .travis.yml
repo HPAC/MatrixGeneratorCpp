@@ -28,14 +28,20 @@ install:
   - cd deps
   - if [ ! -d "blaze" ]; then export BUILD_BLAZE="yes"; else export BUILD_BLAZE="no"; fi
   - if [ "$BUILD_BLAZE" == "yes" ]; then mkdir blaze && cd blaze && git clone https://bitbucket.org/blaze-lib/blaze.git && mkdir build && mkdir install; fi
-  - if [ "$BUILD_BLAZE" == "yes" ]; then cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../blaze && make install && cd ../install; fi
+  - if [ "$BUILD_BLAZE" == "yes" ]; then cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../blaze && cmake --build . --target install && cd ../install; fi
   - if [ "$BUILD_BLAZE" == "no" ]; then cd blaze/install ; fi
   - export BLAZE_ROOT="$(pwd)"
+  - popd
+  - if [ ! -d "eigen" ]; then export BUILD_EIGEN="yes"; else export BUILD_EIGEN="no"; fi
+  - if [ "$BUILD_EIGEN" == "yes" ]; then mkdir eigen && cd eigen && hg clone https://bitbucket.org/eigen/eigen/ && mkdir build && mkdir install; fi
+  - if [ "$BUILD_EIGEN" == "yes" ]; then cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../eigen && cmake --build . --target install && cd ../install; fi
+  - if [ "$BUILD_EIGEN" == "no" ]; then cd eigen/install; fi
+  - export EIGEN_ROOT"$(pwd)"
   - popd
 
 script:
   - mkdir build && cd build
-  - cmake -DWITH_BLAZE=On -DWITH_EXAMPLES=On -DWITH_TESTS=On ..
+  - cmake -DWITH_BLAZE=On -DWITH_EIGEN=0n -DWITH_EXAMPLES=On -DWITH_TESTS=On ..
   - cmake --build .
   - ctest -VV
 
