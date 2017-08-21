@@ -28,7 +28,7 @@ namespace generator { namespace detail {
         template<typename Shape>
         using matrix_t = typename MatrixType<T, Shape>::type;
 
-        typedef std::uniform_real_distribution<> distr_t;
+        typedef std::uniform_real_distribution<T> distr_t;
 
         //Mersenne Twister RNG
         std::mt19937 rng;

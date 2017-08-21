@@ -38,7 +38,7 @@ namespace generator {
                 //Eigen::Map does not work very well with DiagonalMatrix
                 type matrix{rows};
                 auto & diagonal = matrix.diagonal();
-                for(uint32_t i = rows; i < cols; ++i) {
+                for(uint32_t i = 0; i < rows; ++i) {
                     diagonal.coeffRef(i) = ptr[i];
                 }
                 return matrix;

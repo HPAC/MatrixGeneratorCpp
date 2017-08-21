@@ -67,9 +67,17 @@ if(${WITH_BLAZE})
     add_definitions(-DHAVE_BLAZE)
     target_include_directories(libtests INTERFACE $<TARGET_PROPERTY:blaze::blaze,INTERFACE_INCLUDE_DIRECTORIES>)
 endif()
+
 #Warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     #Warnins for Clang/AppleClang
+    #undef warnings called for gtest or blaze
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Werror -Wno-shorten-64-to-32\
+        -Wno-documentation-unknown-command -Wno-undef -Wno-c++98-compat-pedantic \
+        -Wno-reserved-id-macro -Wno-documentation -Wno-used-but-marked-unused\
+        -Wno-deprecated -Wno-sign-conversion -Wno-double-promotion -Wno-float-equal\
+        -Wno-missing-noreturn -Wno-padded -Wno-shift-sign-overflow -Wno-weak-vtables\
+        -Wno-missing-variable-declarations -Wno-global-constructors -Wno-float-conversion")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     #Warnings for GCC
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")

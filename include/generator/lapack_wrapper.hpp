@@ -101,7 +101,7 @@ namespace generator { namespace lapack {
 
 		static float epsilon()
 		{
-			return 1e-5;
+			return 1e-5f;
 		}
 	};
 

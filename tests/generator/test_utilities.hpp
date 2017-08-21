@@ -12,8 +12,15 @@
 #include <type_traits>
 
 #include <traits/matrix.hpp>
+#include <util.hpp>
 
+#ifdef HAVE_BLAZE
 #include "test_utilities_blaze.hpp"
+#endif
+
+#ifdef HAVE_EIGEN
+#include "test_utilities_eigen.hpp"
+#endif
 
 using std::make_tuple;
 
@@ -27,6 +34,11 @@ struct test_settings<>
             std::tuple<float, library::blaze>,
             std::tuple<double, library::blaze>
         > types_to_test;
+
+    /*typedef testing::Types<
+            std::tuple<float, library::eigen>,
+            std::tuple<double, library::eigen>
+        > eigen_types_to_test;*/
 
     static constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> small_sizes{
         {make_tuple(1, 1), make_tuple(2, 1), make_tuple(25, 50), make_tuple(50, 25)}
@@ -223,8 +235,10 @@ TYPED_TEST(test_case_name, name_type##_test_##name) {   \
     }   \
 }
 
+#define COMMA ,
+
 #define GENERATE_GENERAL_TEST(test_case_name, name, sizes_obj, ...)   \
-    GENERATE_MATRIX_TEST(test_case_name, (generator::shape::band<1000,1000>), verify_general, general, name, sizes_obj, __VA_ARGS__)
+    GENERATE_MATRIX_TEST(test_case_name, generator::shape::band<1000 COMMA 1000>, verify_general, general, name, sizes_obj, __VA_ARGS__)
 
 #define GENERATE_HERMITIAN_TEST(test_case_name, name, sizes_obj, ...)   \
     GENERATE_MATRIX_TEST(test_case_name, generator::shape::self_adjoint, verify_hermitian, hermitian, name, sizes_obj, __VA_ARGS__)

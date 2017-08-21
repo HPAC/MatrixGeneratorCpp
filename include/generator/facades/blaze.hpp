@@ -109,7 +109,7 @@ namespace generator {
         template<typename Intermediate>
         using matrix_t = detail::blaze_matrix_type<T, std::decay_t<Intermediate>>;
 
-        generator(uint32_t seed = time(0)) :
+        generator(uint32_t seed = static_cast<uint32_t>(time(0))) :
                 base_t(seed)
         {}
 

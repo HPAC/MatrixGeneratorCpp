@@ -39,14 +39,14 @@ void verify_matrix(const blaze::DenseMatrix<Mat, SO> & mat_, const generator::pr
     typedef typename traits::matrix_traits<Mat>::value_t value_t;
 
     auto mat = ~mat_;
-    uint32_t rows = mat.rows(), cols = mat.columns();
+    uint64_t rows = mat.rows(), cols = mat.columns();
     // multiply matrix * matrix'
     auto multiplication = blaze::eval(mat * blaze::trans(mat) - blaze::IdentityMatrix<double, blaze::rowMajor>(rows));
     // now all elements should be quite close to zero
     //auto matrix_norm = blaze::length(multiplication);
-    value_t sum;
-    for(uint32_t i = 0; i < rows; ++i) {
-        for(uint32_t j = 0; j < cols; ++j) {
+    value_t sum = 0.0;
+    for(uint64_t i = 0; i < rows; ++i) {
+        for(uint64_t j = 0; j < cols; ++j) {
             sum += std::pow(multiplication(i, j), 2);
         }
     }
