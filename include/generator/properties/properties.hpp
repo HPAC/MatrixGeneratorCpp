@@ -15,4 +15,8 @@
 #include <generator/properties/spd.hpp>
 #endif
 
+#ifdef HAVE_LAPACK
+#include <generator/properties/orthogonal.hpp>
+#endif
+
 #endif

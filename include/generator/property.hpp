@@ -38,7 +38,9 @@ namespace generator { namespace property {
     struct spd		: property_t<7> {};
 #endif
 
+#ifdef HAVE_LAPACK
     struct orthogonal: property_t<8> {};
+#endif
 
     template<typename T, uint64_t type>
     struct property;

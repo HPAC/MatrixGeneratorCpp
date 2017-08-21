@@ -8,10 +8,16 @@
 
 #ifdef HAVE_LAPACK
 
+#include <cassert>
+
 #include <generator/shape.hpp>
 
 extern "C" void spotrf_(char *, int*, float*, int*, int*);
 extern "C" void dpotrf_(char *, int*, double*, int*, int*);
+extern "C" void sgeqrf_(int *, int*, float*, int*, float*, float*, int*, int*);
+extern "C" void dgeqrf_(int *, int*, double*, int*, double*, double*, int*, int*);
+extern "C" void sorgqr_(int *, int*, int *, float*, int*, float*, float*, int*, int*);
+extern "C" void dorgqr_(int *, int*, int *, double*, int*, double*, double*, int*, int*);
 
 namespace generator { namespace lapack {
 
@@ -47,6 +53,83 @@ namespace generator { namespace lapack {
 			char triangular = 'U';
 			dpotrf_(&triangular, &rows, input.get(), &lda, &info);
 			return !info;
+		}
+	};
+
+	// Since the input matrix is randomized, we don't care about transposition
+	// of the input matrix.
+	template<typename T>
+	struct QR;
+
+	template<>
+	struct QR<float>
+	{
+		static void q_matrix(const shape::matrix_size & size,
+						std::unique_ptr<float[]> & input,
+						std::unique_ptr<float[]> & output)
+		{
+			// Factorize input into reflectors
+			int rows = size.rows, cols = size.cols;
+			int rank = std::min(rows, cols);
+			int lwork = -1, info;
+			float lwork_size;
+			std::unique_ptr<float[]> tau(new float[rank]);
+			// query optimal work size - returns in lwork_size
+			sgeqrf_(&rows, &cols, input.get(), &cols, tau.get(), &lwork_size, &lwork, &info);
+			assert(!info);
+			lwork = static_cast<int>(lwork_size);
+			std::unique_ptr<float[]> work(new float[lwork]);
+			sgeqrf_(&rows, &cols, input.get(), &cols, tau.get(), work.get(), &lwork, &info);
+			assert(!info);
+
+			// Create Q matrix
+			// query optimal work size - returns in lwork_size
+			lwork = -1;
+			sorgqr_(&rows, &cols, &rank, input.get(), &cols, tau.get(), &lwork_size, &lwork, &info);
+			assert(!info);
+			lwork = static_cast<int>(lwork_size);
+			work.reset(new float[static_cast<int>(lwork)]);
+			sorgqr_(&rows, &cols, &rank, input.get(), &cols, tau.get(), work.get(), &lwork, &info);
+			assert(!info);
+
+			// Avoid copying
+			output = std::move(input);
+		}
+	};
+
+	template<>
+	struct QR<double>
+	{
+		static void q_matrix(const shape::matrix_size & size,
+						std::unique_ptr<double[]> & input,
+						std::unique_ptr<double[]> & output)
+		{
+			// Factorize input into reflectors
+			int rows = size.rows, cols = size.cols;
+			int rank = std::min(rows, cols);
+			int lwork = -1, info;
+			double lwork_size;
+			std::unique_ptr<double[]> tau(new double[rank]);
+			// query optimal work size - returns in lwork_size
+			dgeqrf_(&rows, &cols, input.get(), &cols, tau.get(), &lwork_size, &lwork, &info);
+			assert(!info);
+			lwork = static_cast<int>(lwork_size);
+			std::unique_ptr<double[]> work(new double[lwork]);
+			dgeqrf_(&rows, &cols, input.get(), &cols, tau.get(), work.get(), &lwork, &info);
+			assert(!info);
+
+			// Create Q matrix
+			// query optimal work size - returns in lwork_size
+			lwork = -1;
+			dorgqr_(&rows, &cols, &rank, input.get(), &cols, tau.get(), &lwork_size, &lwork, &info);
+			assert(!info);
+			lwork = static_cast<int>(lwork_size);
+			work.reset(new double[static_cast<int>(lwork)]);
+			dorgqr_(&rows, &cols, &rank, input.get(), &cols, tau.get(), work.get(), &lwork, &info);
+			assert(!info);
+
+			// Avoid copying
+			output = std::move(input);
 		}
 	};
 
