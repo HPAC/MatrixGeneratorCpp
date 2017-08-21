@@ -47,25 +47,16 @@ void verify_matrix(const Eigen::DiagonalMatrix<T, Eigen::Dynamic, Eigen::Dynamic
     verify_matrix(mat, spd_prop);
 }
 
-// Blaze llh should throw if Cholesky factorization fails on a not positive definite matrix
 template<typename Mat>
-void verify_matrix(const Eigen::EigenBase<Mat> &, const generator::property::orthogonal &)
+void verify_matrix(const Eigen::MatrixBase<Mat> & mat, const generator::property::orthogonal &)
 {
-    //uint32_t rows = mat.rows(), cols = mat.columns();
+    typedef typename traits::matrix_traits< std::remove_reference_t<Mat> >::value_t value_t;
+
+    uint32_t rows = mat.rows(), cols = mat.cols();
     // multiply matrix * matrix'
-    //auto multiplication = blaze::eval(mat * blaze::trans(mat) - blaze::IdentityMatrix<double, blaze::rowMajor>(rows));
+    auto multiplication = (mat * mat.transpose() - Mat::Identity(rows,cols)).eval();
     // now all elements should be quite close to zero
-    //auto matrix_norm = blaze::length(multiplication);
-    /*value_t sum;
-    for(uint32_t i = 0; i < rows; ++i) {
-        for(uint32_t j = 0; j < cols; ++j) {
-        	//FIXME: proper epsilon for QR
-            //EXPECT_NEAR(multiplication(i, j), static_cast<value_t>(0.0), 5*std::numeric_limits<value_t>::epsilon());
-            sum += std::pow(multiplication(i, j), 2);
-        }
-    }
-    //std::cout << mat << std::endl;
-    EXPECT_NEAR(std::sqrt(sum), static_cast<value_t>(0.0), generator::lapack::QR<value_t>::epsilon());*/
+    EXPECT_NEAR(multiplication.norm(), static_cast<value_t>(0.0), generator::lapack::QR<value_t>::epsilon());
 }
 
 #endif
