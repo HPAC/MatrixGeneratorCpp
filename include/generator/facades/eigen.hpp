@@ -29,7 +29,7 @@ namespace generator {
         };
 
         template<typename T>
-        struct eigen_matrix_type<T, generator::intermediate::diagonal<T>>
+        struct eigen_matrix_type<T, ::generator::intermediate::diagonal<T>>
         {
             typedef Eigen::DiagonalMatrix<T, Eigen::Dynamic, Eigen::Dynamic> type;
 

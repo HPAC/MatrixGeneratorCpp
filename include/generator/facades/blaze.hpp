@@ -20,7 +20,7 @@ namespace generator {
         struct blaze_matrix_type;
 
         template<typename T>
-        struct blaze_matrix_type<T, generator::intermediate::general<T>>
+        struct blaze_matrix_type<T, ::generator::intermediate::general<T>>
         {
             typedef blaze::DynamicMatrix<T> type;
 
@@ -35,7 +35,7 @@ namespace generator {
         /// Hence we can always use Hermitian
         /// \tparam T
         template<typename T>
-        struct blaze_matrix_type<T, generator::intermediate::self_adjoint<T>>
+        struct blaze_matrix_type<T, ::generator::intermediate::self_adjoint<T>>
         {
             typedef blaze::HermitianMatrix< blaze::DynamicMatrix<T> > type;
 
@@ -46,7 +46,7 @@ namespace generator {
         };
 
         template<typename T>
-        struct blaze_matrix_type<T, generator::intermediate::upper_triangular<T>>
+        struct blaze_matrix_type<T, ::generator::intermediate::upper_triangular<T>>
         {
             typedef blaze::UpperMatrix< blaze::DynamicMatrix<T> > type;
 
@@ -57,7 +57,7 @@ namespace generator {
         };
 
         template<typename T>
-        struct blaze_matrix_type<T, generator::intermediate::lower_triangular<T>>
+        struct blaze_matrix_type<T, ::generator::intermediate::lower_triangular<T>>
         {
             typedef blaze::LowerMatrix< blaze::DynamicMatrix<T> > type;
 
@@ -72,7 +72,7 @@ namespace generator {
         /// Hence we can always use Hermitian
         /// \tparam T
         template<typename T>
-        struct blaze_matrix_type<T, generator::intermediate::diagonal<T>>
+        struct blaze_matrix_type<T, ::generator::intermediate::diagonal<T>>
         {
             // FIXME: should we use here CompressedMatrix?
             typedef blaze::DiagonalMatrix< blaze::DynamicMatrix<T> > type;
