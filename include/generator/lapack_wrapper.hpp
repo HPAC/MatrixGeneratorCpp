@@ -12,10 +12,13 @@
 
 #include <generator/shape.hpp>
 
+/** Cholesky **/
 extern "C" void spotrf_(char *, int*, float*, int*, int*);
 extern "C" void dpotrf_(char *, int*, double*, int*, int*);
+/** Blocked QR factorization **/
 extern "C" void sgeqrf_(int *, int*, float*, int*, float*, float*, int*, int*);
 extern "C" void dgeqrf_(int *, int*, double*, int*, double*, double*, int*, int*);
+/** Construct Q matrix **/
 extern "C" void sorgqr_(int *, int*, int *, float*, int*, float*, float*, int*, int*);
 extern "C" void dorgqr_(int *, int*, int *, double*, int*, double*, double*, int*, int*);
 
@@ -139,7 +142,7 @@ namespace generator { namespace lapack {
 
 		static double epsilon()
 		{
-			return 1e-14;
+			return 1e-13;
 		}
 	};
 
