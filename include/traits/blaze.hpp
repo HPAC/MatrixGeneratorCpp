@@ -21,6 +21,16 @@ namespace traits {
         {
             typedef typename MatType::ElementType value_t;
 
+            static uint64_t rows(const MatType & mat)
+            {
+                return mat.rows();
+            }
+
+            static uint64_t columns(const MatType & mat)
+            {
+                return mat.columns();
+            }
+
             static decltype(auto) get(const MatType & mat, uint64_t i, uint64_t j)
             {
                 return mat(i, j);
