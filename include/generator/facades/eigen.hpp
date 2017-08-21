@@ -33,7 +33,7 @@ namespace generator {
         {
             typedef Eigen::DiagonalMatrix<T, Eigen::Dynamic, Eigen::Dynamic> type;
 
-            static type create(uint32_t rows, uint32_t cols, T * ptr)
+            static type create(uint32_t rows, uint32_t, T * ptr)
             {
                 //Eigen::Map does not work very well with DiagonalMatrix
                 type matrix{rows};

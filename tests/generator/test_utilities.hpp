@@ -31,14 +31,18 @@ template<>
 struct test_settings<>
 {
     typedef testing::Types<
+        #ifdef HAVE_BLAZE
             std::tuple<float, library::blaze>,
             std::tuple<double, library::blaze>
-        > types_to_test;
-
-    /*typedef testing::Types<
+        #endif
+        #ifdef HAVE_EIGEN
+            #ifdef HAVE_BLAZE
+                ,
+            #endif
             std::tuple<float, library::eigen>,
             std::tuple<double, library::eigen>
-        > eigen_types_to_test;*/
+        #endif
+    > types_to_test;
 
     static constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> small_sizes{
         {make_tuple(1, 1), make_tuple(2, 1), make_tuple(25, 50), make_tuple(50, 25)}
@@ -113,15 +117,16 @@ void verify(T, const generator::property::orthogonal &)
 template<typename MatType, typename ... Properties>
 void verify_general(MatType && mat, uint32_t rows, uint32_t cols, Properties &&... props)
 {
-    typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
+    typedef traits::matrix_traits< std::remove_reference_t<MatType> > traits_t;
+    typedef typename traits_t::value_t value_t;
 
-    EXPECT_EQ(mat.rows(), rows);
-    EXPECT_EQ(mat.columns(), cols);
+    EXPECT_EQ(traits_t::rows(mat), rows);
+    EXPECT_EQ(traits_t::columns(mat), cols);
     verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     for(uint32_t i = 0; i < rows; ++i) {
         for(uint32_t j = 0; j < cols; ++j) {
-            verify<value_t>(mat(i, j), std::forward<Properties>(props)...);
+            verify<value_t>(traits_t::get(mat, i, j), std::forward<Properties>(props)...);
         } 
     }
 }
@@ -129,18 +134,19 @@ void verify_general(MatType && mat, uint32_t rows, uint32_t cols, Properties &&.
 template<typename MatType, typename ... Properties>
 void verify_hermitian(MatType && mat, uint32_t rows, uint32_t, Properties &&... props)
 {
-    typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
+    typedef traits::matrix_traits< std::remove_reference_t<MatType> > traits_t;
+    typedef typename traits_t::value_t value_t;
 
-    EXPECT_EQ(mat.rows(), rows);
-    EXPECT_EQ(mat.columns(), rows);
+    EXPECT_EQ(traits_t::rows(mat), rows);
+    EXPECT_EQ(traits_t::columns(mat), rows);
     verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     for(uint32_t i = 0; i < rows; ++i) {
     	//diagonal
         verify<value_t>(mat(i, i), std::forward<Properties>(props)...);	
         for(uint32_t j = i + 1; j < rows; ++j) {
-            EXPECT_NEAR(mat(i, j), mat(j, i), std::numeric_limits<value_t>::epsilon());
-            verify<value_t>(mat(i, j), std::forward<Properties>(props)...);
+            EXPECT_NEAR(traits_t::get(mat, i, j), traits_t::get(mat, j, i), std::numeric_limits<value_t>::epsilon());
+            verify<value_t>(traits_t::get(mat, i, j), std::forward<Properties>(props)...);
         }
     }
 }
@@ -148,10 +154,11 @@ void verify_hermitian(MatType && mat, uint32_t rows, uint32_t, Properties &&... 
 template<typename MatType, typename ... Properties>
 void verify_upper_triangular(MatType && mat, uint32_t rows, uint32_t, Properties &&... props)
 {
-    typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
+    typedef traits::matrix_traits< std::remove_reference_t<MatType> > traits_t;
+    typedef typename traits_t::value_t value_t;
 
-    EXPECT_EQ(mat.rows(), rows);
-    EXPECT_EQ(mat.columns(), rows);
+    EXPECT_EQ(traits_t::rows(mat), rows);
+    EXPECT_EQ(traits_t::columns(mat), rows);
     verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     // FIXME: add non-square tests
@@ -161,10 +168,10 @@ void verify_upper_triangular(MatType && mat, uint32_t rows, uint32_t, Properties
         uint32_t max_cols = std::min(i, cols);
         //empty
         for(uint32_t j = 0; j < max_cols; ++j) {
-            EXPECT_NEAR(mat(i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
+            EXPECT_NEAR(traits_t::get(mat, i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
         }
         for(uint32_t j = i; j < cols; ++j) {
-            verify<value_t>(mat(i, i), std::forward<Properties>(props)...); 
+            verify<value_t>(traits_t::get(mat, i, i), std::forward<Properties>(props)...); 
         }
     }
 }
@@ -172,10 +179,11 @@ void verify_upper_triangular(MatType && mat, uint32_t rows, uint32_t, Properties
 template<typename MatType, typename ... Properties>
 void verify_lower_triangular(MatType && mat, uint32_t rows, uint32_t, Properties &&... props)
 {
-    typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
+    typedef traits::matrix_traits< std::remove_reference_t<MatType> > traits_t;
+    typedef typename traits_t::value_t value_t;
 
-    EXPECT_EQ(mat.rows(), rows);
-    EXPECT_EQ(mat.columns(), rows);
+    EXPECT_EQ(traits_t::rows(mat), rows);
+    EXPECT_EQ(traits_t::columns(mat), rows);
     verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     // FIXME: add non-square tests
@@ -184,11 +192,11 @@ void verify_lower_triangular(MatType && mat, uint32_t rows, uint32_t, Properties
         // in a non-square matrix the upper bound on index might lower than i
         uint32_t max_cols = std::min(i + 1, cols);
         for(uint32_t j = 0; j < max_cols; ++j) {
-            verify<value_t>(mat(i, i), std::forward<Properties>(props)...); 
+            verify<value_t>(traits_t::get(mat, i, j), std::forward<Properties>(props)...); 
         }
         //empty
         for(uint32_t j = i + 1; j < cols; ++j) {
-            EXPECT_NEAR(mat(i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
+            EXPECT_NEAR(traits_t::get(mat, i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
         }
     }
 }
@@ -196,22 +204,23 @@ void verify_lower_triangular(MatType && mat, uint32_t rows, uint32_t, Properties
 template<typename MatType, typename ... Properties>
 void verify_diagonal(MatType && mat, uint32_t rows, uint32_t, Properties &&... props)
 {
-    typedef typename traits::matrix_traits< std::remove_reference_t<MatType> >::value_t value_t;
+    typedef traits::matrix_traits< std::remove_reference_t<MatType> > traits_t;
+    typedef typename traits_t::value_t value_t;
 
-    EXPECT_EQ(mat.rows(), rows);
-    EXPECT_EQ(mat.columns(), rows);
+    EXPECT_EQ(traits_t::rows(mat), rows);
+    EXPECT_EQ(traits_t::columns(mat), rows);
     verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     for(uint32_t i = 0; i < rows; ++i) {
         //empty
         for(uint32_t j = 0; j < i; ++j) {
-            EXPECT_NEAR(mat(i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
+            EXPECT_NEAR(traits_t::get(mat, i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
         }
         //diagonal
-        verify<value_t>(mat(i, i), std::forward<Properties>(props)...);
+        verify<value_t>(traits_t::get(mat, i, i), std::forward<Properties>(props)...);
         //empty
         for(uint32_t j = i + 1; j < rows; ++j) {
-            EXPECT_NEAR(mat(i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
+            EXPECT_NEAR(traits_t::get(mat, i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
         }
     }
 }
