@@ -13,6 +13,8 @@
 
 #include <traits/matrix.hpp>
 
+#include "test_utilities_blaze.hpp"
+
 using std::make_tuple;
 
 template<typename ... T>
@@ -99,6 +101,7 @@ void verify_general(MatType && mat, uint32_t rows, uint32_t cols, Properties &&.
 
     EXPECT_EQ(mat.rows(), rows);
     EXPECT_EQ(mat.columns(), cols);
+    verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     for(uint32_t i = 0; i < rows; ++i) {
         for(uint32_t j = 0; j < cols; ++j) {
@@ -114,6 +117,7 @@ void verify_hermitian(MatType && mat, uint32_t rows, uint32_t, Properties &&... 
 
     EXPECT_EQ(mat.rows(), rows);
     EXPECT_EQ(mat.columns(), rows);
+    verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     for(uint32_t i = 0; i < rows; ++i) {
     	//diagonal
@@ -132,6 +136,7 @@ void verify_upper_triangular(MatType && mat, uint32_t rows, uint32_t, Properties
 
     EXPECT_EQ(mat.rows(), rows);
     EXPECT_EQ(mat.columns(), rows);
+    verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     // FIXME: add non-square tests
     uint32_t cols = rows;
@@ -155,6 +160,7 @@ void verify_lower_triangular(MatType && mat, uint32_t rows, uint32_t, Properties
 
     EXPECT_EQ(mat.rows(), rows);
     EXPECT_EQ(mat.columns(), rows);
+    verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     // FIXME: add non-square tests
     uint32_t cols = rows;
@@ -178,6 +184,7 @@ void verify_diagonal(MatType && mat, uint32_t rows, uint32_t, Properties &&... p
 
     EXPECT_EQ(mat.rows(), rows);
     EXPECT_EQ(mat.columns(), rows);
+    verify_matrix(std::forward<MatType>(mat), std::forward<Properties>(props)...);
 
     for(uint32_t i = 0; i < rows; ++i) {
         //empty
