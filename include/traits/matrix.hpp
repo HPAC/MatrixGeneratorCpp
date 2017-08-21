@@ -6,45 +6,12 @@
 #ifndef LINALG_TESTS_TRAITS_MATRIX_TRAITS_HPP
 #define LINALG_TESTS_TRAITS_MATRIX_TRAITS_HPP
 
-namespace traits {
+#ifdef HAVE_BLAZE
+#include <traits/blaze.hpp>
+#endif
 
-    template<typename MatType>
-    struct matrix_traits;
-
-    namespace detail {
-        /// FIXME: why naming of those types is different?
-        /// We have Type for Dense, ElementType for Hermitian
-        template<typename MatType>
-        struct blaze_matrix
-        {
-            typedef typename MatType::ElementType value_t;
-        };
-    }
-
-    template<typename T>
-    struct matrix_traits<blaze::DynamicMatrix<T>> :
-        detail::blaze_matrix< blaze::DynamicMatrix<T> >
-    {};
-
-    template<typename T>
-    struct matrix_traits< blaze::HermitianMatrix<blaze::DynamicMatrix<T>> > :
-        detail::blaze_matrix< blaze::HermitianMatrix<blaze::DynamicMatrix<T>> >
-    {};
-
-    template<typename T>
-    struct matrix_traits< blaze::UpperMatrix<blaze::DynamicMatrix<T>> > :
-        detail::blaze_matrix< blaze::UpperMatrix<blaze::DynamicMatrix<T>> >
-    {};
-
-    template<typename T>
-    struct matrix_traits< blaze::LowerMatrix<blaze::DynamicMatrix<T>> > :
-        detail::blaze_matrix< blaze::LowerMatrix<blaze::DynamicMatrix<T>> >
-    {};
-
-    template<typename T>
-    struct matrix_traits< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>> > :
-        detail::blaze_matrix< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>> >
-    {};
-}
+#ifdef HAVE_EIGEN
+#include <traits/eigen.hpp>
+#endif
 
 #endif
