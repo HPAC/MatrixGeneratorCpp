@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <limits>
 
+#include <util.hpp>
+
 namespace generator { namespace shape {
 
     struct matrix_size
@@ -102,15 +104,6 @@ namespace generator { namespace shape {
 
     namespace detail {
 
-        template<typename T1, typename T2>
-        struct tuple_cat_result;
-
-        template<typename... T1, typename T2>
-        struct tuple_cat_result<std::tuple<T1...>, T2>
-        {
-            typedef std::tuple<T1..., T2> type;
-        };
-
         template<typename Band, typename OldTuple, typename Enable, typename... Properties>
         struct from_properties;
 
@@ -124,7 +117,6 @@ namespace generator { namespace shape {
             typedef typename merge_band<Band, Property>::type band_type;
             typedef OldTuple properties_type;
         };
-
 
         template<typename Band, typename OldTuple, typename Property>
         struct from_properties<

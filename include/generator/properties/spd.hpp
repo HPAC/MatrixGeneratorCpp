@@ -69,8 +69,8 @@ namespace generator { namespace property {
 
             // Not implemented for: upper_triangular, lower_triangular
             template<typename Shape, typename RndGen, typename... Properties>
-            static void fill(const Shape & shape,
-                            RndGen && gen, Properties &&... props)
+            static void fill(const Shape &,
+                            RndGen &&, Properties &&...)
             {
                 static_assert(
                     !(std::is_same<Shape, intermediate::upper_triangular<T>>::value
