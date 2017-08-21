@@ -32,6 +32,7 @@ install:
   - if [ "$BUILD_BLAZE" == "no" ]; then cd blaze/install ; fi
   - export BLAZE_ROOT="$(pwd)"
   - popd
+  - pushd .
   - if [ ! -d "eigen" ]; then export BUILD_EIGEN="yes"; else export BUILD_EIGEN="no"; fi
   - if [ "$BUILD_EIGEN" == "yes" ]; then mkdir eigen && cd eigen && hg clone https://bitbucket.org/eigen/eigen/ && mkdir build && mkdir install; fi
   - if [ "$BUILD_EIGEN" == "yes" ]; then cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../eigen && cmake --build . --target install && cd ../install; fi
