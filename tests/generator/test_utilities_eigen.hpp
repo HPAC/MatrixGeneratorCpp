@@ -19,13 +19,30 @@ void verify_matrix(const Eigen::EigenBase<Mat> &, const Properties &...)
 template<typename Mat>
 void verify_matrix(const Eigen::EigenBase<Mat> & mat, const generator::property::spd &)
 {
-
     Eigen::LLT<Mat> cholesky(mat);
-	EXPECT_EQ(cholesky.info(), Eigen::ComputationInfo::NumericalIssue);
+	EXPECT_EQ(cholesky.info(), Eigen::ComputationInfo::Success);
 }
 
 template<typename Mat>
 void verify_matrix(const Eigen::EigenBase<Mat> & mat, const generator::property::spd & spd_prop, const generator::property::positive &)
+{
+    verify_matrix(mat, spd_prop);
+}
+
+// Cholesky does not work for Diagonal
+// Use the knowledge that diagonal matrix is SPD iff all entries are positive
+template<typename T>
+void verify_matrix(const Eigen::DiagonalMatrix<T, Eigen::Dynamic, Eigen::Dynamic> & mat, const generator::property::spd &)
+{
+    uint64_t cols = mat.cols();
+    for(uint64_t i = 0; i < cols; ++i) {
+        EXPECT_GT(mat.diagonal().coeff(i), static_cast<T>(0.0));
+    }
+}
+
+template<typename T>
+void verify_matrix(const Eigen::DiagonalMatrix<T, Eigen::Dynamic, Eigen::Dynamic> & mat, const generator::property::spd &spd_prop,
+    const generator::property::positive &)
 {
     verify_matrix(mat, spd_prop);
 }

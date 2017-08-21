@@ -171,7 +171,7 @@ void verify_upper_triangular(MatType && mat, uint32_t rows, uint32_t, Properties
             EXPECT_NEAR(traits_t::get(mat, i, j), static_cast<value_t>(0.0), std::numeric_limits<value_t>::epsilon());
         }
         for(uint32_t j = i; j < cols; ++j) {
-            verify<value_t>(traits_t::get(mat, i, i), std::forward<Properties>(props)...); 
+            verify<value_t>(traits_t::get(mat, i, j), std::forward<Properties>(props)...); 
         }
     }
 }
