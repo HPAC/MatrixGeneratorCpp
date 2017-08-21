@@ -12,7 +12,7 @@
 
 namespace traits {
 
-    template<typename MatType, typename Enable = void>
+    template<typename MatType, typename Enable>
     struct matrix_traits;
 
     namespace detail {

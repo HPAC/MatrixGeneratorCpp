@@ -10,7 +10,7 @@
 
 namespace traits {
 
-    template<typename MatType>
+    template<typename MatType, typename Enable>
     struct matrix_traits;
 
     namespace detail {
@@ -45,27 +45,27 @@ namespace traits {
     }
 
     template<typename T>
-    struct matrix_traits<blaze::DynamicMatrix<T>> :
+    struct matrix_traits< blaze::DynamicMatrix<T>, void> :
         detail::blaze_matrix< blaze::DynamicMatrix<T> >
     {};
 
     template<typename T>
-    struct matrix_traits< blaze::HermitianMatrix<blaze::DynamicMatrix<T>> > :
+    struct matrix_traits< blaze::HermitianMatrix<blaze::DynamicMatrix<T>>, void> :
         detail::blaze_matrix< blaze::HermitianMatrix<blaze::DynamicMatrix<T>> >
     {};
 
     template<typename T>
-    struct matrix_traits< blaze::UpperMatrix<blaze::DynamicMatrix<T>> > :
+    struct matrix_traits< blaze::UpperMatrix<blaze::DynamicMatrix<T>>, void> :
         detail::blaze_matrix< blaze::UpperMatrix<blaze::DynamicMatrix<T>> >
     {};
 
     template<typename T>
-    struct matrix_traits< blaze::LowerMatrix<blaze::DynamicMatrix<T>> > :
+    struct matrix_traits< blaze::LowerMatrix<blaze::DynamicMatrix<T>>, void> :
         detail::blaze_matrix< blaze::LowerMatrix<blaze::DynamicMatrix<T>> >
     {};
 
     template<typename T>
-    struct matrix_traits< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>> > :
+    struct matrix_traits< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>>, void> :
         detail::blaze_matrix< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>> >
     {};
 }

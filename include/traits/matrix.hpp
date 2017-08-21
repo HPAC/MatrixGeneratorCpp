@@ -14,4 +14,11 @@
 #include <traits/eigen.hpp>
 #endif
 
+namespace traits {
+
+    template<typename MatType, typename Enable = void>
+    struct matrix_traits;
+
+}
+
 #endif
