@@ -12,6 +12,7 @@
 #include <blaze/Blaze.h>
 #include <blaze/math/DenseMatrix.h>
 #include <blaze/math/dense/DynamicMatrix.h>
+#include <generator/lapack_wrapper.hpp>
 
 template<typename Mat, bool SO, typename... Properties>
 void verify_matrix(const blaze::DenseMatrix<Mat, SO> &, const Properties &...)
@@ -42,14 +43,20 @@ void verify_matrix(const blaze::DenseMatrix<Mat, SO> & mat_, const generator::pr
     auto mat = ~mat_;
     uint32_t rows = mat.rows(), cols = mat.columns();
     // multiply matrix * matrix'
-    auto multiplication = mat * blaze::trans(mat) - blaze::IdentityMatrix<double, blaze::rowMajor>(rows);
+    auto multiplication = blaze::eval(mat * blaze::trans(mat) - blaze::IdentityMatrix<double, blaze::rowMajor>(rows));
     // now all elements should be quite close to zero
+    //auto matrix_norm = blaze::length(multiplication);
+    value_t sum;
     for(uint32_t i = 0; i < rows; ++i) {
         for(uint32_t j = 0; j < cols; ++j) {
         	//FIXME: proper epsilon for QR
-            EXPECT_NEAR(multiplication(i, j), static_cast<value_t>(0.0), 5*std::numeric_limits<value_t>::epsilon());
-        } 
+            //EXPECT_NEAR(multiplication(i, j), static_cast<value_t>(0.0), 5*std::numeric_limits<value_t>::epsilon());
+            sum += std::pow(multiplication(i, j), 2);
+        }
     }
+    //std::cout << mat << std::endl;
+    //std::cout << "norm: " << std::sqrt(sum) << std::endl;
+    EXPECT_NEAR(std::sqrt(sum), static_cast<value_t>(0.0), generator::lapack::QR<value_t>::epsilon());
 }
 
 

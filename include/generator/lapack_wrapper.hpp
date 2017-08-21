@@ -95,6 +95,11 @@ namespace generator { namespace lapack {
 			// Avoid copying
 			output = std::move(input);
 		}
+
+		static float epsilon()
+		{
+			return 1e-5;
+		}
 	};
 
 	template<>
@@ -130,6 +135,11 @@ namespace generator { namespace lapack {
 
 			// Avoid copying
 			output = std::move(input);
+		}
+
+		static double epsilon()
+		{
+			return 1e-14;
 		}
 	};
 
