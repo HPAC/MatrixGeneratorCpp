@@ -29,23 +29,24 @@ template<typename MatType1, typename MatType2>
 void verify_left(MatType1 && mat, MatType2 && eye)
 {
     // both floating types should be the same
-    typedef typename traits::matrix_traits< std::remove_reference_t<MatType1> >::value_t val_t;
+    typedef traits::matrix_traits< std::remove_reference_t<MatType1> > traits_t;
+    typedef typename traits_t::value_t val_t;
 
     // Mat is (s, rows), eye is (rows, cols)
     // Result matrix is of size s x cols
     // If rows > cols then some columns from original matrix is gone
     // If rows < cols then additional columns in new matrix are set to zero
-    size_t cols = eye.columns();
-    auto left_multiplication = blaze::evaluate(mat * eye);
-    EXPECT_EQ(left_multiplication.rows(), mat.rows());
-    EXPECT_EQ(left_multiplication.columns(), cols);
-    size_t rows_to_check = mat.rows();
-    size_t cols_to_check = std::min(eye.rows(), cols);
+    size_t cols = traits_t::columns(eye);
+    auto left_multiplication = traits_t::eval(mat * eye);
+    EXPECT_EQ(traits_t::rows(left_multiplication), traits_t::rows(mat));
+    EXPECT_EQ(traits_t::columns(left_multiplication), cols);
+    size_t rows_to_check = traits_t::rows(mat);
+    size_t cols_to_check = std::min(traits_t::rows(eye), cols);
     for(size_t i = 0; i < rows_to_check; ++i) {
         for(size_t j = 0; j < cols_to_check; ++j)
-            EXPECT_NEAR(mat(i,j), left_multiplication(i, j), std::numeric_limits<val_t>::epsilon());
+            EXPECT_NEAR(traits_t::get(mat, i, j), traits_t::get(left_multiplication, i, j), std::numeric_limits<val_t>::epsilon());
         for(size_t j = cols_to_check; j < cols; ++j)
-            EXPECT_NEAR(0.0, left_multiplication(i, j), std::numeric_limits<val_t>::epsilon());
+            EXPECT_NEAR(0.0, traits_t::get(left_multiplication, i, j), std::numeric_limits<val_t>::epsilon());
     }
 }
 
@@ -53,25 +54,26 @@ template<typename MatType1, typename MatType2>
 void verify_right(MatType1 && mat, MatType2 && eye)
 {
     // both floating types should be the same
-    typedef typename traits::matrix_traits< std::remove_reference_t<MatType1> >::value_t val_t;
+    typedef traits::matrix_traits< std::remove_reference_t<MatType1> > traits_t;
+    typedef typename traits_t::value_t val_t;
 
     // Mat is (cols, s), eye is (rows, cols)
     // Result matrix is of size rows x s
     // If rows > cols then additional rows not from original matrix should be zero
     // If rows < cols then some rows from original matrix are gone
-    size_t rows = eye.rows();
-    auto right_multiplication = blaze::evaluate(eye * mat);
-    EXPECT_EQ(right_multiplication.rows(), rows);
-    EXPECT_EQ(right_multiplication.columns(), mat.columns());
-    size_t rows_to_check = std::min(rows, eye.columns());
-    size_t cols_to_check = mat.columns();
+    size_t rows = traits_t::rows(eye);
+    auto right_multiplication = traits_t::eval(eye * mat);
+    EXPECT_EQ(traits_t::rows(right_multiplication), rows);
+    EXPECT_EQ(traits_t::columns(right_multiplication), traits_t::columns(mat));
+    size_t rows_to_check = std::min(rows, traits_t::columns(eye));
+    size_t cols_to_check = traits_t::columns(mat);
     for(size_t i = 0; i < rows_to_check; ++i) {
         for(size_t j = 0; j < cols_to_check; ++j)
-            EXPECT_NEAR(mat(i,j), right_multiplication(i, j), std::numeric_limits<val_t>::epsilon());
+            EXPECT_NEAR(traits_t::get(mat, i, j), traits_t::get(right_multiplication, i, j), std::numeric_limits<val_t>::epsilon());
     }
     for(size_t i = rows_to_check; i < rows; ++i) {
         for(size_t j = 0; j < cols_to_check; ++j)
-            EXPECT_NEAR(0.0, right_multiplication(i, j), std::numeric_limits<val_t>::epsilon());
+            EXPECT_NEAR(0.0, traits_t::get(right_multiplication, i, j), std::numeric_limits<val_t>::epsilon());
     }
 }
 

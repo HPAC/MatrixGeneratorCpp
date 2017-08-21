@@ -35,6 +35,12 @@ namespace traits {
             {
                 return mat(i, j);
             }
+
+            template<typename ExprType>
+            static decltype(auto) eval(ExprType && expr)
+            {
+                return blaze::evaluate(expr);
+            }
         };
     }
 

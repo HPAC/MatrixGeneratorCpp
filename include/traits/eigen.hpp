@@ -29,6 +29,12 @@ namespace traits {
             {
                 return mat.cols();
             }
+
+            template<typename ExprType>
+            static decltype(auto) eval(ExprType && expr)
+            {
+                return expr.eval();
+            }
         };
 
     }
