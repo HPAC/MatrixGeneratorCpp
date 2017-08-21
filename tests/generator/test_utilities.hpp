@@ -29,16 +29,16 @@ struct test_settings<>
         > types_to_test;
 
     static constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> small_sizes{
-        make_tuple(1, 1), make_tuple(2, 1), make_tuple(25, 50), make_tuple(50, 25)
+        {make_tuple(1, 1), make_tuple(2, 1), make_tuple(25, 50), make_tuple(50, 25)}
     };
     static constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> small_sq_sizes{
-        make_tuple(1, 1), make_tuple(2, 2), make_tuple(9, 9), make_tuple(25, 25)
+        {make_tuple(1, 1), make_tuple(2, 2), make_tuple(9, 9), make_tuple(25, 25)}
     };
     static constexpr std::array< std::tuple<uint32_t, uint32_t>, 2> medium_sizes{
-        make_tuple(100, 100), make_tuple(199, 173)
+        {make_tuple(100, 100), make_tuple(199, 173)}
     };
     static constexpr std::array< std::tuple<uint32_t, uint32_t>, 3> medium_sq_sizes{
-        make_tuple(100, 100), make_tuple(103, 103), std::make_tuple(125, 125)
+        {make_tuple(100, 100), make_tuple(103, 103), std::make_tuple(125, 125)}
     };
 };
 
@@ -93,6 +93,10 @@ void verify(T val, const generator::property::spd &, const generator::property::
 {
     EXPECT_GT(val, 0.0f);
 }
+
+template<typename FloatingType, typename T>
+void verify(T, const generator::property::orthogonal &)
+{}
 
 template<typename MatType, typename ... Properties>
 void verify_general(MatType && mat, uint32_t rows, uint32_t cols, Properties &&... props)
