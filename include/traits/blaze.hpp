@@ -20,6 +20,11 @@ namespace traits {
         struct blaze_matrix
         {
             typedef typename MatType::ElementType value_t;
+
+            static decltype(auto) get(const MatType & mat, uint64_t i, uint64_t j)
+            {
+                return mat(i, j);
+            }
         };
     }
 
