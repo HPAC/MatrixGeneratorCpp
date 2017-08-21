@@ -22,7 +22,7 @@ using linalg_tests::benchmarker;
     /// \param rows
     /// \param cols
     /// \return
-    void blaze_kernel(benchmarker & b, int rows, int cols)
+    static void blaze_kernel(benchmarker & b, int rows, int cols)
     {
         int idx = b.add_clock();
         b.start_clock( idx );
@@ -70,7 +70,7 @@ using linalg_tests::benchmarker;
 #endif
 
 #ifdef HAVE_ARMADILLO
-    void arma_kernel(benchmarker & b, int rows, int cols)
+    static void arma_kernel(benchmarker & b, int rows, int cols)
     {
         b.start_clock(0);
         arma::mat A = arma::randu<arma::mat>(rows, cols);
@@ -143,8 +143,8 @@ int main()
                   });
 #endif
 
-    std::array<std::string, 4> labels{"Blaze", "Eigen", "Armadillo", "MTL4"};
-    std::array<std::string, 2> clock_labels{"Initialization", "Computation"};
+    std::array<std::string, 4> labels{{"Blaze", "Eigen", "Armadillo", "MTL4"}};
+    std::array<std::string, 2> clock_labels{{"Initialization", "Computation"}};
 
     benchmark.print_results(std::cout, labels, clock_labels);
 }
