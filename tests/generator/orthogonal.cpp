@@ -23,6 +23,9 @@ TYPED_TEST_CASE(orthogonal_test, test_settings<>::types_to_test);
 GENERATE_GENERAL_TEST(orthogonal_test, small, test_settings<>::small_sq_sizes, generator::property::orthogonal())
 GENERATE_GENERAL_TEST(orthogonal_test, medium, test_settings<>::medium_sq_sizes, generator::property::orthogonal())
 
+GENERATE_DIAGONAL_TEST(orthogonal_test, small, test_settings<>::small_sq_sizes, generator::property::orthogonal())
+GENERATE_DIAGONAL_TEST(orthogonal_test, medium, test_settings<>::medium_sq_sizes, generator::property::orthogonal())
+
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

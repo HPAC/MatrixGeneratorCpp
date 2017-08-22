@@ -6,6 +6,8 @@
 #ifndef LINALG_PROPERTIES_ORTHOGONAL_HPP
 #define LINALG_PROPERTIES_ORTHOGONAL_HPP
 
+#include <algorithm>
+
 #include <generator/intermediate.hpp>
 #include <generator/properties/random.hpp>
 #include <generator/lapack_wrapper.hpp>
@@ -47,6 +49,11 @@ namespace generator { namespace property {
                     T,
                     hash<generator::property::random, generator::property::positive>()
                 >::fill(shape, gen, std::forward<Properties>(props)...);
+                std::for_each(shape.data.get(), shape.data.get() + shape.size.rows,
+                    [](T & val) {
+                        val = val >= static_cast<T>(0.5) ? 1 : -1;
+                    }
+                );
             }
 
             // Not implemented for: upper_triangular, lower_triangular
