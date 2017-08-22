@@ -48,6 +48,40 @@ namespace generator { namespace cblas {
 		}
 	};
 
+
+	template<typename T>
+	struct GEMM;
+
+	template<>
+	struct GEMM<float>
+	{
+		// output = input1 * input2'
+		static void call(const shape::matrix_size & size,
+						const std::unique_ptr<float[]> & input1,
+						const std::unique_ptr<float[]> & input2,
+						const std::unique_ptr<float[]> & output)
+		{
+			cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasTrans, size.rows, size.rows,
+				size.cols, 1.0f, input1.get(), size.cols, input2.get(), size.rows, 0.0f,
+				output.get(), size.cols);
+		}
+	};
+
+	template<>
+	struct GEMM<double>
+	{
+		// output = input1 * input2'
+		static void call(const shape::matrix_size & size,
+						const std::unique_ptr<double[]> & input1,
+						const std::unique_ptr<double[]> & input2,
+						const std::unique_ptr<double[]> & output)
+		{
+			cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, size.rows, size.rows,
+				size.cols, 1.0, input1.get(), size.cols, input2.get(), size.cols, 0.0,
+				output.get(), size.rows);
+		}
+	};
+
 }}
 
 #endif

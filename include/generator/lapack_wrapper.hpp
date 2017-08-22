@@ -69,7 +69,8 @@ namespace generator { namespace lapack {
 	{
 		static void q_matrix(const shape::matrix_size & size,
 						std::unique_ptr<float[]> & input,
-						std::unique_ptr<float[]> & output)
+						std::unique_ptr<float[]> & output,
+						bool force_copy = false)
 		{
 			// Factorize input into reflectors
 			int rows = size.rows, cols = size.cols;
@@ -96,7 +97,11 @@ namespace generator { namespace lapack {
 			assert(!info);
 
 			// Avoid copying
-			output = std::move(input);
+			if(force_copy) {
+				memcpy(output.get(), input.get(), sizeof(float) * size.rows * size.cols);
+			} else {
+				output = std::move(input);
+			}
 		}
 
 		static float epsilon()
@@ -110,7 +115,8 @@ namespace generator { namespace lapack {
 	{
 		static void q_matrix(const shape::matrix_size & size,
 						std::unique_ptr<double[]> & input,
-						std::unique_ptr<double[]> & output)
+						std::unique_ptr<double[]> & output,
+						bool force_copy = false)
 		{
 			// Factorize input into reflectors
 			int rows = size.rows, cols = size.cols;
@@ -137,7 +143,11 @@ namespace generator { namespace lapack {
 			assert(!info);
 
 			// Avoid copying
-			output = std::move(input);
+			if(force_copy) {
+				memcpy(output.get(), input.get(), sizeof(double) * size.rows * size.cols);
+			} else {
+				output = std::move(input);
+			}
 		}
 
 		static double epsilon()
