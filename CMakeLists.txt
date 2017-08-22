@@ -42,15 +42,15 @@ endif()
 #Armadillo
 if(${WITH_ARMADILLO})
     find_package(Armadillo CONFIG REQUIRED)
-    include_directories(${ARMADILLO_INCLUDE_DIRS})
-    set(LINK_LIBRARIES ${ARMADILLO_LIBRARIES})
+    target_include_directories(libtests INTERFACE ${ARMADILLO_INCLUDE_DIRS})
+    target_link_libraries(libtests INTERFACE ${ARMADILLO_LIBRARIES})
     add_definitions(-DHAVE_ARMADILLO)
 endif()
 
 #Eigen
 if(${WITH_EIGEN})
     find_package(Eigen3 CONFIG REQUIRED)
-    include_directories(${EIGEN3_INCLUDE_DIRS})
+    target_include_directories(libtests INTERFACE ${EIGEN3_INCLUDE_DIRS})
     add_definitions(-DHAVE_EIGEN)
 endif()
 
