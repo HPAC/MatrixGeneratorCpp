@@ -18,7 +18,7 @@ void verify_matrix(const arma::Mat<T> &, const Properties &...)
 template<typename T>
 void verify_matrix(const arma::Mat<T> & mat, const generator::property::spd &)
 {
-	ASSERT_NO_THROW( arma::chol(mat); );
+	ASSERT_NO_THROW( auto s = arma::chol(mat); );
 }
 
 template<typename T>
