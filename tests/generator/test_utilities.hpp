@@ -22,6 +22,10 @@
 #include "test_utilities_eigen.hpp"
 #endif
 
+#ifdef HAVE_ARMADILLO
+#include "test_utilities_armadillo.hpp"
+#endif
+
 using std::make_tuple;
 
 template<typename ... T>
@@ -41,6 +45,13 @@ struct test_settings<>
             #endif
             std::tuple<float, library::eigen>,
             std::tuple<double, library::eigen>
+        #endif
+        #ifdef HAVE_ARMADILLO
+            #if defined(HAVE_BLAZE) || defined(HAVE_EIGEN)
+                ,
+            #endif
+            std::tuple<float, library::arma>,
+            std::tuple<double, library::arma>
         #endif
     > types_to_test;
 

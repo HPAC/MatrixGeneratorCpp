@@ -16,5 +16,8 @@
 #ifdef HAVE_EIGEN
 #include <generator/facades/eigen.hpp>
 #endif
+#ifdef HAVE_ARMADILLO
+#include <generator/facades/armadillo.hpp>
+#endif
 
 #endif

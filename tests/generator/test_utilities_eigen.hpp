@@ -54,7 +54,7 @@ void verify_matrix(const Eigen::MatrixBase<Mat> & mat, const generator::property
 
     uint32_t rows = mat.rows(), cols = mat.cols();
     // multiply matrix * matrix'
-    auto multiplication = (mat * mat.transpose() - Mat::Identity(rows,cols)).eval();
+    auto multiplication = (mat * mat.transpose() - Mat::Identity(rows, cols)).eval();
     // now all elements should be quite close to zero
     EXPECT_NEAR(multiplication.norm(), static_cast<value_t>(0.0), generator::lapack::QR<value_t>::epsilon());
 }

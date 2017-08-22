@@ -14,6 +14,10 @@
 #include <traits/eigen.hpp>
 #endif
 
+#ifdef HAVE_ARMADILLO
+#include <traits/armadillo.hpp>
+#endif
+
 namespace traits {
 
     template<typename MatType, typename Enable = void>
