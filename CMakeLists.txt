@@ -85,7 +85,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 # Our headers
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(libtests INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if(${WITH_EXAMPLES})
     add_subdirectory(examples)
