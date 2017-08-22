@@ -39,10 +39,17 @@ install:
   - if [ "$BUILD_EIGEN" == "no" ]; then cd eigen/install; fi
   - export EIGEN_ROOT="$(pwd)"
   - popd
+  - pushd .
+  - if [ ! -d "armadillo" ]; then export BUILD_ARMA="yes"; else export BUILD_ARMA="no"; fi
+  - if [ "$BUILD_ARMA" == "yes" ]; then mkdir armadillo && cd armadillo && git clone https://github.com/conradsnicta/armadillo-code/ arma && cd arma && git checkout origin/7.960.x && cd ..; fi
+  - if [ "$BUILD_ARMA" == "yes"]; then mkdir build && mkdir install; && cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../arma && cmake --build . --target install && cd ../install; fi
+  - if [ "$BUILD_ARMA" == "no" ]; then cd armadillo/install; fi
+  - export ARMADILLO_ROOT="$(pwd)"
+  - popd
 
 script:
   - mkdir build && cd build
-  - cmake -DWITH_BLAZE=On -DWITH_EIGEN=0n -DWITH_EXAMPLES=On -DWITH_TESTS=On ..
+  - cmake -DWITH_ARMADILLO=On -DWITH_BLAZE=On -DWITH_EIGEN=0n -DWITH_EXAMPLES=On -DWITH_TESTS=On ..
   - cmake --build .
   - ctest -VV
 
