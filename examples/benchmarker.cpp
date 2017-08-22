@@ -69,20 +69,6 @@ using linalg_tests::benchmarker;
     };
 #endif
 
-#ifdef HAVE_ARMADILLO
-    static void arma_kernel(benchmarker & b, int rows, int cols)
-    {
-        b.start_clock(0);
-        arma::mat A = arma::randu<arma::mat>(rows, cols);
-        arma::mat B = arma::randu<arma::mat>(rows, cols);
-        b.stop_clock(0);
-
-        b.start_clock(1);
-        auto C = (A * B.t() ).eval();
-        b.stop_clock(1);
-    }
-#endif
-
 int main()
 {
     benchmarker benchmark;
