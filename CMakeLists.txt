@@ -6,18 +6,35 @@ project(linalg_tests)
 option(WITH_EXAMPLES "Build examples" Off)
 option(WITH_TESTS "Build tests" Off)
 option(TESTS_FORCE_BUILD "Build Gtest" Off)
-option(WITH_BLAS "Build with BLAS" On)
-option(WITH_LAPACK "Build with LAPACK" On)
+option(WITH_BLAS "Build with BLAS" Off)
+option(WITH_LAPACK "Build with LAPACK" Off)
 
 option(WITH_BLAZE "Use Blaze library")
 option(WITH_EIGEN "Use Eigen3 library")
 option(WITH_ARMADILLO "Use Blaze library")
 option(WITH_MTL4 "Use Blaze library")
 
+option(WITH_MKL "Use Intel MKL" Off)
+
+option(WITH_MULTITHREADING "Enable parallelization inside linked libraries" Off)
+
 set(CMAKE_CXX_STANDARD 14)
 set(LINK_LIBRARIES "")
 
 add_library(libtests INTERFACE)
+
+# Setup BLAS and LAPACK finders to find MKL
+# Works with MKL versions newer than 10.3 and on 64 bit systems
+if(${WITH_MKL})
+    set(WITH_BLAS On)
+    set(WITH_LAPACK On)
+    if(${WITH_MULTITHREADING})
+        set(BLA_VENDOR "Intel10_64lp")
+    else()
+        set(BLA_VENDOR "Intel10_64lp_seq")
+    endif()
+    target_compile_definitions(libtests INTERFACE HAVE_MKL)
+endif()
 
 #Look for BLAS
 if(${WITH_BLAS})
@@ -35,6 +52,19 @@ if(${WITH_LAPACK})
     add_definitions(-DHAVE_LAPACK)
     target_compile_options(libtests INTERFACE ${LAPACK_LINKER_FLAGS})
     target_link_libraries(libtests INTERFACE ${LAPACK_LIBRARIES})
+
+    # Neither BLAS nor LAPACK find modules export include directories
+    # Eigen, on the other hand, uses mkl.h and we use mkl_cblas.h
+    # This code assumes that MKL has a main directory with include/
+    # and MKL libriares are located somewhere deep in in lib/
+    if(${WITH_MKL})
+        foreach(lib ${LAPACK_LIBRARIES})
+            string(REGEX REPLACE "lib/.*libmkl_core.so" "" find_res ${lib})
+            if(NOT ${lib} STREQUAL ${find_res})
+                target_include_directories(libtests INTERFACE ${find_res}/include)
+            endif()
+        endforeach()
+    endif()
 else()
     message("Building without LAPACK - orthogonal generator won't be available")
 endif()
@@ -52,6 +82,10 @@ if(${WITH_EIGEN})
     find_package(Eigen3 CONFIG REQUIRED)
     target_include_directories(libtests INTERFACE ${EIGEN3_INCLUDE_DIRS})
     add_definitions(-DHAVE_EIGEN)
+    if(${WITH_MKL})
+        target_compile_definitions(libtests INTERFACE EIGEN_USE_MKL_ALL)
+        #Eigen includes mkl.h but neither BLAS or LAPACK find modules allow
+    endif()
 endif()
 
 #MTL4

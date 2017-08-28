@@ -10,7 +10,11 @@
 
 #include <cstring>
 
+#ifdef HAVE_MKL
+#include <mkl_cblas.h>
+#else
 #include <cblas.h>
+#endif
 
 #include <generator/shape.hpp>
 
