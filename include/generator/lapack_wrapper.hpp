@@ -12,15 +12,17 @@
 
 #include <generator/shape.hpp>
 
-/** Cholesky **/
-extern "C" void spotrf_(const char *, const int*, float*, const int*, int*);
-extern "C" void dpotrf_(const char *, const int*, double*, const int*, int*);
-/** Blocked QR factorization **/
-extern "C" void sgeqrf_(const int *, const int*, float*, const int*, float*, float*, const int*, int*);
-extern "C" void dgeqrf_(const int *, const int*, double*, const int*, double*, double*, const int*, int*);
-/** Construct Q matrix **/
-extern "C" void sorgqr_(const int *, const int*, const int *, float*, const int*, const float*, float*, const int*, int*);
-extern "C" void dorgqr_(const int *, const int*, const int *, double*, const int*, const double*, double*, const int*, int*);
+namespace {
+    /** Cholesky **/
+    extern "C" void spotrf_(const char *, const int*, float*, const int*, int*);
+    extern "C" void dpotrf_(const char *, const int*, double*, const int*, int*);
+    /** Blocked QR factorization **/
+    extern "C" void sgeqrf_(const int *, const int*, float*, const int*, float*, float*, const int*, int*);
+    extern "C" void dgeqrf_(const int *, const int*, double*, const int*, double*, double*, const int*, int*);
+    /** Construct Q matrix **/
+    extern "C" void sorgqr_(const int *, const int*, const int *, float*, const int*, const float*, float*, const int*, int*);
+    extern "C" void dorgqr_(const int *, const int*, const int *, double*, const int*, const double*, double*, const int*, int*);
+}
 
 namespace generator { namespace lapack {
 
