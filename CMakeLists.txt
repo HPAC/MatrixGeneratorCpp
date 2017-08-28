@@ -115,7 +115,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         -Wno-old-style-cast -Wno-extra-semi -Wno-unused-parameter")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     #Warnings for GCC
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wno-enum-compare")
+    #Werror is not possible because we can't disable warning on enumerator comparison in
+    #conditional expression which is shown for Eigen code
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif()
 
 # Our headers
