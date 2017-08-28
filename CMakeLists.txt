@@ -112,7 +112,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         -Wno-deprecated -Wno-sign-conversion -Wno-double-promotion -Wno-float-equal\
         -Wno-missing-noreturn -Wno-padded -Wno-shift-sign-overflow -Wno-weak-vtables\
         -Wno-missing-variable-declarations -Wno-global-constructors -Wno-float-conversion\
-        -Wno-old-style-cast -Wno-extra-semi")
+        -Wno-old-style-cast -Wno-extra-semi -Wno-unused-parameter")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     #Warnings for GCC
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wno-enum-compare")
