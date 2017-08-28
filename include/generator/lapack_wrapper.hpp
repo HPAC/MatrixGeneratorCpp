@@ -12,17 +12,19 @@
 
 #include <generator/shape.hpp>
 
-namespace {
+#if !defined(HAVE_MKL)
     /** Cholesky **/
-    extern "C" void spotrf_(const char *, const int*, float*, const int*, int*);
-    extern "C" void dpotrf_(const char *, const int*, double*, const int*, int*);
+    extern "C" void spotrf_(char *, int*, float*, int*, int*);
+    extern "C" void dpotrf_(char *, int*, double*, int*, int*);
     /** Blocked QR factorization **/
-    extern "C" void sgeqrf_(const int *, const int*, float*, const int*, float*, float*, const int*, int*);
-    extern "C" void dgeqrf_(const int *, const int*, double*, const int*, double*, double*, const int*, int*);
+    extern "C" void sgeqrf_(int *, int*, float*, int*, float*, float*, int*, int*);
+    extern "C" void dgeqrf_(int *, int*, double*, int*, double*, double*, int*, int*);
     /** Construct Q matrix **/
-    extern "C" void sorgqr_(const int *, const int*, const int *, float*, const int*, const float*, float*, const int*, int*);
-    extern "C" void dorgqr_(const int *, const int*, const int *, double*, const int*, const double*, double*, const int*, int*);
-}
+    extern "C" void sorgqr_(int *, int*, int *, float*, int*, float*, float*, int*, int*);
+    extern "C" void dorgqr_(int *, int*, int *, double*, int*, double*, double*, int*, int*);
+#else
+    #include <mkl.h>
+#endif
 
 namespace generator { namespace lapack {
 
