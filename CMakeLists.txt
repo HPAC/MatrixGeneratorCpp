@@ -100,6 +100,11 @@ if(${WITH_BLAZE})
     find_package(blaze CONFIG REQUIRED)
     add_definitions(-DHAVE_BLAZE)
     target_include_directories(libtests INTERFACE $<TARGET_PROPERTY:blaze::blaze,INTERFACE_INCLUDE_DIRECTORIES>)
+
+    if(${WITH_MKL})
+        # Otherwise Blaze would not compiler
+        target_compile_definitions(libtests INTERFACE BLAZE_BLAS_INCLUDE_FILE=<mkl_cblas.h>)
+    endif()
 endif()
 
 #Warnings

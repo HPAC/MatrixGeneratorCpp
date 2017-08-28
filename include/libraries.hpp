@@ -6,6 +6,10 @@
 #ifndef LINALG_TESTS_LIBRARIES_HPP
 #define LINALG_TESTS_LIBRARIES_HPP
 
+#ifdef HAVE_MKL
+#include <mkl.h>
+#endif
+
 #ifdef HAVE_ARMADILLO
 #include <armadillo>
 #endif
