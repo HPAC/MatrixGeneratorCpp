@@ -15,10 +15,25 @@ option(WITH_ARMADILLO "Use Blaze library")
 option(WITH_MTL4 "Use Blaze library")
 
 option(WITH_MKL "Use Intel MKL" Off)
-
 option(WITH_MULTITHREADING "Enable parallelization inside linked libraries" Off)
 
-set(CMAKE_CXX_STANDARD 14)
+option(GENERATE_RELOCATABLE_TARGETS "" Off)
+
+# Use cxx compile features for CMake >= 3.8
+if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
+    if(${WITH_BLAZE})
+        set(CMAKE_CXX_STANDARD 14)
+    else()
+        set(CMAKE_CXX_STANDARD 11)
+    endif()
+else()
+    if(${WITH_BLAZE})
+        target_compile_features(blaze INTERFACE cxx_std_14)
+    else()
+        target_compile_features(blaze INTERFACE cxx_std_11)
+    endif()
+endif()
+
 set(LINK_LIBRARIES "")
 
 add_library(libtests INTERFACE)
@@ -71,7 +86,7 @@ endif()
 
 #Armadillo
 if(${WITH_ARMADILLO})
-    find_package(Armadillo CONFIG REQUIRED)
+    find_package(Armadillo REQUIRED)
     target_include_directories(libtests INTERFACE ${ARMADILLO_INCLUDE_DIRS})
     target_link_libraries(libtests INTERFACE ${ARMADILLO_LIBRARIES})
     target_compile_definitions(libtests INTERFACE HAVE_ARMADILLO)
@@ -100,7 +115,15 @@ endif()
 if(${WITH_BLAZE})
     find_package(blaze CONFIG REQUIRED)
     target_compile_definitions(libtests INTERFACE HAVE_BLAZE)
-    target_include_directories(libtests INTERFACE $<TARGET_PROPERTY:blaze::blaze,INTERFACE_INCLUDE_DIRECTORIES>)
+    # For future dependencies on imported targets
+    #target_include_directories(libtests INTERFACE $<TARGET_PROPERTY:blaze::blaze,INTERFACE_INCLUDE_DIRECTORIES>)
+    if(${GENERATE_RELOCATABLE_TARGETS})
+        target_link_libraries(libtests INTERFACE blaze::blaze)
+    else()
+        # one can't use generator expressions for exported targets - use has to find blaze target
+        get_target_property(BLAZE_INCLUDE blaze::blaze INTERFACE_INCLUDE_DIRECTORIES)
+        target_include_directories(libtests INTERFACE ${BLAZE_INCLUDE})
+    endif()
 
     if(${WITH_MKL})
         # Otherwise Blaze would not compiler
@@ -127,7 +150,20 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 # Our headers
-target_include_directories(libtests INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(libtests INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+        )
+
+# Installation procedure
+install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(TARGETS libtests EXPORT LibTestsConfig)
+export(EXPORT LibTestsConfig FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/LibTestsConfig.cmake")
+export(PACKAGE libtests)
+install(EXPORT LibTestsConfig
+    FILE LibTestsConfig.cmake
+    DESTINATION share/libtests/cmake
+)
 
 if(${WITH_EXAMPLES})
     add_subdirectory(examples)
