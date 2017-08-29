@@ -142,7 +142,7 @@ endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     #Warnins for Clang/AppleClang
     #undef warnings called for gtest or blaze
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Werror -Wno-shorten-64-to-32\
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -Wno-shorten-64-to-32\
         -Wno-documentation-unknown-command -Wno-undef -Wno-c++98-compat-pedantic \
         -Wno-reserved-id-macro -Wno-documentation -Wno-used-but-marked-unused\
         -Wno-deprecated -Wno-sign-conversion -Wno-double-promotion -Wno-float-equal\
