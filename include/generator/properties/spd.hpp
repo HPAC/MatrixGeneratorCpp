@@ -33,7 +33,16 @@ namespace generator { namespace property {
                     ptr[i*size.cols + i] += static_cast<T>(3.0);
                 }
                 // U * U' creates an SPD matrix
-                cblas::TRMM<T>::call(size, temp.data, array);
+                //cblas::TRMM<T>::call(size, temp.data, array);
+                //cblas::GEMM<T>::call(size, temp.data, temp.data, array);
+                //TRMM is not precise enough
+                cblas::SYRK<T>::call(size, temp.data, array);
+                ptr = array.get();
+                for(uint32_t i = 1; i < size.rows; ++i) {
+                    for(uint32_t j = 0; j < i; ++j) {
+                        ptr[size.rows*i + j] = ptr[i + size.rows*j];
+                    }
+                }
             }
 
             template<typename RndGen, typename... Properties>

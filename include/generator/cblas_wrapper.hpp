@@ -86,6 +86,33 @@ namespace generator { namespace cblas {
 		}
 	};
 
+	template<typename T>
+	struct SYRK;
+
+	template<>
+	struct SYRK<float>
+	{
+		static void call(const shape::matrix_size & size,
+						const std::unique_ptr<float[]> & input,
+						const std::unique_ptr<float[]> & output)
+		{
+			cblas_ssyrk(CblasRowMajor, CblasUpper, CblasNoTrans, size.rows, size.rows,
+						1.0f, input.get(), size.rows, 0.0f, output.get(), size.rows);
+		}
+	};
+
+	template<>
+	struct SYRK<double>
+	{
+		// Performs multiplication matrix * matrix', writing result to output array
+		static void call(const shape::matrix_size & size,
+						const std::unique_ptr<double[]> & input,
+						const std::unique_ptr<double[]> & output)
+		{
+			cblas_dsyrk(CblasRowMajor, CblasUpper, CblasNoTrans, size.rows, size.rows,
+						1.0f, input.get(), size.rows, 0.0f, output.get(), size.rows);
+		}
+	};
 }}
 
 #endif
