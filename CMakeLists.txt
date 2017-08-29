@@ -3,6 +3,12 @@ include(ExternalProject)
 
 project(linalg_tests)
 
+#FIXME: Install target should NOT contain include paths
+#This may lead to an error that we're including paths appearing in prefix paths,
+#passed to locate dependent libraries
+#Question is: should we have two targets, one to install and one for examples/tests
+cmake_policy(SET CMP0041 OLD)
+
 option(WITH_EXAMPLES "Build examples" Off)
 option(WITH_TESTS "Build tests" Off)
 option(TESTS_FORCE_BUILD "Build Gtest" Off)
@@ -19,6 +25,10 @@ option(WITH_MULTITHREADING "Enable parallelization inside linked libraries" Off)
 
 option(GENERATE_RELOCATABLE_TARGETS "" Off)
 
+set(LINK_LIBRARIES "")
+
+add_library(libtests INTERFACE)
+
 # Use cxx compile features for CMake >= 3.8
 if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
     if(${WITH_BLAZE})
@@ -28,15 +38,11 @@ if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
     endif()
 else()
     if(${WITH_BLAZE})
-        target_compile_features(blaze INTERFACE cxx_std_14)
+        target_compile_features(libtests INTERFACE cxx_std_14)
     else()
-        target_compile_features(blaze INTERFACE cxx_std_11)
+        target_compile_features(libtests INTERFACE cxx_std_11)
     endif()
 endif()
-
-set(LINK_LIBRARIES "")
-
-add_library(libtests INTERFACE)
 
 # Setup BLAS and LAPACK finders to find MKL
 # Works with MKL versions newer than 10.3 and on 64 bit systems
@@ -89,6 +95,7 @@ if(${WITH_ARMADILLO})
     find_package(Armadillo REQUIRED)
     target_include_directories(libtests INTERFACE ${ARMADILLO_INCLUDE_DIRS})
     target_link_libraries(libtests INTERFACE ${ARMADILLO_LIBRARIES})
+    
     target_compile_definitions(libtests INTERFACE HAVE_ARMADILLO)
     target_compile_definitions(libtests INTERFACE $<$<CONFIG:RELEASE>:ARMA_NO_DEBUG>)
 endif()
