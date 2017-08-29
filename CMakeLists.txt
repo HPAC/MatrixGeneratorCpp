@@ -74,14 +74,15 @@ if(${WITH_ARMADILLO})
     find_package(Armadillo CONFIG REQUIRED)
     target_include_directories(libtests INTERFACE ${ARMADILLO_INCLUDE_DIRS})
     target_link_libraries(libtests INTERFACE ${ARMADILLO_LIBRARIES})
-    add_definitions(-DHAVE_ARMADILLO)
+    target_compile_definitions(libtests INTERFACE HAVE_ARMADILLO)
+    target_compile_definitions(libtests INTERFACE $<$<CONFIG:RELEASE>:ARMA_NO_DEBUG>)
 endif()
 
 #Eigen
 if(${WITH_EIGEN})
     find_package(Eigen3 CONFIG REQUIRED)
     target_include_directories(libtests INTERFACE ${EIGEN3_INCLUDE_DIRS})
-    add_definitions(-DHAVE_EIGEN)
+    target_compile_definitions(libtests INTERFACE HAVE_EIGEN)
     if(${WITH_MKL})
         target_compile_definitions(libtests INTERFACE EIGEN_USE_MKL_ALL)
         #Eigen includes mkl.h but neither BLAS or LAPACK find modules allow
@@ -98,7 +99,7 @@ endif()
 #Blaze
 if(${WITH_BLAZE})
     find_package(blaze CONFIG REQUIRED)
-    add_definitions(-DHAVE_BLAZE)
+    target_compile_definitions(libtests INTERFACE HAVE_BLAZE)
     target_include_directories(libtests INTERFACE $<TARGET_PROPERTY:blaze::blaze,INTERFACE_INCLUDE_DIRECTORIES>)
 
     if(${WITH_MKL})
