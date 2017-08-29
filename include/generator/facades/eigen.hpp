@@ -20,7 +20,18 @@ namespace generator {
         template<typename T, typename Shape>
         struct eigen_matrix_type
         {
-            typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> type;
+            typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> type;
+
+            static type create(uint32_t rows, uint32_t cols, T * ptr)
+            {
+                return type{Eigen::Map<type>(ptr, cols, rows)}.transpose();
+            }
+        };
+
+        template<typename T>
+        struct eigen_matrix_type<T, ::generator::intermediate::self_adjoint<T>>
+        {
+            typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> type;
 
             static type create(uint32_t rows, uint32_t cols, T * ptr)
             {
