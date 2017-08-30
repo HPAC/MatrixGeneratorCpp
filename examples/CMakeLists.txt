@@ -1,5 +1,5 @@
 
-set(examples benchmarker)
+set(examples benchmarker generator)
 
 foreach(example ${examples})
     add_executable(${example} ${example}.cpp)
