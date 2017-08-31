@@ -17,6 +17,7 @@ option(WITH_LAPACK "Build with LAPACK" Off)
 
 option(WITH_BLAZE "Use Blaze library")
 option(WITH_EIGEN "Use Eigen3 library")
+option(WITH_EIGEN_DIAGONAL_MATRIX "" Off)
 option(WITH_ARMADILLO "Use Blaze library")
 option(WITH_MTL4 "Use Blaze library")
 
@@ -106,6 +107,11 @@ if(${WITH_EIGEN})
     find_package(Eigen3 CONFIG REQUIRED)
     target_include_directories(libtests INTERFACE ${EIGEN3_INCLUDE_DIRS})
     target_compile_definitions(libtests INTERFACE HAVE_EIGEN)
+
+    if(${WITH_EIGEN_DIAGONAL_MATRIX})
+        target_compile_definitions(libtests INTERFACE HAVE_EIGEN_DIAGONAL_MATRIX)
+    endif()
+
     if(${WITH_MKL})
         target_compile_definitions(libtests INTERFACE EIGEN_USE_MKL_ALL)
         #Eigen includes mkl.h but neither BLAS or LAPACK find modules allow

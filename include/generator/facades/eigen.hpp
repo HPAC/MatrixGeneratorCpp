@@ -42,8 +42,8 @@ namespace generator {
         template<typename T>
         struct eigen_matrix_type<T, ::generator::intermediate::diagonal<T>>
         {
+        #if defined(HAVE_EIGEN_DIAGONAL_MATRIX)
             typedef Eigen::DiagonalMatrix<T, Eigen::Dynamic, Eigen::Dynamic> type;
-
             static type create(uint32_t rows, uint32_t, T * ptr)
             {
                 //Eigen::Map does not work very well with DiagonalMatrix
@@ -54,6 +54,14 @@ namespace generator {
                 }
                 return matrix;
             }
+        #else
+            typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> type;
+            static type create(uint32_t rows, uint32_t, T * ptr)
+            {
+                Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1>> map(ptr, rows);
+                return map.asDiagonal();
+            }
+        #endif
         };
 
     }
