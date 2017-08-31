@@ -237,6 +237,21 @@ namespace linalg_tests {
             }
         }
 
+        /// size of runs_labels needs to be greater or equal to number of runs
+        template<typename RLabels>
+        void output_results(std::ostream & os, RLabels && runs_labels)
+        {
+            auto label = std::begin(runs_labels);
+            os << "algorithm\tTime\tStdDev\tMin\tMax\n";
+            for(auto & run : measurements)
+            {
+                os << *label++ << '\t';
+                measurement_data & data = run[0];
+                os << data.avg() << '\t' << data.std_dev() << '\t';
+                os << data.min() << '\t' << data.max() << '\n';
+            }
+        }
+
     private:
 
         void trash_cache()
