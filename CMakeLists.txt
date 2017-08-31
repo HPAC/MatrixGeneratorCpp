@@ -24,6 +24,7 @@ option(WITH_MKL "Use Intel MKL" Off)
 option(WITH_MULTITHREADING "Enable parallelization inside linked libraries" Off)
 
 option(GENERATE_RELOCATABLE_TARGETS "" Off)
+option(WITH_TRACES "Enable trace generation by libraries" Off)
 
 set(LINK_LIBRARIES "")
 
@@ -60,7 +61,7 @@ endif()
 #Look for BLAS
 if(${WITH_BLAS})
     find_package(BLAS REQUIRED)
-    add_definitions(-DHAVE_BLAS)
+    target_compile_definitions(libtests INTERFACE HAVE_BLAS)
     target_compile_options(libtests INTERFACE ${BLAS_LINKER_FLAGS})
     target_link_libraries(libtests INTERFACE ${BLAS_LIBRARIES})
 else()
@@ -70,7 +71,7 @@ endif()
 #Look for LAPACK
 if(${WITH_LAPACK})
     find_package(LAPACK REQUIRED)
-    add_definitions(-DHAVE_LAPACK)
+    target_compile_definitions(libtests INTERFACE HAVE_LAPACK)
     target_compile_options(libtests INTERFACE ${LAPACK_LINKER_FLAGS})
     target_link_libraries(libtests INTERFACE ${LAPACK_LIBRARIES})
 
@@ -133,8 +134,12 @@ if(${WITH_BLAZE})
     endif()
 
     if(${WITH_MKL})
-        # Otherwise Blaze would not compiler
+        # Otherwise Blaze would not compile
         target_compile_definitions(libtests INTERFACE BLAZE_BLAS_INCLUDE_FILE=<mkl_cblas.h>)
+    endif()
+
+    if(${WITH_TRACES})
+        target_compile_definitions(libtests INTERFACE BLAZE_USE_FUNCTION_TRACES=1)
     endif()
 endif()
 
