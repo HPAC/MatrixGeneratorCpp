@@ -70,15 +70,15 @@ namespace generator { namespace intermediate {
     struct row_vector
     {
         row_vector(const shape::matrix_size & size_) :
-            length(size_.cols),
-            data(new T[length])
+            size(size_),
+            data(new T[size_.cols])
         {
             if(size_.rows != 1) {
                 throw std::runtime_error("Number of rows different from one for row_vector");
             }
         }
 
-        size_t length;
+        shape::matrix_size size;
         std::unique_ptr<T[]> data;
     };
 
@@ -86,20 +86,20 @@ namespace generator { namespace intermediate {
     struct col_vector
     {
         col_vector(const shape::matrix_size & size_) :
-            length(size_.rows),
-            data(new T[length])
+            size(size_),
+            data(new T[size_.rows])
         {
             if(size_.cols != 1) {
                 throw std::runtime_error("Number of cols different from one for col_vector");
             }
         }
 
-        size_t length;
+        shape::matrix_size size;
         std::unique_ptr<T[]> data;
     };
 
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type vector, typename = void>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector, typename = void>
     struct intermediate_selector;
 
     template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>

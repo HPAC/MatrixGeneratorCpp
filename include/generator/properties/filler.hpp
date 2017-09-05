@@ -85,7 +85,7 @@ namespace generator { namespace property {
         void fill(const intermediate::row_vector<T> & shape, F && f)
         {
             std::generate(shape.data.get(),
-                shape.data.get() + shape.length,
+                shape.data.get() + shape.size.cols,
                 std::forward<F>(f)
                 );
         }
@@ -94,7 +94,7 @@ namespace generator { namespace property {
         void fill(const intermediate::col_vector<T> & shape, F && f)
         {
             std::generate(shape.data.get(),
-                shape.data.get() + shape.length,
+                shape.data.get() + shape.size.rows,
                 std::forward<F>(f)
                 );
         }
