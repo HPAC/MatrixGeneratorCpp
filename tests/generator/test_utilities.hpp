@@ -67,12 +67,20 @@ struct test_settings<>
     static constexpr std::array< std::tuple<uint32_t, uint32_t>, 3> medium_sq_sizes{
         {make_tuple(100, 100), make_tuple(103, 103), std::make_tuple(125, 125)}
     };
+    static constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> row_vector_sizes{
+        {make_tuple(1, 1), make_tuple(1, 2), make_tuple(1, 53), make_tuple(1, 200)}
+    };
+    static constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> col_vector_sizes{
+        {make_tuple(1, 1), make_tuple(2, 1), make_tuple(53, 1), make_tuple(200, 1)}
+    };
 };
 
 constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> test_settings<>::small_sizes;
 constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> test_settings<>::small_sq_sizes;
 constexpr std::array< std::tuple<uint32_t, uint32_t>, 2> test_settings<>::medium_sizes;
 constexpr std::array< std::tuple<uint32_t, uint32_t>, 3> test_settings<>::medium_sq_sizes;
+constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> test_settings<>::row_vector_sizes;
+constexpr std::array< std::tuple<uint32_t, uint32_t>, 4> test_settings<>::col_vector_sizes;
 
 /// The additional template parameter is used because matrix access operator() may return
 /// an object with type other than a usual floating-point type. Example is DiagonalProxy in
@@ -236,6 +244,36 @@ void verify_diagonal(MatType && mat, uint32_t rows, uint32_t, Properties &&... p
     }
 }
 
+template<typename MatType, typename ... Properties>
+void verify_row_vec(MatType && mat, uint32_t, uint32_t cols, Properties &&... props)
+{
+    typedef traits::matrix_traits< std::remove_reference_t<MatType> > traits_t;
+    typedef typename traits_t::value_t value_t;
+
+    EXPECT_EQ(traits_t::rows(mat), 1);
+    EXPECT_EQ(traits_t::columns(mat), cols);
+
+    for(uint32_t i = 0; i < cols; ++i) {
+        // the existence of traits method taking only one index verifies that MatType is indeed a vector
+        verify<value_t>(traits_t::get(mat, i), std::forward<Properties>(props)...);
+    }
+}
+
+template<typename MatType, typename ... Properties>
+void verify_col_vec(MatType && mat, uint32_t rows, uint32_t, Properties &&... props)
+{
+    typedef traits::matrix_traits< std::remove_reference_t<MatType> > traits_t;
+    typedef typename traits_t::value_t value_t;
+
+    EXPECT_EQ(traits_t::rows(mat), rows);
+    EXPECT_EQ(traits_t::columns(mat), 1);
+
+    for(uint32_t i = 0; i < rows; ++i) {
+        // the existence of traits method taking only one index verifies that MatType is indeed a vector
+        verify<value_t>(traits_t::get(mat, i), std::forward<Properties>(props)...);
+    }
+}
+
 #define GENERATE_MATRIX_TEST(test_case_name, shape, verify_func, name_type, name, sizes_obj, ...)   \
 TYPED_TEST(test_case_name, name_type##_test_##name) {   \
     for(auto & sizes : sizes_obj)            \
@@ -271,6 +309,12 @@ TYPED_TEST(test_case_name, name_type##_test_##name) {   \
 
 #define GENERATE_DIAGONAL_TEST(test_case_name, name, sizes_obj, ...)   \
     GENERATE_MATRIX_TEST(test_case_name, generator::shape::diagonal, verify_diagonal, diagonal, name, sizes_obj, __VA_ARGS__)
+
+#define GENERATE_ROW_VECTOR_TEST(test_case_name, name, sizes_obj, ...)   \
+    GENERATE_MATRIX_TEST(test_case_name, generator::shape::row_vector, verify_row_vec, row_vec, name, sizes_obj, __VA_ARGS__)
+
+#define GENERATE_COL_VECTOR_TEST(test_case_name, name, sizes_obj, ...)   \
+    GENERATE_MATRIX_TEST(test_case_name, generator::shape::col_vector, verify_col_vec, col_vec, name, sizes_obj, __VA_ARGS__)
 
 
 #endif
