@@ -22,7 +22,7 @@ namespace generator { namespace shape {
     enum class vector_type
     {
         row = 0,
-        col = 0,
+        col = 1,
         none = 2
     };
 
@@ -33,8 +33,8 @@ namespace generator { namespace shape {
         static constexpr uint32_t lower_bandwidth = LowerBandwidth;
         static constexpr uint32_t upper_bandwidth = UpperBandwidth;
         static constexpr bool symmetry = Symmetry;
-        typedef band<LowerBandwidth, UpperBandwidth, Symmetry> band_type;
         static constexpr vector_type vector = Vector;
+        typedef band<LowerBandwidth, UpperBandwidth, Symmetry, Vector> band_type;
     };
 
     struct self_adjoint
@@ -42,9 +42,9 @@ namespace generator { namespace shape {
         typedef band<
             std::numeric_limits<uint32_t>::max(),
             std::numeric_limits<uint32_t>::max(),
-            true
+            true,
+            vector_type::none
         > band_type;
-        static constexpr vector_type vector = vector_type::none;
     };
 
     struct upper_triangular
@@ -52,9 +52,9 @@ namespace generator { namespace shape {
         typedef band<
             0,
             std::numeric_limits<uint32_t>::max(),
-            false
+            false,
+            vector_type::none
         > band_type;
-        static constexpr vector_type vector = vector_type::none;
     };
 
     struct lower_triangular
@@ -62,9 +62,9 @@ namespace generator { namespace shape {
         typedef band<
             std::numeric_limits<uint32_t>::max(),
             0,
-            false
+            false,
+            vector_type::none
         > band_type;
-        static constexpr vector_type vector = vector_type::none;
     };
 
     struct tridiagonal
@@ -72,9 +72,9 @@ namespace generator { namespace shape {
         typedef band<
             1,
             1,
-            true
+            true,
+            vector_type::none
         > band_type;
-        static constexpr vector_type vector = vector_type::none;
     };
 
     struct diagonal
@@ -82,9 +82,9 @@ namespace generator { namespace shape {
         typedef band<
             0,
             0,
-            true
+            true,
+            vector_type::none
         > band_type;
-        static constexpr vector_type vector = vector_type::none;
     };
 
     struct row_vector
@@ -92,9 +92,9 @@ namespace generator { namespace shape {
         typedef band<
             0,
             0,
-            true
+            true,
+            vector_type::row
         > band_type;
-        static constexpr vector_type vector = vector_type::row;
     };
 
     struct col_vector
@@ -102,9 +102,9 @@ namespace generator { namespace shape {
         typedef band<
             0,
             0,
-            true
+            true,
+            vector_type::col
         > band_type;
-        static constexpr vector_type vector = vector_type::col;
     };
 
     template<typename Matrix1, typename Matrix2>
