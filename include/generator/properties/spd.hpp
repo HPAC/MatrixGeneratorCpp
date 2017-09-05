@@ -83,8 +83,10 @@ namespace generator { namespace property {
             {
                 static_assert(
                     !(std::is_same<Shape, intermediate::upper_triangular<T>>::value
-                        || std::is_same<Shape, intermediate::lower_triangular<T>>::value),
-                    "SPD generation is not possible for triangular matrices"
+                        || std::is_same<Shape, intermediate::lower_triangular<T>>::value
+                        || std::is_same<Shape, intermediate::row_vector<T>>::value
+                        || std::is_same<Shape, intermediate::col_vector<T>>::value),
+                    "SPD generation is not possible for triangular matrices or vectors"
                     );
             }
         };

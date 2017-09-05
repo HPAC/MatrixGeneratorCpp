@@ -19,13 +19,22 @@ namespace generator { namespace shape {
         uint32_t rows, cols;
     };
 
-    template<uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry = false>
+    enum class vector_type
+    {
+        row = 0,
+        col = 0,
+        none = 2
+    };
+
+    template<uint32_t LowerBandwidth, uint32_t UpperBandwidth,
+            bool Symmetry = false, vector_type Vector = vector_type::none>
     struct band
     {
         static constexpr uint32_t lower_bandwidth = LowerBandwidth;
         static constexpr uint32_t upper_bandwidth = UpperBandwidth;
         static constexpr bool symmetry = Symmetry;
         typedef band<LowerBandwidth, UpperBandwidth, Symmetry> band_type;
+        static constexpr vector_type vector = Vector;
     };
 
     struct self_adjoint
@@ -35,6 +44,7 @@ namespace generator { namespace shape {
             std::numeric_limits<uint32_t>::max(),
             true
         > band_type;
+        static constexpr vector_type vector = vector_type::none;
     };
 
     struct upper_triangular
@@ -44,6 +54,7 @@ namespace generator { namespace shape {
             std::numeric_limits<uint32_t>::max(),
             false
         > band_type;
+        static constexpr vector_type vector = vector_type::none;
     };
 
     struct lower_triangular
@@ -53,6 +64,7 @@ namespace generator { namespace shape {
             0,
             false
         > band_type;
+        static constexpr vector_type vector = vector_type::none;
     };
 
     struct tridiagonal
@@ -62,6 +74,7 @@ namespace generator { namespace shape {
             1,
             true
         > band_type;
+        static constexpr vector_type vector = vector_type::none;
     };
 
     struct diagonal
@@ -71,6 +84,27 @@ namespace generator { namespace shape {
             0,
             true
         > band_type;
+        static constexpr vector_type vector = vector_type::none;
+    };
+
+    struct row_vector
+    {
+        typedef band<
+            0,
+            0,
+            true
+        > band_type;
+        static constexpr vector_type vector = vector_type::row;
+    };
+
+    struct col_vector
+    {
+        typedef band<
+            0,
+            0,
+            true
+        > band_type;
+        static constexpr vector_type vector = vector_type::col;
     };
 
     template<typename Matrix1, typename Matrix2>
@@ -79,10 +113,17 @@ namespace generator { namespace shape {
         typedef typename Matrix1::band_type band_1;
         typedef typename Matrix2::band_type band_2;
 
+        // Avoid clash between row and col vector
+        // Disallowed: different vector settings and both of them are not none
+        static_assert(band_1::vector == band_2::vector ||
+                      band_1::vector == vector_type::none ||
+                      band_2::vector == vector_type::none,
+                      "Clash between row_vector and col_vector");
         typedef band<
             std::min(band_1::lower_bandwidth, band_2::lower_bandwidth),
             std::min(band_1::upper_bandwidth, band_2::upper_bandwidth),
-            band_1::symmetry | band_2::symmetry
+            band_1::symmetry | band_2::symmetry,
+            band_1::vector != vector_type::none ? band_1::vector : band_2::vector
         > type;
     };
 
@@ -101,6 +142,10 @@ namespace generator { namespace shape {
     struct is_shape_type<tridiagonal> : std::true_type {};
     template<>
     struct is_shape_type<diagonal> : std::true_type {};
+    template<>
+    struct is_shape_type<row_vector> : std::true_type {};
+    template<>
+    struct is_shape_type<col_vector> : std::true_type {};
 
     namespace detail {
 

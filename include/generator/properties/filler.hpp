@@ -81,6 +81,24 @@ namespace generator { namespace property {
                 );
         }
 
+        template<typename T, typename F>
+        void fill(const intermediate::row_vector<T> & shape, F && f)
+        {
+            std::generate(shape.data.get(),
+                shape.data.get() + shape.length,
+                std::forward<F>(f)
+                );
+        }
+
+        template<typename T, typename F>
+        void fill(const intermediate::col_vector<T> & shape, F && f)
+        {
+            std::generate(shape.data.get(),
+                shape.data.get() + shape.length,
+                std::forward<F>(f)
+                );
+        }
+
     }
 }}
 
