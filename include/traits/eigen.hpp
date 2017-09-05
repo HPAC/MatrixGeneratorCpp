@@ -37,25 +37,56 @@ namespace traits {
             }
         };
 
+        template<typename MatType>
+        struct eigen_vec_traits
+        {
+            typedef typename MatType::value_type value_t;
+
+            static uint64_t rows(const MatType & mat)
+            {
+                return mat.rows();
+            }
+
+            static uint64_t columns(const MatType & mat)
+            {
+                return mat.cols();
+            }
+
+            template<typename ExprType>
+            static decltype(auto) eval(ExprType && expr)
+            {
+                return expr.eval();
+            }
+
+            static decltype(auto) get(const MatType & mat, uint64_t i)
+            {
+                return mat(i);
+            }
+        };
+
     }
 
-    template<typename MatType>
+    template<typename T>
     struct matrix_traits<
-        MatType,
+        /*MatType,
         typename std::enable_if<
             std::is_base_of<Eigen::EigenBase<MatType>, MatType>::value &&
             !std::is_same<MatType, Eigen::DiagonalMatrix<typename MatType::value_type, Eigen::Dynamic, Eigen::Dynamic>>::value
-        >::type
-    > : detail::eigen_traits<MatType>
+        >::type*/
+        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+        void
+    > : detail::eigen_traits< Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >
     {
-        typedef typename MatType::value_type value_t;
+        typedef T value_t;
+        typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat_t;
 
-        static decltype(auto) get(const MatType & mat, uint64_t i, uint64_t j)
+        static decltype(auto) get(const mat_t & mat, uint64_t i, uint64_t j)
         {
             return mat(i, j);
         }
     };  
 
+#if defined(HAVE_EIGEN_DIAGONAL_MATRIX)
     template<typename T>
     struct matrix_traits<
         Eigen::DiagonalMatrix<T, Eigen::Dynamic, Eigen::Dynamic>,
@@ -78,6 +109,21 @@ namespace traits {
         }
 
     };
+#endif
+
+    template<typename T>
+    struct matrix_traits<
+        Eigen::Matrix<T, 1, Eigen::Dynamic>,
+        void
+    > : detail::eigen_vec_traits< Eigen::Matrix<T, 1, Eigen::Dynamic> >
+    {};
+
+    template<typename T>
+    struct matrix_traits<
+        Eigen::Matrix<T, Eigen::Dynamic, 1>,
+        void
+    > : detail::eigen_vec_traits< Eigen::Matrix<T, Eigen::Dynamic, 1> >
+    {};  
 }
 
 #endif

@@ -43,7 +43,63 @@ namespace traits {
         {
             return mat(i, j);
         }
-    };  
+    };
+
+    namespace detail {
+
+        template<typename T>
+        struct vec_traits
+        {
+            typedef T value_t;
+
+            template<typename ExprType>
+            static decltype(auto) eval(ExprType && expr)
+            {
+                return expr.eval();
+            }
+
+            template<typename Vec>
+            static decltype(auto) get(const Vec & mat, uint64_t i)
+            {
+                return mat(i);
+            }
+
+        };
+    }
+
+    template<typename T>
+    struct matrix_traits<
+        arma::Row<T>,
+        void
+    > : detail::vec_traits<T>
+    {
+        static uint64_t rows(const arma::Row<T> &)
+        {
+            return 1;
+        }
+
+        static uint64_t columns(const arma::Row<T> & mat)
+        {
+            return mat.n_cols;
+        }
+    };
+
+    template<typename T>
+    struct matrix_traits<
+        arma::Col<T>,
+        void
+    > : detail::vec_traits<T>
+    {
+        static uint64_t rows(const arma::Col<T> & mat)
+        {
+            return mat.n_rows;
+        }
+
+        static uint64_t columns(const arma::Col<T> &)
+        {
+            return 1;
+        }
+    };
 
 }
 
