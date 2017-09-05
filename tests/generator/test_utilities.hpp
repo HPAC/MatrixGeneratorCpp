@@ -250,7 +250,7 @@ void verify_row_vec(MatType && mat, uint32_t, uint32_t cols, Properties &&... pr
     typedef traits::matrix_traits< std::remove_reference_t<MatType> > traits_t;
     typedef typename traits_t::value_t value_t;
 
-    EXPECT_EQ(traits_t::rows(mat), 1);
+    EXPECT_EQ(traits_t::rows(mat), 1u);
     EXPECT_EQ(traits_t::columns(mat), cols);
 
     for(uint32_t i = 0; i < cols; ++i) {
@@ -266,7 +266,7 @@ void verify_col_vec(MatType && mat, uint32_t rows, uint32_t, Properties &&... pr
     typedef typename traits_t::value_t value_t;
 
     EXPECT_EQ(traits_t::rows(mat), rows);
-    EXPECT_EQ(traits_t::columns(mat), 1);
+    EXPECT_EQ(traits_t::columns(mat), 1u);
 
     for(uint32_t i = 0; i < rows; ++i) {
         // the existence of traits method taking only one index verifies that MatType is indeed a vector
