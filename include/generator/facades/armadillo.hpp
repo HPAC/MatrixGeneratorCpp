@@ -34,6 +34,28 @@ namespace generator {
         };
 
         template<typename T>
+        struct arma_matrix_type<T, ::generator::intermediate::row_vector<T>>
+        {
+            typedef arma::Row<T> type;
+
+            static type create(uint32_t, uint32_t cols, T * ptr)
+            {
+                return type{ptr, cols};
+            }
+        };
+
+        template<typename T>
+        struct arma_matrix_type<T, ::generator::intermediate::col_vector<T>>
+        {
+            typedef arma::Col<T> type;
+
+            static type create(uint32_t rows, uint32_t, T * ptr)
+            {
+                return type{ptr, rows};
+            }
+        };
+
+        template<typename T>
         struct arma_matrix_type<T, ::generator::intermediate::diagonal<T>>
         {
             typedef arma::Mat<T> type;

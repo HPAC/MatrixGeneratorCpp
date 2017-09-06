@@ -60,7 +60,8 @@ namespace generator { namespace detail {
                 T,
                 band_type::lower_bandwidth,
                 band_type::upper_bandwidth,
-                band_type::symmetry
+                band_type::symmetry,
+                band_type::vector
                 >::type intermediate_t;
             intermediate_t matrix{size};
             property_t::fill(matrix,

@@ -42,6 +42,23 @@ namespace traits {
                 return blaze::evaluate(expr);
             }
         };
+
+        template<typename MatType>
+        struct vec_blaze_matrix
+        {
+            typedef typename MatType::ElementType value_t;
+
+            static decltype(auto) get(const MatType & mat, uint64_t i)
+            {
+                return mat[i];
+            }
+
+            template<typename ExprType>
+            static decltype(auto) eval(ExprType && expr)
+            {
+                return blaze::evaluate(expr);
+            }
+        };
     }
 
     template<typename T>
@@ -68,6 +85,40 @@ namespace traits {
     struct matrix_traits< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>>, void> :
         detail::blaze_matrix< blaze::DiagonalMatrix<blaze::DynamicMatrix<T>> >
     {};
+
+    template<typename T>
+    struct matrix_traits< blaze::DynamicVector<T, blaze::rowVector>, void> :
+        detail::vec_blaze_matrix< blaze::DynamicVector<T, blaze::rowVector> >
+    {
+        typedef blaze::DynamicVector<T, blaze::rowVector> mat_t;
+
+        static uint64_t rows(const mat_t &)
+        {
+            return 1;
+        }
+
+        static uint64_t columns(const mat_t & mat)
+        {
+            return mat.size();
+        }
+    };
+
+    template<typename T>
+    struct matrix_traits< blaze::DynamicVector<T, blaze::columnVector>, void> :
+        detail::vec_blaze_matrix< blaze::DynamicVector<T, blaze::columnVector> >
+    {
+        typedef blaze::DynamicVector<T, blaze::columnVector> mat_t;
+
+        static uint64_t rows(const mat_t & mat)
+        {
+            return mat.size();
+        }
+
+        static uint64_t columns(const mat_t &)
+        {
+            return 1;
+        }
+    };
 }
 
 #endif

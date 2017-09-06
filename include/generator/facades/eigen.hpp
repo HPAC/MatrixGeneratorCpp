@@ -40,6 +40,28 @@ namespace generator {
         };
 
         template<typename T>
+        struct eigen_matrix_type<T, ::generator::intermediate::row_vector<T>>
+        {
+            typedef Eigen::Matrix<T, 1, Eigen::Dynamic> type;
+
+            static type create(uint32_t, uint32_t cols, T * ptr)
+            {
+                return Eigen::Map<type>(ptr, cols);
+            }
+        };
+
+        template<typename T>
+        struct eigen_matrix_type<T, ::generator::intermediate::col_vector<T>>
+        {
+            typedef Eigen::Matrix<T, Eigen::Dynamic, 1> type;
+
+            static type create(uint32_t rows, uint32_t, T * ptr)
+            {
+                return Eigen::Map<type>(ptr, rows);
+            }
+        };
+
+        template<typename T>
         struct eigen_matrix_type<T, ::generator::intermediate::diagonal<T>>
         {
         #if defined(HAVE_EIGEN_DIAGONAL_MATRIX)

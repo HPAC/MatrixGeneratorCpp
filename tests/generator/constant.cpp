@@ -33,6 +33,8 @@ GENERATE_LOWER_TRIANGULAR_TEST(constant_test, small, test_settings<>::small_sq_s
 GENERATE_LOWER_TRIANGULAR_TEST(constant_test, medium, test_settings<>::medium_sq_sizes, generator::property::constant(3.14))
 GENERATE_DIAGONAL_TEST(constant_test, small, test_settings<>::small_sq_sizes, generator::property::constant(3.14))
 GENERATE_DIAGONAL_TEST(constant_test, medium, test_settings<>::medium_sq_sizes, generator::property::constant(3.14))
+GENERATE_ROW_VECTOR_TEST(constant_test, small, test_settings<>::row_vector_sizes, generator::property::constant(3.14))
+GENERATE_COL_VECTOR_TEST(constant_test, medium, test_settings<>::col_vector_sizes, generator::property::constant(3.14))
 
 template<typename Types>
 struct zeros_test : public testing::Test
@@ -54,6 +56,8 @@ GENERATE_LOWER_TRIANGULAR_TEST(zeros_test, small, test_settings<>::small_sq_size
 GENERATE_LOWER_TRIANGULAR_TEST(zeros_test, medium, test_settings<>::medium_sq_sizes, generator::property::zeros())
 GENERATE_DIAGONAL_TEST(zeros_test, small, test_settings<>::small_sq_sizes, generator::property::zeros())
 GENERATE_DIAGONAL_TEST(zeros_test, medium, test_settings<>::medium_sq_sizes, generator::property::zeros())
+GENERATE_ROW_VECTOR_TEST(zeros_test, small, test_settings<>::row_vector_sizes, generator::property::zeros())
+GENERATE_COL_VECTOR_TEST(zeros_test, medium, test_settings<>::col_vector_sizes, generator::property::zeros())
 
 template<typename Types>
 struct ones_test : public testing::Test
@@ -75,6 +79,8 @@ GENERATE_LOWER_TRIANGULAR_TEST(ones_test, small, test_settings<>::small_sq_sizes
 GENERATE_LOWER_TRIANGULAR_TEST(ones_test, medium, test_settings<>::medium_sq_sizes, generator::property::ones())
 GENERATE_DIAGONAL_TEST(ones_test, small, test_settings<>::small_sq_sizes, generator::property::ones())
 GENERATE_DIAGONAL_TEST(ones_test, medium, test_settings<>::medium_sq_sizes, generator::property::ones())
+GENERATE_ROW_VECTOR_TEST(ones_test, small, test_settings<>::row_vector_sizes, generator::property::ones())
+GENERATE_COL_VECTOR_TEST(ones_test, medium, test_settings<>::col_vector_sizes, generator::property::ones())
 
 
 int main(int argc, char **argv) {

@@ -58,6 +58,14 @@ GENERATE_DIAGONAL_TEST(random_test, positive_medium, test_settings<>::medium_sq_
 GENERATE_DIAGONAL_TEST(random_test, negative_small, test_settings<>::small_sq_sizes, generator::property::random(), generator::property::negative())
 GENERATE_DIAGONAL_TEST(random_test, negative_medium, test_settings<>::medium_sq_sizes, generator::property::random(), generator::property::negative())
 
+GENERATE_ROW_VECTOR_TEST(random_test, small, test_settings<>::row_vector_sizes, generator::property::random())
+GENERATE_ROW_VECTOR_TEST(random_test, positive_small, test_settings<>::row_vector_sizes, generator::property::random(), generator::property::positive())
+GENERATE_ROW_VECTOR_TEST(random_test, negative_small, test_settings<>::row_vector_sizes, generator::property::random(), generator::property::negative())
+
+GENERATE_COL_VECTOR_TEST(random_test, small, test_settings<>::col_vector_sizes, generator::property::random())
+GENERATE_COL_VECTOR_TEST(random_test, positive_small, test_settings<>::col_vector_sizes, generator::property::random(), generator::property::positive())
+GENERATE_COL_VECTOR_TEST(random_test, negative_small, test_settings<>::col_vector_sizes, generator::property::random(), generator::property::negative())
+
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

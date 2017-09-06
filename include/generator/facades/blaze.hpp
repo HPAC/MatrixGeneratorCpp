@@ -88,6 +88,28 @@ namespace generator {
             }
         };
 
+        template<typename T>
+        struct blaze_matrix_type<T, ::generator::intermediate::row_vector<T>>
+        {
+            typedef blaze::DynamicVector<T, blaze::rowVector> type;
+
+            static type create(uint32_t, uint32_t cols, T * ptr)
+            {
+                return type(cols, ptr);
+            }
+        };
+
+        template<typename T>
+        struct blaze_matrix_type<T, ::generator::intermediate::col_vector<T>>
+        {
+            typedef blaze::DynamicVector<T, blaze::columnVector> type;
+
+            static type create(uint32_t rows, uint32_t, T * ptr)
+            {
+                return type(rows, ptr);
+            }
+        };
+
     }
 
     // Forward declaration

@@ -106,8 +106,10 @@ namespace generator { namespace property {
             {
                 static_assert(
                     !(std::is_same<Shape, intermediate::upper_triangular<T>>::value
-                        || std::is_same<Shape, intermediate::lower_triangular<T>>::value),
-                    "Orthogonal generation is not possible for symmetric and triangular matrices"
+                        || std::is_same<Shape, intermediate::lower_triangular<T>>::value
+                        || std::is_same<Shape, intermediate::row_vector<T>>::value
+                        || std::is_same<Shape, intermediate::col_vector<T>>::value),
+                    "Orthogonal generation is not possible for symmetric, triangular matrices and vectors"
                     );
             }
         };

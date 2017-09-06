@@ -66,56 +66,118 @@ namespace generator { namespace intermediate {
         std::unique_ptr<T[]> data;
     };
 
+    template<typename T>
+    struct row_vector
+    {
+        row_vector(const shape::matrix_size & size_) :
+            size(size_),
+            data(new T[size_.cols])
+        {
+            if(size_.rows != 1) {
+                throw std::runtime_error("Number of rows different from one for row_vector");
+            }
+        }
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, typename = void>
+        shape::matrix_size size;
+        std::unique_ptr<T[]> data;
+    };
+
+    template<typename T>
+    struct col_vector
+    {
+        col_vector(const shape::matrix_size & size_) :
+            size(size_),
+            data(new T[size_.rows])
+        {
+            if(size_.cols != 1) {
+                throw std::runtime_error("Number of cols different from one for col_vector");
+            }
+        }
+
+        shape::matrix_size size;
+        std::unique_ptr<T[]> data;
+    };
+
+
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector, typename = void>
     struct intermediate_selector;
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
-        typename std::enable_if<(LowerBandwidth > 0 && UpperBandwidth > 0)>::type
+        Vector,
+        typename std::enable_if<(LowerBandwidth > 0 && UpperBandwidth > 0 && Vector == shape::vector_type::none)>::type
     >
     {
         typedef typename std::conditional<Symmetry, self_adjoint<T>, general<T>>::type type;
     };
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
-        typename std::enable_if<(LowerBandwidth == 0 && UpperBandwidth == 0)>::type
+        Vector,
+        typename std::enable_if<(LowerBandwidth == 0 && UpperBandwidth == 0 && Vector == shape::vector_type::none)>::type
     >
     {
         typedef diagonal<T> type;
     };
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
-        typename std::enable_if<(LowerBandwidth == 0 && UpperBandwidth > 0)>::type
+        Vector,
+        typename std::enable_if<(LowerBandwidth == 0 && UpperBandwidth > 0 && Vector == shape::vector_type::none)>::type
     >
     {
         typedef upper_triangular<T> type;
     };
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
-        typename std::enable_if<(LowerBandwidth > 0 && UpperBandwidth == 0)>::type
+        Vector,
+        typename std::enable_if<(LowerBandwidth > 0 && UpperBandwidth == 0 && Vector == shape::vector_type::none)>::type
     >
     {
         typedef lower_triangular<T> type;
+    };
+
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
+    struct intermediate_selector<
+        T,
+        LowerBandwidth,
+        UpperBandwidth,
+        Symmetry,
+        Vector,
+        typename std::enable_if<(Vector == shape::vector_type::row)>::type
+    >
+    {
+        typedef row_vector<T> type;
+    };
+
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
+    struct intermediate_selector<
+        T,
+        LowerBandwidth,
+        UpperBandwidth,
+        Symmetry,
+        Vector,
+        typename std::enable_if<(Vector == shape::vector_type::col)>::type
+    >
+    {
+        typedef col_vector<T> type;
     };
 }}
 
