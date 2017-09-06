@@ -22,7 +22,7 @@ namespace generator { namespace property {
                 RndGen && gen, Properties &&... props)
             {
                 // Create an upper triangular matrix
-                intermediate::upper_triangular<T> temp{size};
+                intermediate::lower_triangular<T> temp{size};
                 property<
                     T,
                     hash<generator::property::random, SPDProperties...>()
@@ -30,7 +30,7 @@ namespace generator { namespace property {
                 // To ensure that matrix is non-singular, add a value to diagonal
                 T * ptr = temp.data.get();
                 for(uint32_t i = 0; i < size.rows; ++i) {
-                    ptr[i*size.cols + i] += static_cast<T>(3.0);
+                    ptr[i*size.cols + i] += static_cast<T>(size.rows);//2.0);
                 }
                 // U * U' creates an SPD matrix
                 //cblas::TRMM<T>::call(size, temp.data, array);

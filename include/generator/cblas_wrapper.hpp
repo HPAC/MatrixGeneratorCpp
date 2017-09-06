@@ -110,7 +110,7 @@ namespace generator { namespace cblas {
 						const std::unique_ptr<double[]> & output)
 		{
 			cblas_dsyrk(CblasRowMajor, CblasUpper, CblasNoTrans, size.rows, size.rows,
-						1.0f, input.get(), size.rows, 0.0f, output.get(), size.rows);
+						1.0, input.get(), size.rows, 0.0, output.get(), size.rows);
 		}
 	};
 }}
