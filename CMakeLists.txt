@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 include(ExternalProject)
+include(CheckCXXCompilerFlag)
 
 project(linalg_tests)
 
@@ -30,6 +31,16 @@ option(WITH_TRACES "Enable trace generation by libraries" Off)
 set(LINK_LIBRARIES "")
 
 add_library(libtests INTERFACE)
+
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+    if (COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+        message(STATUS "Adding -march=native flag")
+        target_compile_options(libtests INTERFACE "-march=native")
+    else()
+        message(STATUS "The compiler does not support -march=native flag")
+    endif()
+endif()
 
 # Use cxx compile features for CMake >= 3.8
 if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
@@ -164,7 +175,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     #Warnings for GCC
     #Werror is not possible because we can't disable warning on enumerator comparison in
     #conditional expression which is shown for Eigen code
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif()
 
 # Our headers
