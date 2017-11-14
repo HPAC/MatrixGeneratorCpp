@@ -46,10 +46,11 @@ namespace generator { namespace property {
             uint32_t rows = shape.size.rows, cols = shape.size.cols;
             auto ptr = shape.data.get();
             for (uint32_t i = 0; i < rows; ++i) {
-                for (uint32_t j = 0; j < i; ++j)
+                uint32_t central_point = std::min(i, cols);
+                for (uint32_t j = 0; j < central_point; ++j)
                     ptr[cols * i + j] = static_cast<T>(0.0);
                 // from [i, i] until [i+1, 0] is reached
-                std::generate(ptr + cols * i + i,
+                std::generate(ptr + cols * i + central_point,
                     ptr + cols * (i + 1),
                     std::forward<F>(f)
                     );
