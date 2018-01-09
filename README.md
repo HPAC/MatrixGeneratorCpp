@@ -9,9 +9,10 @@ Supported libraries:
 - [Blaze](https://bitbucket.org/blaze-lib/blaze/) - tested with 3.0
 - [Armadillo](http://arma.sourceforge.net/) - tested with 7.5
 
-Supported matrix shapes: full, symmetric, upper/lower triangular, diagonal, banded (partial support)
+Supported matrix shapes: full, symmetric, upper/lower triangular (non-square as well), diagonal, banded (partial support)
+
 Support matrix properties: random, constant, symmetric positive-definite, orthogonal
 
 An example of configuring project with support for Blaze and Armadillo libraries:
 
-`cmake -DCMAKE_PREFIX_PATH="ARMADILLO_PATH;EIGEN_PATH;BLAZE_PATH" -DWITH_BLAZE=On -DWITH_ARMADILLO=On -DWITH_LAPACK=On
+`cmake -DCMAKE_PREFIX_PATH="ARMADILLO_PATH;EIGEN_PATH;BLAZE_PATH" -DWITH_BLAZE=On -DWITH_ARMADILLO=On -DWITH_LAPACK=On`
