@@ -46,7 +46,7 @@ namespace generator {
         };
 
         template<typename T>
-        struct blaze_matrix_type<T, ::generator::intermediate::upper_triangular<T>>
+        struct blaze_matrix_type<T, ::generator::intermediate::upper_triangular<T, true>>
         {
             typedef blaze::UpperMatrix< blaze::DynamicMatrix<T> > type;
 
@@ -55,9 +55,14 @@ namespace generator {
                 return type(rows, ptr);
             }
         };
+        
+        template<typename T>
+        struct blaze_matrix_type<T, ::generator::intermediate::upper_triangular<T, false>>
+            : blaze_matrix_type<T, ::generator::intermediate::general<T>>
+        {};
 
         template<typename T>
-        struct blaze_matrix_type<T, ::generator::intermediate::lower_triangular<T>>
+        struct blaze_matrix_type<T, ::generator::intermediate::lower_triangular<T, true>>
         {
             typedef blaze::LowerMatrix< blaze::DynamicMatrix<T> > type;
 
@@ -66,6 +71,11 @@ namespace generator {
                 return type(rows, ptr);
             }
         };
+        
+        template<typename T>
+        struct blaze_matrix_type<T, ::generator::intermediate::lower_triangular<T, false>>
+            : blaze_matrix_type<T, ::generator::intermediate::general<T>>
+        {};
 
         /// As long as we don't use block matrices,
         /// Hermitian and Symmetric in Blaze behaves identically for non-complex types

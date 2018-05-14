@@ -27,14 +27,16 @@ namespace generator { namespace shape {
     };
 
     template<uint32_t LowerBandwidth, uint32_t UpperBandwidth,
-            bool Symmetry = false, vector_type Vector = vector_type::none>
+            bool Symmetry = false, bool MustBeSquare = true,
+            vector_type Vector = vector_type::none>
     struct band
     {
         static constexpr uint32_t lower_bandwidth = LowerBandwidth;
         static constexpr uint32_t upper_bandwidth = UpperBandwidth;
         static constexpr bool symmetry = Symmetry;
+        static constexpr bool must_be_square = MustBeSquare;
         static constexpr vector_type vector = Vector;
-        typedef band<LowerBandwidth, UpperBandwidth, Symmetry, Vector> band_type;
+        typedef band<LowerBandwidth, UpperBandwidth, Symmetry, MustBeSquare, Vector> band_type;
     };
 
     struct self_adjoint
@@ -42,6 +44,7 @@ namespace generator { namespace shape {
         typedef band<
             std::numeric_limits<uint32_t>::max(),
             std::numeric_limits<uint32_t>::max(),
+            true,
             true,
             vector_type::none
         > band_type;
@@ -53,6 +56,7 @@ namespace generator { namespace shape {
             0,
             std::numeric_limits<uint32_t>::max(),
             false,
+            true,
             vector_type::none
         > band_type;
     };
@@ -63,6 +67,7 @@ namespace generator { namespace shape {
             std::numeric_limits<uint32_t>::max(),
             0,
             false,
+            true,
             vector_type::none
         > band_type;
     };
@@ -72,6 +77,7 @@ namespace generator { namespace shape {
         typedef band<
             1,
             1,
+            true,
             true,
             vector_type::none
         > band_type;
@@ -83,6 +89,7 @@ namespace generator { namespace shape {
             0,
             0,
             true,
+            true,
             vector_type::none
         > band_type;
     };
@@ -92,6 +99,7 @@ namespace generator { namespace shape {
         typedef band<
             0,
             0,
+            true,
             true,
             vector_type::row
         > band_type;
@@ -103,7 +111,19 @@ namespace generator { namespace shape {
             0,
             0,
             true,
+            true,
             vector_type::col
+        > band_type;
+    };
+    
+    struct not_square
+    {
+        typedef band<
+            std::numeric_limits<uint32_t>::max(),
+            std::numeric_limits<uint32_t>::max(),
+            false,
+            false,
+            vector_type::none
         > band_type;
     };
 
@@ -123,6 +143,7 @@ namespace generator { namespace shape {
             std::min(band_1::lower_bandwidth, band_2::lower_bandwidth),
             std::min(band_1::upper_bandwidth, band_2::upper_bandwidth),
             band_1::symmetry | band_2::symmetry,
+            band_1::must_be_square & band_2::must_be_square, 
             band_1::vector != vector_type::none ? band_1::vector : band_2::vector
         > type;
     };
@@ -146,6 +167,8 @@ namespace generator { namespace shape {
     struct is_shape_type<row_vector> : std::true_type {};
     template<>
     struct is_shape_type<col_vector> : std::true_type {};
+    template<>
+    struct is_shape_type<not_square> : std::true_type {};
 
     namespace detail {
 

@@ -38,7 +38,7 @@ namespace generator { namespace intermediate {
         }
     };
 
-    template<typename T>
+    template<typename T, bool MustBeSquare = true>
     struct upper_triangular : general<T>
     {
         upper_triangular(const shape::matrix_size & size_) :
@@ -46,7 +46,7 @@ namespace generator { namespace intermediate {
         {}
     };
 
-    template<typename T>
+    template<typename T, bool MustBeSquare = true>
     struct lower_triangular : general<T>
     {
         lower_triangular(const shape::matrix_size & size_) :
@@ -99,15 +99,16 @@ namespace generator { namespace intermediate {
     };
 
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector, typename = void>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, bool MustBeSquare, shape::vector_type Vector, typename = void>
     struct intermediate_selector;
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, bool MustBeSquare, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
+        MustBeSquare,
         Vector,
         typename std::enable_if<(LowerBandwidth > 0 && UpperBandwidth > 0 && Vector == shape::vector_type::none)>::type
     >
@@ -115,12 +116,13 @@ namespace generator { namespace intermediate {
         typedef typename std::conditional<Symmetry, self_adjoint<T>, general<T>>::type type;
     };
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, bool MustBeSquare, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
+        MustBeSquare,
         Vector,
         typename std::enable_if<(LowerBandwidth == 0 && UpperBandwidth == 0 && Vector == shape::vector_type::none)>::type
     >
@@ -128,38 +130,41 @@ namespace generator { namespace intermediate {
         typedef diagonal<T> type;
     };
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, bool MustBeSquare, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
+        MustBeSquare,
         Vector,
         typename std::enable_if<(LowerBandwidth == 0 && UpperBandwidth > 0 && Vector == shape::vector_type::none)>::type
     >
     {
-        typedef upper_triangular<T> type;
+        typedef upper_triangular<T, MustBeSquare> type;
     };
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, bool MustBeSquare, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
+        MustBeSquare,
         Vector,
         typename std::enable_if<(LowerBandwidth > 0 && UpperBandwidth == 0 && Vector == shape::vector_type::none)>::type
     >
     {
-        typedef lower_triangular<T> type;
+        typedef lower_triangular<T, MustBeSquare> type;
     };
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, bool MustBeSquare, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
+        MustBeSquare,
         Vector,
         typename std::enable_if<(Vector == shape::vector_type::row)>::type
     >
@@ -167,12 +172,13 @@ namespace generator { namespace intermediate {
         typedef row_vector<T> type;
     };
 
-    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, shape::vector_type Vector>
+    template<typename T, uint32_t LowerBandwidth, uint32_t UpperBandwidth, bool Symmetry, bool MustBeSquare, shape::vector_type Vector>
     struct intermediate_selector<
         T,
         LowerBandwidth,
         UpperBandwidth,
         Symmetry,
+        MustBeSquare,
         Vector,
         typename std::enable_if<(Vector == shape::vector_type::col)>::type
     >
