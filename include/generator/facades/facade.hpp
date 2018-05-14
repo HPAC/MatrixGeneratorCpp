@@ -31,15 +31,20 @@ namespace generator { namespace detail {
         typedef std::uniform_real_distribution<T> distr_t;
 
         //Mersenne Twister RNG
-        std::mt19937 rng;
+        std::mt19937 rng_;
         distr_t distribution;
     public:
 
         generator_facade(uint32_t seed) :
-                rng(seed),
+                rng_(seed),
                 distribution(-1, 1)
         {
 
+        }
+
+        std::mt19937 & rng()
+        {
+            return rng_;
         }
 
         template<typename... Properties>
@@ -66,7 +71,7 @@ namespace generator { namespace detail {
             intermediate_t matrix{size};
             property_t::fill(matrix,
                     [&]() {
-                        return distribution(rng);
+                        return distribution(rng_);
                     },
                     std::forward<Properties>(properties)...
                 );

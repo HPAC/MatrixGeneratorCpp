@@ -9,7 +9,7 @@
 #include <generator/shape.hpp>
 #include <generator/property.hpp>
 #include <generator/properties/properties.hpp>
-//FIXME: create header for all facades
+
 #ifdef HAVE_BLAZE
 #include <generator/facades/blaze.hpp>
 #endif
