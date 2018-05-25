@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/HPAC/MatrixGeneratorCpp.svg?branch=master)](https://travis-ci.org/mcopik/MatrixGeneratorCpp)
+[![Build Status](https://travis-ci.org/HPAC/MatrixGeneratorCpp.svg?branch=master)](https://travis-ci.org/HPAC/MatrixGeneratorCpp)
 
 Requirements:
 - a C++14 compiler - currently tested against recent versions of GCC and Clang
