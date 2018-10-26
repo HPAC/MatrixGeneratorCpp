@@ -37,7 +37,7 @@ namespace generator { namespace detail {
 
         generator_facade(uint32_t seed) :
                 rng_(seed),
-                distribution(-1, 1)
+                distribution(1, 2)
         {
 
         }
