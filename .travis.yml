@@ -13,9 +13,6 @@ addons:
       - clang-4.0
       - libboost-all-dev
       - liblapack-dev
-#cache:
-  #directories:
-      #  - "deps/blaze/install"
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-6"; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-4.0"; fi
@@ -28,13 +25,6 @@ install:
   - pushd .
   - mkdir -p deps
   - cd deps
-  - if [ ! -d "blaze" ]; then export BUILD_BLAZE="yes"; else export BUILD_BLAZE="no"; fi
-  - if [ "$BUILD_BLAZE" == "yes" ]; then mkdir blaze && cd blaze && git clone https://bitbucket.org/blaze-lib/blaze.git && mkdir build && mkdir install; fi
-  - if [ "$BUILD_BLAZE" == "yes" ]; then cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../blaze && cmake --build . --target install && cd ../install; fi
-  - if [ "$BUILD_BLAZE" == "no" ]; then cd blaze/install ; fi
-  - export BLAZE_ROOT="$(pwd)"
-  - popd
-  - pushd .
   - if [ ! -d "eigen" ]; then export BUILD_EIGEN="yes"; else export BUILD_EIGEN="no"; fi
   - if [ "$BUILD_EIGEN" == "yes" ]; then mkdir eigen && cd eigen && hg clone https://bitbucket.org/eigen/eigen/ && mkdir build && mkdir install; fi
   - if [ "$BUILD_EIGEN" == "yes" ]; then cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../eigen && cmake --build . --target install && cd ../install; fi
@@ -43,7 +33,7 @@ install:
   - popd
   - pushd .
   - if [ ! -d "armadillo" ]; then export BUILD_ARMA="yes"; else export BUILD_ARMA="no"; fi
-  - if [ "$BUILD_ARMA" == "yes" ]; then mkdir armadillo && cd armadillo && git clone https://github.com/conradsnicta/armadillo-code/ arma && cd arma && git checkout origin/7.960.x && cd ..; fi
+  - if [ "$BUILD_ARMA" == "yes" ]; then mkdir armadillo && cd armadillo && git clone https://github.com/conradsnicta/armadillo-code/ arma && cd arma && git checkout origin/9.200.x && cd ..; fi
   - if [ "$BUILD_ARMA" == "yes" ]; then mkdir build && mkdir install && cd build && cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/../install ../arma && cmake --build . --target install && cd ../install; fi
   - if [ "$BUILD_ARMA" == "no" ]; then cd armadillo/install; fi
   - export ARMADILLO_ROOT="$(pwd)"
@@ -51,12 +41,11 @@ install:
 
 script:
   - mkdir build && cd build
-  - cmake -DWITH_ARMADILLO=On -DWITH_BLAZE=On -DWITH_EIGEN=On -DWITH_EXAMPLES=On -DWITH_TESTS=On -DWITH_BLAS=On -DWITH_LAPACK=On -DCMAKE_PREFIX_PATH="$EIGEN_ROOT;$ARMADILLO_ROOT" ../MatrixGeneratorCpp
-
+  - cmake -DWITH_ARMADILLO=On -DWITH_EIGEN=On -DWITH_EXAMPLES=On -DWITH_TESTS=On -DWITH_BLAS=On -DWITH_LAPACK=On -DCMAKE_PREFIX_PATH="$EIGEN_ROOT;$ARMADILLO_ROOT" ../MatrixGeneratorCpp
   - VERBOSE=1 cmake --build .
   - ctest -VV
 
 notifications:
   email:
     on_success: never
-    on_failure: always
+    on_failure: never

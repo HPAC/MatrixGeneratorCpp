@@ -16,11 +16,10 @@ option(TESTS_FORCE_BUILD "Build Gtest" Off)
 option(WITH_BLAS "Build with BLAS" Off)
 option(WITH_LAPACK "Build with LAPACK" Off)
 
-option(WITH_BLAZE "Use Blaze library")
 option(WITH_EIGEN "Use Eigen3 library")
 option(WITH_EIGEN_DIAGONAL_MATRIX "" Off)
-option(WITH_ARMADILLO "Use Blaze library")
-option(WITH_MTL4 "Use Blaze library")
+option(WITH_ARMADILLO "Use Armadillo library")
+option(WITH_MTL4 "Use MTL4 library")
 
 option(WITH_MKL "Use Intel MKL" Off)
 option(WITH_MULTITHREADING "Enable parallelization inside linked libraries" Off)
@@ -44,17 +43,9 @@ endif()
 
 # Use cxx compile features for CMake >= 3.8
 if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
-    if(${WITH_BLAZE})
-        set(CMAKE_CXX_STANDARD 14)
-    else()
-        set(CMAKE_CXX_STANDARD 11)
-    endif()
+    set(CMAKE_CXX_STANDARD 11)
 else()
-    if(${WITH_BLAZE})
-        target_compile_features(libtests INTERFACE cxx_std_14)
-    else()
-        target_compile_features(libtests INTERFACE cxx_std_11)
-    endif()
+    target_compile_features(libtests INTERFACE cxx_std_11)
 endif()
 
 # Setup BLAS and LAPACK finders to find MKL
@@ -108,7 +99,7 @@ if(${WITH_ARMADILLO})
     find_package(Armadillo REQUIRED)
     target_include_directories(libtests INTERFACE ${ARMADILLO_INCLUDE_DIRS})
     target_link_libraries(libtests INTERFACE ${ARMADILLO_LIBRARIES})
-    
+
     target_compile_definitions(libtests INTERFACE HAVE_ARMADILLO)
     target_compile_definitions(libtests INTERFACE $<$<CONFIG:RELEASE>:ARMA_NO_DEBUG>)
 endif()
@@ -136,29 +127,6 @@ if(${WITH_MTL4})
     add_definitions(-DHAVE_MTL4)
 endif()
 
-#Blaze
-if(${WITH_BLAZE})
-    find_package(blaze CONFIG REQUIRED)
-    target_compile_definitions(libtests INTERFACE HAVE_BLAZE)
-    # For future dependencies on imported targets
-    #target_include_directories(libtests INTERFACE $<TARGET_PROPERTY:blaze::blaze,INTERFACE_INCLUDE_DIRECTORIES>)
-    if(${GENERATE_RELOCATABLE_TARGETS})
-        target_link_libraries(libtests INTERFACE blaze::blaze)
-    else()
-        # one can't use generator expressions for exported targets - use has to find blaze target
-        get_target_property(BLAZE_INCLUDE blaze::blaze INTERFACE_INCLUDE_DIRECTORIES)
-        target_include_directories(libtests INTERFACE ${BLAZE_INCLUDE})
-    endif()
-
-    if(${WITH_MKL})
-        # Otherwise Blaze would not compile
-        target_compile_definitions(libtests INTERFACE BLAZE_BLAS_INCLUDE_FILE=<mkl_cblas.h>)
-    endif()
-
-    if(${WITH_TRACES})
-        target_compile_definitions(libtests INTERFACE BLAZE_USE_FUNCTION_TRACES=1)
-    endif()
-endif()
 
 #Warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
