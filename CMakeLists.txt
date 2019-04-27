@@ -10,19 +10,15 @@ project(linalg_tests)
 #Question is: should we have two targets, one to install and one for examples/tests
 cmake_policy(SET CMP0041 OLD)
 
-option(WITH_EXAMPLES "Build examples" Off)
-option(WITH_TESTS "Build tests" Off)
-option(TESTS_FORCE_BUILD "Build Gtest" Off)
-option(WITH_BLAS "Build with BLAS" Off)
-option(WITH_LAPACK "Build with LAPACK" Off)
+option(WITH_EXAMPLES "Build examples"  On)
+option(WITH_BLAS     "Build with BLAS" On)
+option(WITH_LAPACK "Build with LAPACK" On)
 
-option(WITH_BLAZE "Use Blaze library")
-option(WITH_EIGEN "Use Eigen3 library")
-option(WITH_EIGEN_DIAGONAL_MATRIX "" Off)
-option(WITH_ARMADILLO "Use Blaze library")
-option(WITH_MTL4 "Use Blaze library")
+option(WITH_EIGEN "Use Eigen3 library" On)
+option(WITH_EIGEN_DIAGONAL_MATRIX ""   On)
+option(WITH_ARMADILLO "Use Armadillo library" On)
 
-option(WITH_MKL "Use Intel MKL" Off)
+option(WITH_MKL "Use Intel MKL"        On)
 option(WITH_MULTITHREADING "Enable parallelization inside linked libraries" Off)
 
 option(GENERATE_RELOCATABLE_TARGETS "" Off)
@@ -44,17 +40,9 @@ endif()
 
 # Use cxx compile features for CMake >= 3.8
 if(${CMAKE_VERSION} VERSION_LESS "3.8.0")
-    if(${WITH_BLAZE})
-        set(CMAKE_CXX_STANDARD 14)
-    else()
-        set(CMAKE_CXX_STANDARD 11)
-    endif()
+    set(CMAKE_CXX_STANDARD 14)
 else()
-    if(${WITH_BLAZE})
-        target_compile_features(libtests INTERFACE cxx_std_14)
-    else()
-        target_compile_features(libtests INTERFACE cxx_std_11)
-    endif()
+    target_compile_features(libtests INTERFACE cxx_std_14)
 endif()
 
 # Setup BLAS and LAPACK finders to find MKL
@@ -129,37 +117,6 @@ if(${WITH_EIGEN})
     endif()
 endif()
 
-#MTL4
-if(${WITH_MTL4})
-    find_package(MTL CONFIG REQUIRED)
-    include_directories(${MTL_INCLUDE_DIRS})
-    add_definitions(-DHAVE_MTL4)
-endif()
-
-#Blaze
-if(${WITH_BLAZE})
-    find_package(blaze CONFIG REQUIRED)
-    target_compile_definitions(libtests INTERFACE HAVE_BLAZE)
-    # For future dependencies on imported targets
-    #target_include_directories(libtests INTERFACE $<TARGET_PROPERTY:blaze::blaze,INTERFACE_INCLUDE_DIRECTORIES>)
-    if(${GENERATE_RELOCATABLE_TARGETS})
-        target_link_libraries(libtests INTERFACE blaze::blaze)
-    else()
-        # one can't use generator expressions for exported targets - use has to find blaze target
-        get_target_property(BLAZE_INCLUDE blaze::blaze INTERFACE_INCLUDE_DIRECTORIES)
-        target_include_directories(libtests INTERFACE ${BLAZE_INCLUDE})
-    endif()
-
-    if(${WITH_MKL})
-        # Otherwise Blaze would not compile
-        target_compile_definitions(libtests INTERFACE BLAZE_BLAS_INCLUDE_FILE=<mkl_cblas.h>)
-    endif()
-
-    if(${WITH_TRACES})
-        target_compile_definitions(libtests INTERFACE BLAZE_USE_FUNCTION_TRACES=1)
-    endif()
-endif()
-
 #Warnings
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     #Warnins for Clang/AppleClang
@@ -197,31 +154,3 @@ install(EXPORT LibTestsConfig
 if(${WITH_EXAMPLES})
     add_subdirectory(examples)
 endif(${WITH_EXAMPLES})
-
-################################
-# GTest
-################################
-if(${WITH_TESTS})
-
-    enable_testing()
-    find_package(GTest)
-    if(GTEST_FOUND AND ${TESTS_FORCE_BUILD})
-        include_directories(${GTEST_INCLUDE_DIRS})
-        set(GTEST_LINK_FLAGS ${GTEST_BOTH_LIBRARIES} -lpthread)
-    else()
-        # don't update automatically
-        ExternalProject_Add(googletest
-            GIT_REPOSITORY https://github.com/google/googletest.git
-            CMAKE_ARGS -DBUILD_GTEST=On
-            PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
-            UPDATE_DISCONNECTED 1
-            INSTALL_COMMAND "")
-        ExternalProject_Get_Property(googletest source_dir binary_dir)
-        include_directories(${source_dir}/googletest/include/)
-        set(GTEST_LINK_FLAGS ${binary_dir}/googlemock/gtest/libgtest.a ${binary_dir}/googlemock/gtest/libgtest_main.a -lpthread CACHE STRING "GTest link flags" FORCE)
-        # for local build one has to make tests dependent on the external project
-        set(GTEST_DEPENDENCY googletest)
-    endif(GTEST_FOUND AND ${TESTS_FORCE_BUILD})
-
-    add_subdirectory(tests)
-endif(${WITH_TESTS})
