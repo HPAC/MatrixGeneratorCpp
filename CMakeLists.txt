@@ -15,7 +15,7 @@ option(WITH_BLAS     "Build with BLAS" On)
 option(WITH_LAPACK "Build with LAPACK" On)
 
 option(WITH_EIGEN "Use Eigen3 library" On)
-option(WITH_EIGEN_DIAGONAL_MATRIX ""   On)
+option(WITH_EIGEN_DIAGONAL_MATRIX ""   Off)
 option(WITH_ARMADILLO "Use Armadillo library" On)
 
 option(WITH_MKL "Use Intel MKL"        On)
@@ -96,7 +96,7 @@ if(${WITH_ARMADILLO})
     find_package(Armadillo REQUIRED)
     target_include_directories(libtests INTERFACE ${ARMADILLO_INCLUDE_DIRS})
     target_link_libraries(libtests INTERFACE ${ARMADILLO_LIBRARIES})
-    
+
     target_compile_definitions(libtests INTERFACE HAVE_ARMADILLO)
     target_compile_definitions(libtests INTERFACE $<$<CONFIG:RELEASE>:ARMA_NO_DEBUG>)
 endif()
