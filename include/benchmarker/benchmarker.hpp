@@ -58,6 +58,7 @@ class basic_benchmarker {
   basic_benchmarker()
       : cache_trash(nullptr)
   {
+    this->set_cache_size(7500000);
   }
 
   void set_cache_size(int l3_size)
@@ -116,7 +117,7 @@ class basic_benchmarker {
     if (cache_trash) {
       std::for_each(cache_trash.get(), cache_trash.get() + trash_size,
           [](double& val) {
-            val += 0.01;
+            val += 0.0001;
           });
     }
   }
