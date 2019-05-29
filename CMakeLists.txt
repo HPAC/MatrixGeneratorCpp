@@ -9,6 +9,7 @@ project(linalg_tests)
 #passed to locate dependent libraries
 #Question is: should we have two targets, one to install and one for examples/tests
 cmake_policy(SET CMP0041 OLD)
+set( CMAKE_VERBOSE_MAKEFILE on )
 
 option(WITH_EXAMPLES "Build examples"  On)
 option(WITH_BLAS     "Build with BLAS" On)
@@ -19,7 +20,7 @@ option(WITH_EIGEN_DIAGONAL_MATRIX ""   Off)
 option(WITH_ARMADILLO "Use Armadillo library" On)
 
 option(WITH_MKL "Use Intel MKL"        On)
-option(WITH_MULTITHREADING "Enable parallelization inside linked libraries" Off)
+option(WITH_MULTITHREADING "Enable parallelization inside linked libraries" On)
 
 option(GENERATE_RELOCATABLE_TARGETS "" Off)
 option(WITH_TRACES "Enable trace generation by libraries" Off)
