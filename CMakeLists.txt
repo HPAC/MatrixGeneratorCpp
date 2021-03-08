@@ -75,7 +75,8 @@ if(${WITH_LAPACK})
     target_compile_definitions(libtests INTERFACE HAVE_LAPACK)
     target_compile_options(libtests INTERFACE ${LAPACK_LINKER_FLAGS})
     target_link_libraries(libtests INTERFACE ${LAPACK_LIBRARIES})
-
+    target_include_directories(libtests INTERFACE $ENV{MKLROOT}/include)
+    
     # Neither BLAS nor LAPACK find modules export include directories
     # Eigen, on the other hand, uses mkl.h and we use mkl_cblas.h
     # This code assumes that MKL has a main directory with include/
